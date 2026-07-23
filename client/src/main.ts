@@ -5,13 +5,14 @@ import { diff } from 'ohash';
 import { createPinia } from 'pinia';
 import { polyfill as SeamlessScrollPolyfill } from 'seamless-scroll-polyfill';
 import { useRegisterSW } from 'virtual:pwa-register/vue';
-import { createApp } from 'vue';
+import { createApp, watch } from 'vue';
 import VueVirtualScroller from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 import App from '@/App.vue';
 import Message from '@/message';
 import FloatingVue from '@/plugins/floating-vue';
+import i18n, { setLanguage } from '@/plugins/i18n';
 import vuetify from '@/plugins/vuetify';
 import router from '@/router';
 import OfflineVideos from '@/services/OfflineVideos';
@@ -45,6 +46,10 @@ app.use(createPinia());
 
 // Iconify (アイコン) のグローバルコンポーネントを登録
 app.component('Icon', Icon);
+
+// vue-i18n を使う
+// Vuetify のロケールアダプターが useI18n() を参照するため、必ず Vuetify より先に登録する必要がある
+app.use(i18n);
 
 // Vue Router を使う
 app.use(router);
@@ -104,6 +109,14 @@ const { updateServiceWorker } = useRegisterSW({
 // 設定データの変更を監視する
 // Pinia の $subscribe() は app.mount() の後に呼び出す必要がある
 const settings_store = useSettingsStore();
+
+// 表示言語の設定変更を監視し、変更があれば即座に UI 全体のロケールを切り替える
+// 初回描画時のロケールは plugins/i18n.ts が LocalStorage から直接読み出して適用済みだが、
+// 設定同期による更新や設定画面での変更にも追従できるよう、ここで immediate 付きで監視する
+watch(() => settings_store.settings.language, (language) => {
+    setLanguage(language);
+}, { immediate: true });
+
 let is_updating_watched_history = false;
 settings_store.$subscribe(async () => {
 

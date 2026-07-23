@@ -76,6 +76,7 @@ class ClientSettings(BaseModel):
         '福祉': 'White',
         'その他': 'White',
     }
+    # language: 同期無効
     show_player_background_image: bool = True
     use_pure_black_player_background: bool = False
     tv_channel_sort_by_jikkyo_force: bool = False

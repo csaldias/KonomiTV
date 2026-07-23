@@ -1,16 +1,24 @@
 
 import 'vuetify/styles';
 import '@/styles/materialdesignicons.min.css';
+import { useI18n } from 'vue-i18n';
 import { createVuetify } from 'vuetify';
-import { ja } from 'vuetify/locale';
+import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n';
+
+import i18n from '@/plugins/i18n';
 
 
 // ref: https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 const vuetify = createVuetify({
+    // Vuetify 標準コンポーネントの文言のロケールを、vue-i18n アダプター経由で vue-i18n 側に一元化する
+    // これにより、表示言語を切り替えたときに Vuetify 標準コンポーネントの文言も自動的に追従する
+    // ($vuetify 名前空間の翻訳は plugins/i18n.ts のメッセージカタログにマージ済み)
     locale: {
-        locale: 'ja',
-        fallback: 'ja',
-        messages: { ja },
+        // createVueI18nAdapter() は緩く型付けされた I18n<any, ...> を期待するが、vue-i18n は
+        // メッセージカタログから厳密なスキーマ型を推論するため、そのまま渡すと型が合致せず
+        // TS2589 (型のインスタンス化が深すぎる) も発生する。これは Vuetify アダプター側のジェネリクス
+        // 制約による既知の齟齬で、実行時には全く問題がないため、ここでのみ any キャストで吸収している
+        adapter: createVueI18nAdapter({ i18n: i18n as any, useI18n }),
     },
     theme: {
         defaultTheme: 'dark',
