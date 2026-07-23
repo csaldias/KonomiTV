@@ -6,19 +6,19 @@
                 <Icon icon="fluent:chevron-left-12-filled" width="27px" />
             </a>
             <Icon icon="fa-brands:twitter" width="22px" />
-            <span class="ml-3">Twitter / Bluesky 連携</span>
+            <span class="ml-3">{{ $t('settings.twitter.title') }}</span>
         </h2>
         <div class="settings__content" :class="{'settings__content--loading': is_loading}">
             <div class="twitter-accounts">
                 <div class="twitter-accounts__heading" v-if="has_linked_accounts">
-                    <Icon icon="fluent:person-board-20-filled" class="mr-2" height="30" />連携中のアカウント
+                    <Icon icon="fluent:person-board-20-filled" class="mr-2" height="30" />{{ $t('settings.twitter.linked_heading') }}
                 </div>
                 <div class="twitter-accounts__guide" v-if="has_no_linked_accounts">
                     <Icon class="flex-shrink-0" icon="fa-brands:twitter" width="45px" />
                     <div class="ml-4">
-                        <div class="font-weight-bold text-h6">Twitter / Bluesky アカウントと連携していません</div>
+                        <div class="font-weight-bold text-h6">{{ $t('settings.twitter.guide_no_link_title') }}</div>
                         <div class="text-text-darken-1 text-subtitle-2 mt-1">
-                            Twitter / Bluesky アカウントと連携すると、テレビを見ながらキャプ付きで実況ツイートしたり、ほかの実況ツイートをリアルタイムで表示できるようになります。
+                            {{ $t('settings.twitter.guide_no_link_description') }}
                         </div>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     </div>
                     <v-btn class="twitter-account__logout ml-auto" width="124" height="52" variant="flat"
                         @click="logoutTwitterAccount(twitter_account.screen_name)">
-                        <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="24" />連携解除
+                        <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.logout_button') }}
                     </v-btn>
                 </div>
                 <div class="twitter-account"
@@ -63,107 +63,67 @@
                     </div>
                     <v-btn class="twitter-account__logout ml-auto" width="124" height="52" variant="flat"
                         @click="logoutBlueskyAccount(bluesky_account.handle)">
-                        <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="24" />連携解除
+                        <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.logout_button') }}
                     </v-btn>
                 </div>
                 <v-btn class="twitter-account__login" color="secondary" max-width="300" height="50" variant="flat"
                     @click="loginTwitterAccountWithCookieForm()">
-                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="24" />連携する Twitter アカウントを追加
+                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.add_twitter_button') }}
                 </v-btn>
                 <v-btn class="twitter-account__login twitter-account__login--bluesky" color="secondary" max-width="300" height="50" variant="flat"
                     @click="loginBlueskyAccountWithAppPasswordForm()">
-                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="24" />連携する Bluesky アカウントを追加
+                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.add_bluesky_button') }}
                 </v-btn>
                 <v-dialog max-width="740" v-model="twitter_cookie_auth_dialog">
                     <v-card>
-                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">連携する Twitter アカウントを追加</v-card-title>
+                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('settings.twitter.cookie_dialog.title') }}</v-card-title>
                         <v-card-text class="pt-2 pb-0">
-                            <p>
-                                2023年7月以降、<a class="link" href="https://www.watch.impress.co.jp/docs/news/1475575.html" target="_blank">Twitter のサードパーティー API の有料化（個人向け API の事実上廃止）</a> により、従来の連携方法では KonomiTV から Twitter にアクセスできなくなりました。
-                            </p>
-                            <p class="mt-1">
-                                そこで KonomiTV では、<strong><a class="link" href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Chrome 拡張機能「GET cookies.txt LOCALLY」</a> を使い、ブラウザから Netscape 形式でエクスポートした、<a class="link" href="https://x.com/" target="_blank">Web 版 Twitter</a> の Cookie データによる Twitter 連携に対応しています。</strong>
-                            </p>
-                            <p class="mt-2">
-                                <strong>ここで入力した Cookie データは、ローカルの KonomiTV サーバーにのみ、暗号化の上で保存されます。</strong><br>
-                                Cookie データが Twitter API 以外の外部サービスに送信されることは一切ありません。<br>
-                                Cookie を取得した際に使ったブラウザと同じブラウザで操作することを強く推奨します。
-                            </p>
-                            <p class="mt-1">
-                                <strong>詳しい手順はこちら：<a class="link" href="https://github.com/tsukumijima/KonomiTV#twitter-実況機能について" target="_blank">KonomiTV への Twitter アカウント連携の手順</a></strong>
-                            </p>
-                            <blockquote class="mt-3">
-                                ⚠️ 不審判定されないよう様々な技術的対策を施してはいますが、<strong>非公式な方法で無理やり実装しているため、今後の Twitter の仕様変更や不審判定基準の変更により、アカウントがロック・凍結される可能性も否定できません。</strong>自己の責任のもとでご利用ください。<br>
-                                <p class="mt-2">
-                                    <strong>📢 レート制限緩和のため、なるべく <a class="link" href="https://x.com/i/premium_sign_up" target="_blank">X Premium</a> に課金済みのアカウントでの利用をおすすめします。</strong><br>
-                                    また、万が一の凍結リスクに備え、<strong>実況専用に作成したサブアカウントでの連携をおすすめします。</strong>
-                                </p>
-                            </blockquote>
-                            <blockquote class="mt-3">
-                                📢 v0.13.0 以降では、<strong><a class="link" href="https://github.com/tsukumijima/KonomiTV/blob/master/server/app/utils/TwitterScrapeBrowser.py" target="_blank">ヘッドレスブラウザ（ウインドウが表示されないブラウザ）を使って</a> 、<a class="link" href="https://github.com/tsukumijima/KonomiTV/blob/master/server/static/zendriver_setup.js" target="_blank">Web 版 Twitter からの API コールと全く同じ方法で API リクエストを送る</a> ように改良しました！</strong><br>
-                                <p class="mt-1">
-                                    これまで不審判定されないよう <a class="link" href="https://github.com/tsukumijima/tweepy-authlib" target="_blank">様々な技術的対策</a> を施してきましたが、2025年11月に KonomiTV と同様の方法で Twitter API にアクセスしていた <a class="link" href="https://arkxv.com/blog/x-suspended/" target="_blank">OldTweetDeck のユーザーが一時的に大量凍結される騒動</a> (<a class="link" href="https://github.com/dimdenGD/OldTweetDeck/issues/459#issuecomment-3499066798" target="_blank">詳細</a>) が起きたことを踏まえ、より堅牢で安全なアプローチに切り替えました。<br>
-                                </p>
-                                <p class="mt-2">
-                                    <strong>この関係で、Twitter 実況機能を使うには、KonomiTV サーバー側に <a class="link" href="https://www.google.com/chrome/" target="_blank">Google Chrome</a> または <a class="link" href="https://brave.com/ja/" target="_blank">Brave</a> がインストールされている必要があります。</strong>なお、Linux (Docker) 環境では既に Docker イメージに含まれているため不要です。また、Twitter 実況機能を使わないならインストールする必要はありません。
-                                </p>
-                                <p class="mt-2">
-                                    ヘッドレスブラウザは、視聴画面で Twitter パネル内の各機能を使うときにバックグラウンドで自動的に起動し、使わなくなったら自動終了します。Twitter 実況機能が使われない場合には起動しません。
-                                </p>
-                            </blockquote>
+                            <div v-html="$t('settings.twitter.cookie_dialog.body')"></div>
                             <v-form class="settings__item" ref="twitter_form" @submit.prevent>
                                 <v-textarea class="settings__item-form mt-4" style="height: 200px !important;" color="primary" variant="outlined"
-                                    label='Cookie (Netscape cookies.txt 形式)'
-                                    placeholder='まず Chrome 拡張機能「Get cookies.txt LOCALLY」を PC 版 Chrome にインストールします。次に Chrome の「シークレットウインドウ」で Web 版 Twitter を開き、連携したいアカウントにのみログインします。ログインできたら、Web 版 Twitter を開いているタブで Chrome 拡張機能「Get cookies.txt LOCALLY」を起動します。その後、[Export Format:] が [Netscape] になっていることを確認してから [Copy] ボタンを押し、クリップボードにコピーされた x.com の Cookie データをこのフォームに貼り付けてください。'
+                                    :label="$t('settings.twitter.cookie_dialog.cookie_label')"
+                                    :placeholder="$t('settings.twitter.cookie_dialog.cookie_placeholder')"
                                     v-model="twitter_cookie"
                                     :density="is_form_dense ? 'compact' : 'default'"
-                                    :rules="[(value) => {
-                                        if (!value) return 'Cookie を入力してください。';
-                                        return true;
-                                    }]">
+                                    :rules="[(value: string) => !value ? $t('settings.twitter.validation.cookie_required') : true]">
                                 </v-textarea>
                             </v-form>
                         </v-card-text>
                         <v-card-actions class="pt-0 px-6 pb-6">
                             <v-spacer></v-spacer>
-                            <v-btn color="text" variant="text" height="40" @click="twitter_cookie_auth_dialog = false">キャンセル</v-btn>
+                            <v-btn color="text" variant="text" height="40" @click="twitter_cookie_auth_dialog = false">{{ $t('settings.twitter.cookie_dialog.cancel') }}</v-btn>
                             <v-btn color="secondary" variant="flat" height="40" class="px-4" @click="loginTwitterAccountWithCookie()">
-                                <Icon icon="fa:sign-in" class="mr-2" height="17px" />ログイン
+                                <Icon icon="fa:sign-in" class="mr-2" height="17px" />{{ $t('settings.twitter.cookie_dialog.login') }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
                 <v-dialog max-width="590" v-model="bluesky_auth_dialog">
                     <v-card>
-                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">連携する Bluesky アカウントを追加</v-card-title>
+                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('settings.twitter.bluesky_dialog.title') }}</v-card-title>
                         <v-card-text class="pt-2 pb-0">
-                            <p>
-                                Bluesky で <a class="link" href="https://bsky.app/settings/app-passwords" target="_blank">App Password</a> を発行し、Bluesky ハンドルと一緒に入力してください。
-                            </p>
-                            <p class="mt-1">
-                                ここで入力された App Password は保存されません。ログイン後に、atproto SDK のセッション文字列だけを、ローカルの KonomiTV サーバーに暗号化して保存します。
-                            </p>
+                            <div v-html="$t('settings.twitter.bluesky_dialog.body')"></div>
                             <v-form class="settings__item" ref="bluesky_form" @submit.prevent>
                                 <v-text-field class="settings__item-form mt-6" color="primary" variant="outlined"
-                                    label="Bluesky ハンドル" placeholder="example.bsky.social"
+                                    :label="$t('settings.twitter.bluesky_dialog.handle_label')" placeholder="example.bsky.social"
                                     v-model="bluesky_handle" :density="is_form_dense ? 'compact' : 'default'"
                                     :rules="[validateBlueskyHandle]">
                                 </v-text-field>
                                 <v-text-field class="settings__item-form mt-3" color="primary" variant="outlined"
-                                    label="App Password" placeholder="xxxx-xxxx-xxxx-xxxx"
+                                    :label="$t('settings.twitter.bluesky_dialog.app_password_label')" placeholder="xxxx-xxxx-xxxx-xxxx"
                                     v-model="bluesky_app_password" :density="is_form_dense ? 'compact' : 'default'"
                                     :type="bluesky_app_password_showing ? 'text' : 'password'"
                                     :append-inner-icon="bluesky_app_password_showing ? 'mdi-eye' : 'mdi-eye-off'"
                                     @click:appendInner="bluesky_app_password_showing = !bluesky_app_password_showing"
-                                    :rules="[(value) => { if (!value) return 'App Password を入力してください。'; return true; }]">
+                                    :rules="[(value: string) => !value ? $t('settings.twitter.validation.app_password_required') : true]">
                                 </v-text-field>
                             </v-form>
                         </v-card-text>
                         <v-card-actions class="pt-0 px-6 pb-6">
                             <v-spacer></v-spacer>
-                            <v-btn color="text" variant="text" height="40" @click="closeBlueskyAuthDialog()">キャンセル</v-btn>
+                            <v-btn color="text" variant="text" height="40" @click="closeBlueskyAuthDialog()">{{ $t('settings.twitter.bluesky_dialog.cancel') }}</v-btn>
                             <v-btn color="secondary" variant="flat" height="40" class="px-4" @click="loginBlueskyAccountWithAppPassword()">
-                                <Icon icon="fa:sign-in" class="mr-2" height="17px" />ログイン
+                                <Icon icon="fa:sign-in" class="mr-2" height="17px" />{{ $t('settings.twitter.bluesky_dialog.login') }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -171,14 +131,14 @@
             </div>
             <div class="twitter-accounts mt-6">
                 <div class="twitter-accounts__heading">
-                    <Icon icon="fluent:link-20-filled" class="mr-2" height="28" />紐付け中の Twitter / Bluesky アカウント
+                    <Icon icon="fluent:link-20-filled" class="mr-2" height="28" />{{ $t('settings.twitter.account_link_heading') }}
                 </div>
                 <div class="twitter-accounts__guide mt-4" v-if="userStore.user === null || userStore.user.account_links.length === 0">
                     <Icon class="flex-shrink-0" icon="fluent:link-20-filled" width="45px" />
                     <div class="ml-4">
-                        <div class="font-weight-bold text-h6">紐付け中の Twitter / Bluesky アカウントはありません</div>
+                        <div class="font-weight-bold text-h6">{{ $t('settings.twitter.account_link_guide_title') }}</div>
                         <div class="text-text-darken-1 text-subtitle-2 mt-1">
-                            Twitter と Bluesky のアカウントを紐付けると、視聴画面で両方のタイムラインをまとめて表示し、両方に同時に実況ツイートを投稿できます。
+                            {{ $t('settings.twitter.account_link_guide_description') }}
                         </div>
                     </div>
                 </div>
@@ -202,129 +162,96 @@
                     </div>
                     <v-btn class="twitter-account__logout ml-auto" width="124" height="52" variant="flat"
                         @click="deleteAccountLink(account_link.id)">
-                        <Icon icon="fluent:link-dismiss-20-filled" class="mr-2" height="24" />紐付け解除
+                        <Icon icon="fluent:link-dismiss-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.unlink_button') }}
                     </v-btn>
                 </div>
                 <v-btn class="twitter-account__login" color="secondary" max-width="330" height="50" variant="flat"
                     :disabled="account_link_twitter_items.length === 0 || account_link_bluesky_items.length === 0"
                     @click="account_link_dialog = true">
-                    <Icon icon="fluent:link-add-20-filled" class="mr-2" height="24" />紐付けを追加
+                    <Icon icon="fluent:link-add-20-filled" class="mr-2" height="24" />{{ $t('settings.twitter.add_link_button') }}
                 </v-btn>
                 <v-dialog max-width="560" v-model="account_link_dialog">
                     <v-card>
-                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">Twitter と Bluesky のアカウントを紐付ける</v-card-title>
+                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('settings.twitter.account_link_dialog.title') }}</v-card-title>
                         <v-card-text class="pt-2 pb-0">
                             <v-select class="settings__item-form mt-4" color="primary" variant="outlined"
-                                label="Twitter アカウント" :items="account_link_twitter_items" v-model="account_link_twitter_account_id">
+                                :label="$t('settings.twitter.account_link_dialog.twitter_label')" :items="account_link_twitter_items" v-model="account_link_twitter_account_id">
                             </v-select>
                             <v-select class="settings__item-form mt-3" color="primary" variant="outlined"
-                                label="Bluesky アカウント" :items="account_link_bluesky_items" v-model="account_link_bluesky_account_id">
+                                :label="$t('settings.twitter.account_link_dialog.bluesky_label')" :items="account_link_bluesky_items" v-model="account_link_bluesky_account_id">
                             </v-select>
                         </v-card-text>
                         <v-card-actions class="pt-0 px-6 pb-6">
                             <v-spacer></v-spacer>
-                            <v-btn color="text" variant="text" height="40" @click="account_link_dialog = false">キャンセル</v-btn>
+                            <v-btn color="text" variant="text" height="40" @click="account_link_dialog = false">{{ $t('settings.twitter.account_link_dialog.cancel') }}</v-btn>
                             <v-btn color="secondary" variant="flat" height="40" class="px-4" @click="createAccountLink()">
-                                <Icon icon="fluent:add-12-filled" class="mr-2" height="17px" />追加
+                                <Icon icon="fluent:add-12-filled" class="mr-2" height="17px" />{{ $t('settings.twitter.account_link_dialog.add') }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
             </div>
             <div class="settings__item settings__item--switch">
-                <label class="settings__item-heading" for="fold_panel_after_sending_tweet">ツイート送信後にパネルを自動で折りたたむ</label>
-                <label class="settings__item-label" for="fold_panel_after_sending_tweet">
-                    ツイートするとき以外はできるだけ映像を大きくして観たい方におすすめです。<br>
-                </label>
+                <label class="settings__item-heading" for="fold_panel_after_sending_tweet">{{ $t('settings.twitter.fold_panel_after_sending_tweet.heading') }}</label>
+                <label class="settings__item-label" for="fold_panel_after_sending_tweet" v-html="$t('settings.twitter.fold_panel_after_sending_tweet.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="fold_panel_after_sending_tweet" hide-details
                     v-model="settingsStore.settings.fold_panel_after_sending_tweet">
                 </v-switch>
             </div>
             <div class="settings__item settings__item--switch">
-                <label class="settings__item-heading" for="reset_hashtag_when_program_switches">番組が切り替わったときにハッシュタグフォームをリセットする</label>
-                <label class="settings__item-label" for="reset_hashtag_when_program_switches">
-                    チャンネルを切り替えたときや、視聴中の番組が終了し次の番組の放送が開始されたときに、ハッシュタグフォームをリセットするかを設定します。<br>
-                    オンにしておけば、「誤って前番組のハッシュタグをつけたまま、次の番組の実況ツイートをしてしまう」といったミスを防止できます。<br>
-                </label>
+                <label class="settings__item-heading" for="reset_hashtag_when_program_switches">{{ $t('settings.twitter.reset_hashtag_when_program_switches.heading') }}</label>
+                <label class="settings__item-label" for="reset_hashtag_when_program_switches" v-html="$t('settings.twitter.reset_hashtag_when_program_switches.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="reset_hashtag_when_program_switches" hide-details
                     v-model="settingsStore.settings.reset_hashtag_when_program_switches">
                 </v-switch>
             </div>
             <div class="settings__item settings__item--switch">
-                <label class="settings__item-heading" for="auto_add_watching_channel_hashtag">視聴中のチャンネルに対応する局タグを自動で追加する</label>
-                <label class="settings__item-label" for="auto_add_watching_channel_hashtag">
-                    オンにすると、視聴中のチャンネルに対応する局タグ (#nhk, #tokyomx など) がハッシュタグフォームに自動で追加されます。<br>
-                    なお、録画番組を視聴するときは、リアルタイム放送と誤解されないように、この設定がオンでも局タグは自動追加されません。<br>
-                </label>
+                <label class="settings__item-heading" for="auto_add_watching_channel_hashtag">{{ $t('settings.twitter.auto_add_watching_channel_hashtag.heading') }}</label>
+                <label class="settings__item-label" for="auto_add_watching_channel_hashtag" v-html="$t('settings.twitter.auto_add_watching_channel_hashtag.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="auto_add_watching_channel_hashtag" hide-details
                     v-model="settingsStore.settings.auto_add_watching_channel_hashtag">
                 </v-switch>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">リプライツリー実況の設定 (Twitter)</div>
-                <div class="settings__item-label">
-                    <strong>実況ツイートを「直前の自分の実況ツイートへのリプライ」としてつなげていくことで、X Premium 未加入アカウントでのツイート数上限を緩和し、スパム判定されづらくするための機能です。</strong>
-                </div>
-                <div class="settings__item-label mt-1">
-                    <a class="link" href="https://pc.watch.impress.co.jp/docs/news/2109474.html" target="_blank">2026年5月現在、X Premium 未加入アカウントの1日あたりのツイート数は、通常ツイートで 50 件、リプライで 200 件と大きく制限されています。</a> 実況中に1日のツイート数上限に達してしまうケースも珍しくありません。<br>
-                    このため Twitter の実況コミュニティでは、ツイート数上限の緩いリプライ機能を使い、実況ツイートをぶら下げていく「リプライツリー実況」が、苦肉の策として標準的になりつつあります。<br>
-                    リプライツリー実況なら「短期間のハッシュタグ付き通常ツイートの連投」というスパマーと間違われやすい行為を回避できるため、スパム判定確率を下げる効果も期待できます。
-                </div>
-                <div class="settings__item-label mt-2">
-                    <strong>ハッシュタグごとにリプライツリーを切り替える（推奨）：</strong>連続した同一ハッシュタグの実況ツイートを、1つのリプライツリーにまとめます。<br>
-                    このモードではハッシュタグが変わるたびに新しいリプライツリーが開始されるため、実況ツイートが自動的に番組単位でまとまります。ハッシュタグがついていないツイートは、独立したツイートとして送信されます。
-                </div>
-                <div class="settings__item-label mt-1">
-                    <strong>1日ごとにリプライツリーを切り替える：</strong>ハッシュタグに関係なく、朝4時から翌朝4時直前までを1つのリプライツリーとしてまとめます。1日単位で実況ツイートをひとまとめにしたい方におすすめです。
-                </div>
-                <div class="settings__item-label mt-1">
-                    <strong>リプライツリー実況を行わない：</strong>すべてのツイートを独立したツイートとして送信します。従来通りの動作ですが、未課金アカウントではツイート数上限の影響を受けやすくなるほか、凍結リスクが高まる恐れもあります。
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.twitter.twitter_reply_thread.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.twitter.twitter_reply_thread.label_1')"></div>
+                <div class="settings__item-label mt-1" v-html="$t('settings.twitter.twitter_reply_thread.label_2')"></div>
+                <div class="settings__item-label mt-2" v-html="$t('settings.twitter.twitter_reply_thread.label_per_hashtag')"></div>
+                <div class="settings__item-label mt-1" v-html="$t('settings.twitter.twitter_reply_thread.label_per_day')"></div>
+                <div class="settings__item-label mt-1" v-html="$t('settings.twitter.twitter_reply_thread.label_disabled')"></div>
                 <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
                     :density="is_form_dense ? 'compact' : 'default'"
                     :items="twitter_reply_thread_mode" v-model="settingsStore.settings.twitter_reply_thread_mode">
                 </v-select>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">リプライツリー実況の設定 (Bluesky)</div>
-                <div class="settings__item-label">
-                    Bluesky は1日あたりのツイート数上限が緩いため、Twitter のように制限回避の目的でリプライツリー実況を行う必要はありません。とはいえハッシュタグごとに実況ツイートをまとめられる点は便利ですので、後で番組ごとに実況ツイートを遡りたい方は設定しておくと便利です。
-                </div>
-                <div class="settings__item-label mt-1">
-                    各モードの動作は Twitter 側と同じです。Twitter と Bluesky のアカウントを紐付けていて同時にツイートする際も、リプライツリーの状態は Twitter / Bluesky それぞれで独立して管理されます。<br>
-                    Twitter だけ実況ツイートをリプライツリーにまとめ、Bluesky では独立したポストのままにしておく、といった使い分けも可能です。
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.twitter.bluesky_reply_thread.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.twitter.bluesky_reply_thread.label_1')"></div>
+                <div class="settings__item-label mt-1" v-html="$t('settings.twitter.bluesky_reply_thread.label_2')"></div>
                 <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
                     :density="is_form_dense ? 'compact' : 'default'"
                     :items="bluesky_reply_thread_mode" v-model="settingsStore.settings.bluesky_reply_thread_mode">
                 </v-select>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">デフォルトで表示される Twitter タブ内のタブ</div>
-                <div class="settings__item-label">
-                    視聴画面を開いたときに、パネルの Twitter タブの中で最初に表示されるタブを設定します。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.twitter.twitter_active_tab.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.twitter.twitter_active_tab.label')"></div>
                 <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
                     :density="is_form_dense ? 'compact' : 'default'"
                     :items="twitter_active_tab" v-model="settingsStore.settings.twitter_active_tab">
                 </v-select>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">ツイートにつけるハッシュタグの位置</div>
-                <div class="settings__item-label">
-                    ハッシュタグをツイート本文のどの位置に追加するかを設定します。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.twitter.tweet_hashtag_position.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.twitter.tweet_hashtag_position.label')"></div>
                 <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
                     :density="is_form_dense ? 'compact' : 'default'"
                     :items="tweet_hashtag_position" v-model="settingsStore.settings.tweet_hashtag_position">
                 </v-select>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">ツイートするキャプチャに番組タイトルの透かしを描画する</div>
-                <div class="settings__item-label">
-                    ツイートに添付するキャプチャ画像に、視聴中の番組タイトルを透かしとして描画するかを設定します。<br>
-                    透かしの描画位置は 左上・右上・左下・右下 から選択できます。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.twitter.tweet_capture_watermark_position.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.twitter.tweet_capture_watermark_position.label')"></div>
                 <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
                     :density="is_form_dense ? 'compact' : 'default'"
                     :items="tweet_capture_watermark_position" v-model="settingsStore.settings.tweet_capture_watermark_position">
@@ -371,44 +298,6 @@ export default defineComponent({
             // フォームを小さくするかどうか
             is_form_dense: Utils.isSmartphoneHorizontal(),
 
-            // Twitter のリプライツリー実況モードの選択肢
-            twitter_reply_thread_mode: [
-                {title: 'ハッシュタグごとにリプライツリーを切り替える（推奨）', value: 'PerHashtag'},
-                {title: '1日ごとにリプライツリーを切り替える', value: 'PerDay'},
-                {title: 'リプライツリー実況を行わない', value: 'Disabled'},
-            ],
-
-            // Bluesky のリプライツリー実況モードの選択肢
-            bluesky_reply_thread_mode: [
-                {title: 'ハッシュタグごとにリプライツリーを切り替える', value: 'PerHashtag'},
-                {title: '1日ごとにリプライツリーを切り替える', value: 'PerDay'},
-                {title: 'リプライツリー実況を行わない', value: 'Disabled'},
-            ],
-
-            // デフォルトで表示されるパネルのタブの選択肢
-            twitter_active_tab: [
-                {title: 'ツイート検索タブ', value: 'Search'},
-                {title: 'タイムラインタブ', value: 'Timeline'},
-                {title: 'キャプチャタブ', value: 'Capture'},
-            ],
-
-            // ツイートにつけるハッシュタグの位置の選択肢
-            tweet_hashtag_position: [
-                {title: 'ツイート本文の前に追加する', value: 'Prepend'},
-                {title: 'ツイート本文の後に追加する', value: 'Append'},
-                {title: 'ツイート本文の前に追加してから改行する', value: 'PrependWithLineBreak'},
-                {title: 'ツイート本文の後に改行してから追加する', value: 'AppendWithLineBreak'},
-            ],
-
-            // ツイートするキャプチャに番組タイトルの透かしを描画する位置の選択肢
-            tweet_capture_watermark_position: [
-                {title: '透かしを描画しない', value: 'None'},
-                {title: '透かしをキャプチャの左上に描画する', value: 'TopLeft'},
-                {title: '透かしをキャプチャの右上に描画する', value: 'TopRight'},
-                {title: '透かしをキャプチャの左下に描画する', value: 'BottomLeft'},
-                {title: '透かしをキャプチャの右下に描画する', value: 'BottomRight'},
-            ],
-
             // ローディング中かどうか
             is_loading: true,
 
@@ -448,6 +337,54 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore),
+
+        // Twitter のリプライツリー実況モードの選択肢
+        twitter_reply_thread_mode() {
+            return [
+                {title: this.$t('settings.twitter.twitter_reply_thread.option_per_hashtag'), value: 'PerHashtag'},
+                {title: this.$t('settings.twitter.twitter_reply_thread.option_per_day'), value: 'PerDay'},
+                {title: this.$t('settings.twitter.twitter_reply_thread.option_disabled'), value: 'Disabled'},
+            ];
+        },
+
+        // Bluesky のリプライツリー実況モードの選択肢
+        bluesky_reply_thread_mode() {
+            return [
+                {title: this.$t('settings.twitter.bluesky_reply_thread.option_per_hashtag'), value: 'PerHashtag'},
+                {title: this.$t('settings.twitter.bluesky_reply_thread.option_per_day'), value: 'PerDay'},
+                {title: this.$t('settings.twitter.bluesky_reply_thread.option_disabled'), value: 'Disabled'},
+            ];
+        },
+
+        // デフォルトで表示されるパネルのタブの選択肢
+        twitter_active_tab() {
+            return [
+                {title: this.$t('settings.twitter.twitter_active_tab.option_search'), value: 'Search'},
+                {title: this.$t('settings.twitter.twitter_active_tab.option_timeline'), value: 'Timeline'},
+                {title: this.$t('settings.twitter.twitter_active_tab.option_capture'), value: 'Capture'},
+            ];
+        },
+
+        // ツイートにつけるハッシュタグの位置の選択肢
+        tweet_hashtag_position() {
+            return [
+                {title: this.$t('settings.twitter.tweet_hashtag_position.option_prepend'), value: 'Prepend'},
+                {title: this.$t('settings.twitter.tweet_hashtag_position.option_append'), value: 'Append'},
+                {title: this.$t('settings.twitter.tweet_hashtag_position.option_prepend_linebreak'), value: 'PrependWithLineBreak'},
+                {title: this.$t('settings.twitter.tweet_hashtag_position.option_append_linebreak'), value: 'AppendWithLineBreak'},
+            ];
+        },
+
+        // ツイートするキャプチャに番組タイトルの透かしを描画する位置の選択肢
+        tweet_capture_watermark_position() {
+            return [
+                {title: this.$t('settings.twitter.tweet_capture_watermark_position.option_none'), value: 'None'},
+                {title: this.$t('settings.twitter.tweet_capture_watermark_position.option_top_left'), value: 'TopLeft'},
+                {title: this.$t('settings.twitter.tweet_capture_watermark_position.option_top_right'), value: 'TopRight'},
+                {title: this.$t('settings.twitter.tweet_capture_watermark_position.option_bottom_left'), value: 'BottomLeft'},
+                {title: this.$t('settings.twitter.tweet_capture_watermark_position.option_bottom_right'), value: 'BottomRight'},
+            ];
+        },
 
         has_linked_accounts(): boolean {
             if (this.userStore.user === null) {
@@ -519,7 +456,7 @@ export default defineComponent({
 
         validateBlueskyHandle(value: string): true | string {
             if (this.normalizeBlueskyHandle(value ?? '') === '') {
-                return 'Bluesky ハンドルを入力してください。';
+                return this.$t('settings.twitter.validation.bluesky_handle_required');
             }
             return true;
         },
@@ -543,7 +480,7 @@ export default defineComponent({
         async loginTwitterAccountWithCookieForm() {
             // ログインしていない場合はエラーにする
             if (this.userStore.is_logged_in === false) {
-                Message.warning('連携をはじめるには、KonomiTV アカウントにログインしてください。');
+                Message.warning(this.$t('settings.twitter.message.login_required'));
                 await Utils.sleep(0.01);
                 this.twitter_cookie_auth_dialog = false;
                 return;
@@ -608,7 +545,7 @@ export default defineComponent({
 
             // 空文字が入力されている場合は弾く
             if (this.twitter_cookie === null || this.twitter_cookie.trim() === '') {
-                Message.warning('Cookie を入力してください！');
+                Message.warning(this.$t('settings.twitter.message.cookie_required'));
                 return;
             }
 
@@ -630,7 +567,7 @@ export default defineComponent({
             // アカウント情報を強制的に更新
             await this.userStore.fetchUser(true);
             if (this.userStore.user === null) {
-                Message.error('アカウント情報を取得できませんでした。');
+                Message.error(this.$t('settings.twitter.message.account_info_failed'));
                 return;
             }
 
@@ -641,7 +578,7 @@ export default defineComponent({
                 return (a.updated_at < b.updated_at) ? 1 : ((a.updated_at > b.updated_at) ? -1 : 0);
             })[0];
 
-            Message.success(`Twitter @${current_twitter_account.screen_name} と連携しました。`);
+            Message.success(this.$t('settings.twitter.message.twitter_linked', { screen_name: current_twitter_account.screen_name }));
 
             // フォームをリセットし、非表示にする
             (this.$refs.twitter_form as VForm).reset();
@@ -659,12 +596,12 @@ export default defineComponent({
             // アカウント情報を強制的に更新
             await this.userStore.fetchUser(true);
 
-            Message.success(`Twitter @${screen_name} との連携を解除しました。`);
+            Message.success(this.$t('settings.twitter.message.twitter_unlinked', { screen_name }));
         },
 
         async loginBlueskyAccountWithAppPasswordForm() {
             if (this.userStore.is_logged_in === false) {
-                Message.warning('連携をはじめるには、KonomiTV アカウントにログインしてください。');
+                Message.warning(this.$t('settings.twitter.message.login_required'));
                 await Utils.sleep(0.01);
                 this.bluesky_auth_dialog = false;
                 return;
@@ -686,7 +623,7 @@ export default defineComponent({
             }
             const normalized_handle = this.normalizeBlueskyHandle(this.bluesky_handle);
             if (normalized_handle === '') {
-                Message.warning('Bluesky ハンドルを入力してください！');
+                Message.warning(this.$t('settings.twitter.message.bluesky_handle_required'));
                 return;
             }
             this.bluesky_handle = normalized_handle;
@@ -704,17 +641,17 @@ export default defineComponent({
             }
             const fetched_user = await this.userStore.fetchUser(true);
             if (fetched_user === null) {
-                Message.warning('Bluesky 連携情報の再取得に失敗しました。画面を再読み込みしてください。');
+                Message.warning(this.$t('settings.twitter.message.bluesky_refetch_failed'));
                 return;
             }
             const current_bluesky_account = [...fetched_user.bluesky_accounts].sort((a, b) => {
                 return (a.updated_at < b.updated_at) ? 1 : ((a.updated_at > b.updated_at) ? -1 : 0);
             })[0];
             if (current_bluesky_account === undefined) {
-                Message.warning('Bluesky 連携情報の再取得に失敗しました。画面を再読み込みしてください。');
+                Message.warning(this.$t('settings.twitter.message.bluesky_refetch_failed'));
                 return;
             }
-            Message.success(`Bluesky @${current_bluesky_account.handle} と連携しました。`);
+            Message.success(this.$t('settings.twitter.message.bluesky_linked', { handle: current_bluesky_account.handle }));
             (this.$refs.bluesky_form as VForm).reset();
             this.bluesky_app_password_showing = false;
             this.bluesky_auth_dialog = false;
@@ -726,12 +663,12 @@ export default defineComponent({
                 return;
             }
             await this.userStore.fetchUser(true);
-            Message.success(`Bluesky @${handle} との連携を解除しました。`);
+            Message.success(this.$t('settings.twitter.message.bluesky_unlinked', { handle }));
         },
 
         async createAccountLink() {
             if (this.account_link_twitter_account_id === null || this.account_link_bluesky_account_id === null) {
-                Message.warning('紐付ける Twitter アカウントと Bluesky アカウントを選択してください。');
+                Message.warning(this.$t('settings.twitter.message.account_link_select_required'));
                 return;
             }
             const account_link = await AccountLinks.create({
@@ -746,7 +683,7 @@ export default defineComponent({
             this.account_link_twitter_account_id = null;
             this.account_link_bluesky_account_id = null;
             this.account_link_dialog = false;
-            Message.success('Twitter / Bluesky アカウントを紐付けました。');
+            Message.success(this.$t('settings.twitter.message.account_linked'));
         },
 
         async deleteAccountLink(link_id: number) {
@@ -755,7 +692,7 @@ export default defineComponent({
                 return;
             }
             await this.userStore.fetchUser(true);
-            Message.success('Twitter / Bluesky アカウントの紐付けを解除しました。');
+            Message.success(this.$t('settings.twitter.message.account_unlinked'));
         },
     }
 });

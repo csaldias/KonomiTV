@@ -6,7 +6,7 @@
                 <Icon icon="fluent:chevron-left-12-filled" width="27px" />
             </a>
             <Icon icon="fluent:person-20-filled" width="25px" />
-            <span class="ml-2">アカウント</span>
+            <span class="ml-2">{{ $t('settings.account.title') }}</span>
         </h2>
         <div class="settings__content" :class="{'settings__content--loading': is_loading}">
             <div class="account" v-if="userStore.user === null">
@@ -14,13 +14,13 @@
                     <img class="account__icon" src="/assets/images/account-icon-default.png">
                     <div class="account__info">
                         <div class="account__info-name">
-                            <span class="account__info-name-text">ログインしていません</span>
+                            <span class="account__info-name-text">{{ $t('settings.account.not_logged_in_name') }}</span>
                         </div>
                         <span class="account__info-id">Not logged in</span>
                     </div>
                 </div>
                 <v-btn class="account__login ml-auto" color="secondary" width="140" height="56" variant="flat" to="/login/">
-                    <Icon icon="fa:sign-in" class="mr-2" />ログイン
+                    <Icon icon="fa:sign-in" class="mr-2" />{{ $t('settings.account.login_button') }}
                 </v-btn>
             </div>
             <div class="account" v-if="userStore.user !== null">
@@ -29,122 +29,101 @@
                     <div class="account__info">
                         <div class="account__info-name">
                             <span class="account__info-name-text">{{userStore.user.name}}</span>
-                            <span class="account__info-admin" v-if="userStore.user.is_admin">管理者</span>
+                            <span class="account__info-admin" v-if="userStore.user.is_admin">{{ $t('settings.account.admin_badge') }}</span>
                         </div>
                         <span class="account__info-id">User ID: {{userStore.user.id}}</span>
                     </div>
                 </div>
                 <v-btn class="account__login ml-auto" color="secondary" width="140" height="56" variant="flat" @click="userStore.logout()">
-                    <Icon icon="fa:sign-out" class="mr-2" />ログアウト
+                    <Icon icon="fa:sign-out" class="mr-2" />{{ $t('settings.account.logout_button') }}
                 </v-btn>
             </div>
             <div class="account-register" v-if="userStore.is_logged_in === false">
-                <div class="account-register__heading">
-                    KonomiTV アカウントにログインすると、<br>より便利な機能が使えます！
-                </div>
+                <div class="account-register__heading" v-html="$t('settings.account.register.heading')"></div>
                 <div class="account-register__feature">
                     <div class="account-feature">
                         <Icon class="account-feature__icon" icon="bi:chat-left-text-fill" />
                         <div class="account-feature__info">
-                            <span class="account-feature__info-heading">ニコニコ実況にコメントする</span>
-                            <span class="account-feature__info-text">テレビを見ながらニコニコ実況にコメントできます。別途、ニコニコアカウントとの連携が必要です。</span>
+                            <span class="account-feature__info-heading">{{ $t('settings.account.register.feature_jikkyo_heading') }}</span>
+                            <span class="account-feature__info-text">{{ $t('settings.account.register.feature_jikkyo_text') }}</span>
                         </div>
                     </div>
                     <div class="account-feature">
                         <Icon class="account-feature__icon" icon="fa-brands:twitter" />
                         <div class="account-feature__info">
-                            <span class="account-feature__info-heading">Twitter 連携機能</span>
-                            <span class="account-feature__info-text">テレビを見ながら Twitter にツイートしたり、検索したツイートをリアルタイムで表示できます。別途、Twitter アカウントとの連携が必要です。</span>
+                            <span class="account-feature__info-heading">{{ $t('settings.account.register.feature_twitter_heading') }}</span>
+                            <span class="account-feature__info-text">{{ $t('settings.account.register.feature_twitter_text') }}</span>
                         </div>
                     </div>
                     <div class="account-feature">
                         <Icon class="account-feature__icon" icon="fluent:arrow-sync-20-filled" />
                         <div class="account-feature__info">
-                            <span class="account-feature__info-heading" style="white-space: nowrap;">設定・マイリスト・視聴履歴などを<wbr>デバイス間で同期</span>
-                            <span class="account-feature__info-text">ピン留めしたチャンネル、マイリスト、視聴履歴など、ブラウザに保存されている各種設定をブラウザやデバイスをまたいで同期できます。</span>
+                            <span class="account-feature__info-heading" style="white-space: nowrap;" v-html="$t('settings.account.register.feature_sync_heading')"></span>
+                            <span class="account-feature__info-text">{{ $t('settings.account.register.feature_sync_text') }}</span>
                         </div>
                     </div>
                     <div class="account-feature">
                         <Icon class="account-feature__icon" icon="fa-solid:sliders-h" />
                         <div class="account-feature__info">
-                            <span class="account-feature__info-heading">サーバー設定をブラウザから変更</span>
-                            <span class="account-feature__info-text">管理者権限があれば、サーバー設定をブラウザから変更できます。一番最初に作成されたアカウントには、自動で管理者権限が付与されます。</span>
+                            <span class="account-feature__info-heading">{{ $t('settings.account.register.feature_server_heading') }}</span>
+                            <span class="account-feature__info-text">{{ $t('settings.account.register.feature_server_text') }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="account-register__description">
-                    KonomiTV アカウントの作成に必要なものは<br class="smartphone-vertical-only">ユーザー名とパスワードだけです。<br>
-                    アカウントはローカルに導入した<br class="smartphone-vertical-only"> KonomiTV サーバーにのみ保存されます。<br>
-                    外部のサービスには保存されませんので、ご安心ください。<br>
-                </div>
+                <div class="account-register__description" v-html="$t('settings.account.register.description')"></div>
                 <v-btn class="account-register__button" color="secondary" width="100%" max-width="250" height="50" variant="flat" to="/register/">
-                    <Icon icon="fluent:person-add-20-filled" class="mr-2" height="24" />アカウントを作成
+                    <Icon icon="fluent:person-add-20-filled" class="mr-2" height="24" />{{ $t('settings.account.register.button') }}
                 </v-btn>
             </div>
             <div v-if="userStore.is_logged_in === true">
                 <div class="settings__item settings__item--switch">
-                    <label class="settings__item-heading" for="sync_settings">設定をデバイス間で同期する</label>
-                    <label class="settings__item-label" for="sync_settings">
-                        KonomiTV では、設定を同じアカウントでログインしているデバイス間で同期できます！<br>
-                        同期をオンにすると、<strong>同期をオンにしているすべてのデバイスで共通の設定が使えます。</strong><br>
-                    </label>
-                    <label class="settings__item-label" for="sync_settings">
-                        <strong>ピン留めしたチャンネル・マイリスト・視聴履歴・ハッシュタグリストなども一緒に同期されます。</strong><br>
-                        なお、デバイス固有の設定（画質設定など）は、同期後も各デバイスで個別に反映されます。<br>
-                    </label>
+                    <label class="settings__item-heading" for="sync_settings">{{ $t('settings.account.sync_settings.heading') }}</label>
+                    <label class="settings__item-label" for="sync_settings" v-html="$t('settings.account.sync_settings.label_1')"></label>
+                    <label class="settings__item-label" for="sync_settings" v-html="$t('settings.account.sync_settings.label_2')"></label>
                     <v-switch class="settings__item-switch" color="primary" id="sync_settings" hide-details
                         v-model="sync_settings">
                     </v-switch>
                 </div>
                 <v-dialog max-width="530" v-model="sync_settings_dialog">
                     <v-card>
-                        <v-card-title class="d-flex justify-center font-weight-bold pt-6">設定データの競合</v-card-title>
-                        <v-card-text class="pt-2 pb-5">
-                            このデバイスの設定と、サーバーに保存されている設定が競合しています。<br>
-                            一度上書きすると、元に戻すことはできません。慎重に選択してください。<br>
-                        </v-card-text>
+                        <v-card-title class="d-flex justify-center font-weight-bold pt-6">{{ $t('settings.account.conflict_dialog.title') }}</v-card-title>
+                        <v-card-text class="pt-2 pb-5"><span v-html="$t('settings.account.conflict_dialog.body')"></span></v-card-text>
                         <div class="d-flex flex-column px-4 pb-6 settings__conflict-dialog">
                             <v-btn class="settings__save-button text-error-lighten-1" color="background-lighten-1" variant="flat"
                                 @click="overrideServerSettingsFromClient()">
                                 <Icon icon="fluent:document-arrow-up-16-filled" class="mr-2" height="22px" />
-                                サーバーに保存されている設定を、<br class="smartphone-vertical-only">このデバイスの設定で上書きする
+                                <span v-html="$t('settings.account.conflict_dialog.override_to_server')"></span>
                             </v-btn>
                             <v-btn class="settings__save-button text-error-lighten-1 mt-3" color="background-lighten-1" variant="flat"
                                 @click="overrideClientSettingsFromServer()">
                                 <Icon icon="fluent:document-arrow-down-16-filled" class="mr-2" height="22px" />
-                                このデバイスの設定を、<br class="smartphone-vertical-only">サーバーに保存されている設定で上書きする
+                                <span v-html="$t('settings.account.conflict_dialog.override_to_client')"></span>
                             </v-btn>
                             <v-btn class="settings__save-button mt-3" variant="flat" color="background-lighten-1"
                                 @click="sync_settings_dialog = false">
                                 <Icon icon="fluent:dismiss-16-filled" class="mr-2" height="22px" />
-                                キャンセル
+                                {{ $t('settings.account.conflict_dialog.cancel') }}
                             </v-btn>
                         </div>
                     </v-card>
                 </v-dialog>
                 <v-form class="settings__item" ref="settings_username" @submit.prevent>
-                    <div class="settings__item-heading">ユーザー名</div>
-                    <div class="settings__item-label">
-                        KonomiTV アカウントのユーザー名を設定します。アルファベットだけでなく日本語や記号も使えます。<br>
-                        同じ KonomiTV サーバー上の他のアカウントと同じユーザー名には変更できません。<br>
-                    </div>
-                    <v-text-field class="settings__item-form" color="primary" variant="outlined" placeholder="ユーザー名"
+                    <div class="settings__item-heading">{{ $t('settings.account.username.heading') }}</div>
+                    <div class="settings__item-label" v-html="$t('settings.account.username.label')"></div>
+                    <v-text-field class="settings__item-form" color="primary" variant="outlined" :placeholder="$t('settings.account.username.placeholder')"
                         :density="is_form_dense ? 'compact' : 'default'"
                         v-model="settings_username"
                         :rules="[settings_username_validation]">
                     </v-text-field>
                 </v-form>
                 <v-btn class="settings__save-button mt-2" variant="flat" @click="updateAccountInfo('username')">
-                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />ユーザー名を更新
+                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />{{ $t('settings.account.username.update_button') }}
                 </v-btn>
                 <v-form class="settings__item" @submit.prevent>
-                    <div class="settings__item-heading">アイコン画像</div>
-                    <div class="settings__item-label">
-                        KonomiTV アカウントのアイコン画像を設定します。<br>
-                        アップロードされた画像は自動で 400×400 の正方形にリサイズされます。<br>
-                    </div>
+                    <div class="settings__item-heading">{{ $t('settings.account.icon.heading') }}</div>
+                    <div class="settings__item-label" v-html="$t('settings.account.icon.label')"></div>
                     <v-file-input class="settings__item-form" color="primary" variant="outlined" hide-details
-                        label="アイコン画像を選択"
+                        :label="$t('settings.account.icon.file_label')"
                         :density="is_form_dense ? 'compact' : 'default'"
                         accept="image/jpeg, image/png"
                         prepend-icon=""
@@ -153,14 +132,12 @@
                     </v-file-input>
                 </v-form>
                 <v-btn class="settings__save-button mt-5" variant="flat" @click="updateAccountIcon()">
-                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />アイコン画像を更新
+                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />{{ $t('settings.account.icon.update_button') }}
                 </v-btn>
                 <v-form class="settings__item" ref="settings_password" @submit.prevent>
-                    <div class="settings__item-heading">新しいパスワード</div>
-                    <div class="settings__item-label">
-                        KonomiTV アカウントの新しいパスワードを設定します。<br>
-                    </div>
-                    <v-text-field class="settings__item-form" color="primary" variant="outlined" placeholder="新しいパスワード"
+                    <div class="settings__item-heading">{{ $t('settings.account.password.heading') }}</div>
+                    <div class="settings__item-label" v-html="$t('settings.account.password.label')"></div>
+                    <v-text-field class="settings__item-form" color="primary" variant="outlined" :placeholder="$t('settings.account.password.placeholder')"
                         :density="is_form_dense ? 'compact' : 'default'"
                         v-model="settings_password"
                         :type="settings_password_showing ? 'text' : 'password'"
@@ -170,31 +147,25 @@
                     </v-text-field>
                 </v-form>
                 <v-btn class="settings__save-button mt-2" variant="flat" @click="updateAccountInfo('password')">
-                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />パスワードを更新
+                    <Icon icon="fluent:save-16-filled" class="mr-2" height="24px" />{{ $t('settings.account.password.update_button') }}
                 </v-btn>
                 <v-divider class="mt-6"></v-divider>
                 <div class="settings__item mt-6">
-                    <div class="settings__item-heading text-error-lighten-1">アカウントを削除</div>
-                    <div class="settings__item-label">
-                        現在ログインしている KonomiTV アカウントを削除します。<br>
-                        <strong class="text-error-lighten-1">アカウントに紐づくすべてのデータが削除されます。元に戻すことはできません。</strong><br>
-                    </div>
+                    <div class="settings__item-heading text-error-lighten-1">{{ $t('settings.account.delete.heading') }}</div>
+                    <div class="settings__item-label" v-html="$t('settings.account.delete.label')"></div>
                 </div>
                 <v-btn class="settings__save-button bg-error mt-5" variant="flat" @click="account_delete_confirm_dialog = true">
-                    <Icon icon="fluent:delete-16-filled" class="mr-2" height="24px" />アカウントを削除
+                    <Icon icon="fluent:delete-16-filled" class="mr-2" height="24px" />{{ $t('settings.account.delete.button') }}
                 </v-btn>
                 <v-dialog max-width="440" v-model="account_delete_confirm_dialog">
                     <v-card>
-                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">本当にアカウントを削除しますか？</v-card-title>
-                        <v-card-text class="pt-2 pb-0">
-                            アカウントに紐づくすべてのユーザーデータが削除されます。元に戻すことはできません。<br>
-                            本当にアカウントを削除しますか？
-                        </v-card-text>
+                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('settings.account.delete_dialog.title') }}</v-card-title>
+                        <v-card-text class="pt-2 pb-0"><span v-html="$t('settings.account.delete_dialog.body')"></span></v-card-text>
                         <v-card-actions class="pt-4 px-6 pb-6">
                             <v-spacer></v-spacer>
-                            <v-btn color="text" variant="text" @click="account_delete_confirm_dialog = false">キャンセル</v-btn>
+                            <v-btn color="text" variant="text" @click="account_delete_confirm_dialog = false">{{ $t('settings.account.delete_dialog.cancel') }}</v-btn>
                             <v-btn color="error" variant="flat" class="px-3" height="40" @click="deleteAccount()">
-                                <Icon icon="fluent:delete-16-filled" class="mr-1" height="24px" />削除
+                                <Icon icon="fluent:delete-16-filled" class="mr-1" height="24px" />{{ $t('settings.account.delete_dialog.delete') }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -233,19 +204,8 @@ export default defineComponent({
             // ユーザー名とパスワード
             // ログイン画面やアカウント作成画面の data と同一のもの
             settings_username: null as string | null,
-            settings_username_validation: (value: string | null) => {
-                if (value === '' || value === null) return 'ユーザー名を入力してください。';
-                if (/^.{2,}$/.test(value) === false) return 'ユーザー名は2文字以上で入力してください。';
-                return true;
-            },
             settings_password: null as string | null,
             settings_password_showing: false,
-            settings_password_validation: (value: string | null) => {
-                if (value === '' || value === null) return 'パスワードを入力してください。';
-                // 正規表現の参考: https://qiita.com/grrrr/items/0b35b5c1c98eebfa5128
-                if (/^[a-zA-Z0-9!-/:-@¥[-`{-~]{4,}$/.test(value) === false) return 'パスワードは4文字以上の半角英数記号を入力してください。';
-                return true;
-            },
 
             // アップロードするアイコン画像
             // 基本1ファイルしか入らない (Vuetify 側の都合で配列になっている)
@@ -281,7 +241,7 @@ export default defineComponent({
                 // 一度オブジェクトに戻したものをハッシュ化する
                 const server_sync_settings = await Settings.fetchClientSettings();
                 if (server_sync_settings === null) {
-                    Message.error('サーバーから設定データを取得できませんでした。');
+                    Message.error(this.$t('settings.account.message.sync_fetch_failed'));
                     return;
                 }
                 const server_sync_settings_hash = hashClientSettings(server_sync_settings);
@@ -317,6 +277,23 @@ export default defineComponent({
         this.is_loading = false;
     },
     methods: {
+
+        // ユーザー名のバリデーション関数
+        // ログイン画面やアカウント作成画面のものと同一のもの
+        settings_username_validation(value: string | null): boolean | string {
+            if (value === '' || value === null) return this.$t('settings.account.username.validation_required');
+            if (/^.{2,}$/.test(value) === false) return this.$t('settings.account.username.validation_length');
+            return true;
+        },
+
+        // パスワードのバリデーション関数
+        // ログイン画面やアカウント作成画面のものと同一のもの
+        settings_password_validation(value: string | null): boolean | string {
+            if (value === '' || value === null) return this.$t('settings.account.password.validation_required');
+            // 正規表現の参考: https://qiita.com/grrrr/items/0b35b5c1c98eebfa5128
+            if (/^[a-zA-Z0-9!-/:-@¥[-`{-~]{4,}$/.test(value) === false) return this.$t('settings.account.password.validation_format');
+            return true;
+        },
 
         // このクライアントの設定でサーバー上の設定を上書きする
         async overrideServerSettingsFromClient() {
@@ -374,7 +351,7 @@ export default defineComponent({
 
             // アイコン画像が選択されていないなら更新しない
             if (this.settings_icon_file === null) {
-                Message.error('アップロードする画像を選択してください！');
+                Message.error(this.$t('settings.account.message.icon_select_required'));
                 return;
             }
 
