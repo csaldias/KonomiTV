@@ -6,7 +6,7 @@
                 <Icon icon="fluent:chevron-left-12-filled" width="27px" />
             </a>
             <Icon icon="bi:chat-left-text-fill" width="19px" />
-            <span class="ml-3">ニコニコ実況</span>
+            <span class="ml-3">{{ $t('settings.jikkyo.title') }}</span>
         </h2>
         <div class="settings__content" :class="{'settings__content--loading': is_loading}">
             <div class="niconico-account niconico-account--anonymous" v-if="userStore.user === null || userStore.user.niconico_user_id === null">
@@ -14,16 +14,16 @@
                     <Icon class="flex-shrink-0" icon="bi:chat-left-text-fill" width="45px" />
                     <div class="niconico-account__info ml-4">
                         <div class="niconico-account__info-name">
-                            <span class="niconico-account__info-name-text">ニコニコアカウントと連携していません</span>
+                            <span class="niconico-account__info-name-text">{{ $t('settings.jikkyo.account.not_linked_name') }}</span>
                         </div>
                         <span class="niconico-account__info-description">
-                            ニコニコアカウントと連携すると、テレビを見ながらニコニコ実況にコメントできるようになります。
+                            {{ $t('settings.jikkyo.account.not_linked_description') }}
                         </span>
                     </div>
                 </div>
                 <v-btn class="niconico-account__login ml-auto" color="secondary" width="130" height="56" variant="flat"
                     @click="loginNiconicoAccount()">
-                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="26" />連携する
+                    <Icon icon="fluent:plug-connected-20-filled" class="mr-2" height="26" />{{ $t('settings.jikkyo.account.connect_button') }}
                 </v-btn>
             </div>
             <div class="niconico-account" v-if="userStore.user !== null && userStore.user.niconico_user_id !== null">
@@ -31,10 +31,10 @@
                     <img class="niconico-account__icon" :src="userStore.user_niconico_icon_url ?? ''" @error="setDefaultIcon">
                     <div class="niconico-account__info">
                         <div class="niconico-account__info-name">
-                            <span class="niconico-account__info-name-text">{{userStore.user.niconico_user_name}} と連携しています</span>
+                            <span class="niconico-account__info-name-text">{{ $t('settings.jikkyo.account.linked_name', { name: userStore.user.niconico_user_name }) }}</span>
                         </div>
                         <span class="niconico-account__info-description">
-                            <span class="mr-2" style="white-space: nowrap;">Niconico User ID:</span>
+                            <span class="mr-2" style="white-space: nowrap;">{{ $t('settings.jikkyo.account.niconico_user_id_label') }}</span>
                             <a class="link mr-2" :href="`https://www.nicovideo.jp/user/${userStore.user.niconico_user_id}`"
                                 target="_blank">{{userStore.user.niconico_user_id}}</a>
                             <span class="text-secondary" v-if="userStore.user.niconico_user_premium === true">(Premium)</span>
@@ -43,76 +43,44 @@
                 </div>
                 <v-btn class="niconico-account__login ml-auto" color="secondary" width="130" height="56" variant="flat"
                     @click="logoutNiconicoAccount()">
-                    <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="26" />連携解除
+                    <Icon icon="fluent:plug-disconnected-20-filled" class="mr-2" height="26" />{{ $t('settings.jikkyo.account.disconnect_button') }}
                 </v-btn>
             </div>
             <div class="settings__item settings__item--switch">
-                <label class="settings__item-heading" for="prefer_posting_to_nicolive">可能であればニコニコ実況にコメントする</label>
-                <label class="settings__item-label" for="prefer_posting_to_nicolive">
-                    <ul class="ml-4 mb-2 font-weight-bold">
-                        <li>オン：<a class="link" href="https://jk.nicovideo.jp" target="_blank">ニコニコ実況</a> に優先的にコメントを送信</li>
-                        <li>オフ：<a class="link" href="https://nx-jikkyo.tsukumijima.net" target="_blank">NX-Jikkyo</a> にコメントを送信</li>
-                    </ul>
-                    ニコニコ実況が利用できない場合（BS 民放など公式では廃止された実況チャンネル・ニコニコ生放送のメンテナンス中など）は、常に NX-Jikkyo にコメントします。
-                    <div class="mt-2"></div>
-                    ニコニコ実況にコメントするには、ニコニコアカウントとの連携が必要です。<br>
-                    NX-Jikkyo は「ニコニコ実況の Web 版非公式コメントビューア」＋「ニコニコ実況公式にない実況チャンネルを補完する互換コメントサーバー」で、アカウント不要でコメントできます。<br>
-                    <div class="mt-2"></div>
-                    ニコニコアカウント未連携でのコメント送信時に「代わりに NX-Jikkyo にコメントします」という通知を表示しないようにするには、この設定をオフにしてください。
-                </label>
+                <label class="settings__item-heading" for="prefer_posting_to_nicolive">{{ $t('settings.jikkyo.prefer_posting_to_nicolive.heading') }}</label>
+                <label class="settings__item-label" for="prefer_posting_to_nicolive" v-html="$t('settings.jikkyo.prefer_posting_to_nicolive.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="prefer_posting_to_nicolive" hide-details
                     v-model="settingsStore.settings.prefer_posting_to_nicolive">
                 </v-switch>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">コメントのミュート設定</div>
-                <div class="settings__item-label">
-                    表示したくないコメントを、映像上やコメントリストに表示しないようにミュートできます。<br>
-                </div>
-                <div class="settings__item-label mt-2">
-                    デフォルトでは、下記のミュート設定がオンになっています。<br>
-                    これらのコメントも表示したい方は、適宜オフに設定してください。<br>
-                    <ul class="ml-5 mt-2">
-                        <li>露骨な表現を含むコメントをミュートする</li>
-                        <li>ネガティブな表現、差別的な表現、政治的に偏った表現を含むコメントをミュートする</li>
-                        <li>文字サイズが大きいコメントをミュートする</li>
-                    </ul>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.jikkyo.comment_mute.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.jikkyo.comment_mute.label')"></div>
+                <div class="settings__item-label mt-2" v-html="$t('settings.jikkyo.comment_mute.label_default')"></div>
             </div>
             <v-btn class="settings__save-button mt-4" variant="flat" @click="comment_mute_settings_modal = !comment_mute_settings_modal">
                 <Icon icon="heroicons-solid:filter" height="19px" />
-                <span class="ml-1">コメントのミュート設定を開く</span>
+                <span class="ml-1">{{ $t('settings.jikkyo.comment_mute.button') }}</span>
             </v-btn>
             <v-divider class="mt-6"></v-divider>
-            <div class="settings__quote mt-7">
-                「コメントを表示」「コメントを無制限に表示」「コメントの不透明度」の各設定は、<br>プレイヤー下にある設定アイコン ⚙️ からも随時変更できます。<br>
-            </div>
+            <div class="settings__quote mt-7" v-html="$t('settings.jikkyo.quote')"></div>
             <div class="settings__item settings__item--switch settings__item--sync-disabled">
-                <label class="settings__item-heading" for="show_comment">コメントを表示</label>
-                <label class="settings__item-label" for="show_comment">
-                    プレイヤーにニコニコ実況 / NX-Jikkyo のコメントを流すかどうかを設定します。<br>
-                    コメントを非表示にしても、画面右側にあるパネルのコメントリストには表示されます。<br>
-                </label>
+                <label class="settings__item-heading" for="show_comment">{{ $t('settings.jikkyo.show_comment.heading') }}</label>
+                <label class="settings__item-label" for="show_comment" v-html="$t('settings.jikkyo.show_comment.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="show_comment" hide-details
                     v-model="show_comment">
                 </v-switch>
             </div>
             <div class="settings__item settings__item--switch settings__item--sync-disabled">
-                <label class="settings__item-heading" for="show_comment_unlimited">コメントを無制限に表示</label>
-                <label class="settings__item-label" for="show_comment_unlimited">
-                    オンにすると、コメントの重なりを許容し、可能な限り多くのコメントを表示します。<br>
-                    コメントが多い番組でオンにすると、映像が見づらくなる可能性があります。<br>
-                </label>
+                <label class="settings__item-heading" for="show_comment_unlimited">{{ $t('settings.jikkyo.show_comment_unlimited.heading') }}</label>
+                <label class="settings__item-label" for="show_comment_unlimited" v-html="$t('settings.jikkyo.show_comment_unlimited.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="show_comment_unlimited" hide-details
                     v-model="show_comment_unlimited">
                 </v-switch>
             </div>
             <div class="settings__item settings__item--sync-disabled">
-                <div class="settings__item-heading">コメントの不透明度</div>
-                <div class="settings__item-label">
-                    プレイヤーに流れるコメントの不透明度を設定します。<br>
-                    0% に設定するとコメントが完全に透明になり、100% に設定すると完全に不透明になります。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.jikkyo.comment_opacity.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.jikkyo.comment_opacity.label')"></div>
                 <v-slider class="settings__item-form" color="primary" show-ticks="always" thumb-label hide-details
                     :step="0.05" :min="0" :max="1" v-model="comment_opacity">
                     <template #thumb-label="{ modelValue }">
@@ -122,31 +90,22 @@
             </div>
             <v-divider class="mt-6"></v-divider>
             <div class="settings__item">
-                <div class="settings__item-heading">コメントの速さ</div>
-                <div class="settings__item-label">
-                    プレイヤーに流れるコメントの速さを設定します。<br>
-                    たとえば 1.2 に設定すると、コメントが 1.2 倍速く流れます。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.jikkyo.comment_speed_rate.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.jikkyo.comment_speed_rate.label')"></div>
                 <v-slider class="settings__item-form" color="primary" show-ticks="always" thumb-label hide-details
                     :step="0.1" :min="0.5" :max="2" v-model="settingsStore.settings.comment_speed_rate">
                 </v-slider>
             </div>
             <div class="settings__item">
-                <div class="settings__item-heading">コメントの文字サイズ</div>
-                <div class="settings__item-label">
-                    プレイヤーに流れるコメントの文字サイズの基準値を設定します。<br>
-                    実際の文字サイズは画面サイズに合わせて調整されます。デフォルトの文字サイズは 34px です。<br>
-                </div>
+                <div class="settings__item-heading">{{ $t('settings.jikkyo.comment_font_size.heading') }}</div>
+                <div class="settings__item-label" v-html="$t('settings.jikkyo.comment_font_size.label')"></div>
                 <v-slider class="settings__item-form" color="primary" show-ticks="always" thumb-label hide-details
                     :step="1" :min="20" :max="60" v-model="settingsStore.settings.comment_font_size">
                 </v-slider>
             </div>
             <div class="settings__item settings__item--switch">
-                <label class="settings__item-heading" for="close_comment_form_after_sending">コメント送信後にコメント入力フォームを閉じる</label>
-                <label class="settings__item-label" for="close_comment_form_after_sending">
-                    オンにすると、コメント送信後に、コメント入力フォームが自動で閉じるようになります。<br>
-                    コメント入力フォームが表示されたままだと、大半のショートカットキーが文字入力と競合して使えなくなります。とくに理由がなければ、オンにしておくのがおすすめです。<br>
-                </label>
+                <label class="settings__item-heading" for="close_comment_form_after_sending">{{ $t('settings.jikkyo.close_comment_form_after_sending.heading') }}</label>
+                <label class="settings__item-label" for="close_comment_form_after_sending" v-html="$t('settings.jikkyo.close_comment_form_after_sending.label')"></label>
                 <v-switch class="settings__item-switch" color="primary" id="close_comment_form_after_sending" hide-details
                     v-model="settingsStore.settings.close_comment_form_after_sending">
                 </v-switch>
@@ -261,7 +220,7 @@ export default defineComponent({
 
             // ログインしていない場合はエラーにする
             if (this.userStore.is_logged_in === false) {
-                Message.warning('連携をはじめるには、KonomiTV アカウントにログインしてください。');
+                Message.warning(this.$t('settings.jikkyo.message.login_required'));
                 return;
             }
 
@@ -282,7 +241,7 @@ export default defineComponent({
             // ref: https://qiita.com/catatsuy/items/babce8726ea78f5d25b1 (大変参考になりました)
             const popup_window = window.open(authorization_url, 'KonomiTV-OAuthPopup', Utils.getWindowFeatures());
             if (popup_window === null) {
-                Message.error('ポップアップウインドウを開けませんでした。');
+                Message.error(this.$t('settings.jikkyo.message.popup_failed'));
                 return;
             }
 
@@ -317,19 +276,19 @@ export default defineComponent({
             // OAuth 連携に失敗した
             if (authorization_status !== 200) {
                 if (authorization_detail.startsWith('Authorization was denied (access_denied)')) {
-                    Message.error('ニコニコアカウントとの連携がキャンセルされました。');
+                    Message.error(this.$t('settings.jikkyo.message.auth_cancelled'));
                 } else if (authorization_detail.startsWith('Failed to get access token (HTTP Error ')) {
                     const error = authorization_detail.replace('Failed to get access token ', '');
-                    Message.error(`アクセストークンの取得に失敗しました。${error}`);
+                    Message.error(this.$t('settings.jikkyo.message.token_failed', { error }));
                 } else if (authorization_detail.startsWith('Failed to get access token (Connection Timeout)')) {
-                    Message.error('アクセストークンの取得に失敗しました。ニコニコで障害が発生している可能性があります。');
+                    Message.error(this.$t('settings.jikkyo.message.token_failed_timeout'));
                 } else if (authorization_detail.startsWith('Failed to get user information (HTTP Error ')) {
                     const error = authorization_detail.replace('Failed to get user information ', '');
-                    Message.error(`ニコニコアカウントのユーザー情報の取得に失敗しました。${error}`);
+                    Message.error(this.$t('settings.jikkyo.message.userinfo_failed', { error }));
                 } else if (authorization_detail.startsWith('Failed to get user information (Connection Timeout)')) {
-                    Message.error('ニコニコアカウントのユーザー情報の取得に失敗しました。ニコニコで障害が発生している可能性があります。');
+                    Message.error(this.$t('settings.jikkyo.message.userinfo_failed_timeout'));
                 } else {
-                    Message.error(`ニコニコアカウントとの連携に失敗しました。(${authorization_detail})`);
+                    Message.error(this.$t('settings.jikkyo.message.link_failed', { detail: authorization_detail }));
                 }
                 return;
             }
@@ -337,7 +296,7 @@ export default defineComponent({
             // アカウント情報を強制的に更新
             await this.userStore.fetchUser(true);
 
-            Message.success('ニコニコアカウントと連携しました。');
+            Message.success(this.$t('settings.jikkyo.message.linked'));
         },
 
         async logoutNiconicoAccount() {
@@ -351,7 +310,7 @@ export default defineComponent({
             // アカウント情報を強制的に更新
             await this.userStore.fetchUser(true);
 
-            Message.success('ニコニコアカウントとの連携を解除しました。');
+            Message.success(this.$t('settings.jikkyo.message.unlinked'));
         },
     }
 });

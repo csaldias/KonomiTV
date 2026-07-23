@@ -16,6 +16,12 @@ export default defineConfig({
     define: {
         'process.env': {},  // これがないと assert がエラーになる
         'import.meta.env.KONOMITV_VERSION': JSON.stringify(process.env.npm_package_version),
+        // vue-i18n の esm-bundler ビルドの機能フラグ (未定義だとブラウザのコンソールに警告が出る)
+        // Composition API (legacy: false) のみを使うため、Legacy API はビルドから除外する
+        // ref: https://vue-i18n.intlify.dev/guide/advanced/optimization.html#reduce-bundle-size-with-feature-build-flags
+        '__VUE_I18N_FULL_INSTALL__': true,
+        '__VUE_I18N_LEGACY_API__': false,
+        '__INTLIFY_PROD_DEVTOOLS__': false,
     },
     // ビルドの設定
     build: {

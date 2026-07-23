@@ -90,6 +90,12 @@ export function setLanguage(language: Language): void {
     dayjs.locale(locale);
     // スクリーンリーダーや :lang() セレクタのために <html lang> 属性も更新する
     document.documentElement.setAttribute('lang', locale);
+    // CSS の content 擬似要素で表示している「デバイス間同期無効」バッジ (Base.vue) の文言を、
+    // CSS 変数経由で現在のロケールに追従させる (JSON.stringify で CSS 文字列リテラル用にダブルクオートで囲む)
+    document.documentElement.style.setProperty(
+        '--konomitv-sync-disabled-badge',
+        JSON.stringify(i18n.global.t('settings.common.sync_disabled_badge')),
+    );
 }
 
 // 初回描画時点で <html lang> と dayjs のロケールを初期値に揃えておく
