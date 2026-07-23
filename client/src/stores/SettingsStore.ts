@@ -73,6 +73,7 @@ export interface ILocalClientSettings extends IClientSettings {
     timetable_hover_expand: boolean;
     timetable_dim_shopping_programs: boolean;
     timetable_genre_colors: ITimeTableGenreColors;
+    language: 'Auto' | 'Japanese' | 'English';
     show_player_background_image: boolean;
     use_pure_black_player_background: boolean;
     tv_channel_sort_by_jikkyo_force: boolean;
@@ -214,6 +215,10 @@ export const ILocalClientSettingsDefault: ILocalClientSettings = {
 
     // ***** 設定 → 全般 *****
 
+    // UI の表示言語 (Default: 自動 / ブラウザの言語設定に従う) (同期無効)
+    // 'Auto' はブラウザの言語設定に従う特別な値で、実際のロケールは plugins/i18n.ts の resolveLocale() で決定される
+    // 言語は端末ごとに変えたいケースがある (例: 共用端末) ため、あえて同期対象外の端末ローカル設定にしている
+    language: 'Auto',
     // プレイヤーの読み込み中に背景写真を表示する (Default: オン)
     show_player_background_image: true,
     // プレイヤー表示領域の背景色を完全な黒にする (Default: オフ)
@@ -384,6 +389,7 @@ export const SYNCABLE_SETTINGS_KEYS: (keyof IClientSettings)[] = [
     'timetable_hover_expand',
     'timetable_dim_shopping_programs',
     'timetable_genre_colors',
+    // language: 同期無効
     'show_player_background_image',
     'use_pure_black_player_background',
     'tv_channel_sort_by_jikkyo_force',
