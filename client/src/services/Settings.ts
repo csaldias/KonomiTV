@@ -137,6 +137,13 @@ export interface IServerSettings {
     capture: {
         upload_folders: string[];
     };
+    translation: {
+        enabled: boolean;
+        ollama_url: string;
+        model: string;
+        context_length: number;
+        update_interval: number;
+    };
 }
 
 /* サーバー設定を表すインターフェースのデフォルト値 */
@@ -168,6 +175,13 @@ export const IServerSettingsDefault: IServerSettings = {
     },
     capture: {
         upload_folders: [],
+    },
+    translation: {
+        enabled: false,
+        ollama_url: 'http://127.0.0.1:11434/',
+        model: 'qwen3:8b',
+        context_length: 8192,
+        update_interval: 10.0,
     },
 };
 

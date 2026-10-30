@@ -89,6 +89,17 @@ class Programs(BaseModel):
     total: int
     programs: list[Program]
 
+class ProgramTranslation(BaseModel):
+    title: str
+    title_symbols: list[str]
+    description: str
+    detail: dict[str, str]
+    is_complete: bool
+
+class ProgramTranslations(BaseModel):
+    target_language: Literal['en']
+    translations: dict[str, ProgramTranslation]
+
 class Genre(TypedDict):
     major: str
     middle: str

@@ -13,12 +13,14 @@ from app import logging, schemas
 from app.config import Config
 from app.constants import JST
 from app.models.Channel import Channel
+from app.models.Program import Program
 from app.routers.ReservationConditionsRouter import EncodeEDCBSearchKeyInfo
 from app.routers.ReservationsRouter import GetCtrlCmdUtil
 from app.utils import NormalizeToJSTDatetime, ParseDatetimeStringToJST
 from app.utils.edcb import EventInfo, ReserveDataRequired, SearchKeyInfo
 from app.utils.edcb.CtrlCmdUtil import CtrlCmdUtil
 from app.utils.edcb.EDCBUtil import EDCBUtil
+from app.utils.EPGTranslator import EPGTranslator
 from app.utils.TSInformation import TSInformation
 
 
@@ -747,3 +749,24 @@ async def TimeTableAPI(
         channels=validated_channels,
         date_range=schemas.TimeTableDateRange(earliest=earliest, latest=latest),
     )
+
+
+@router.post(
+    '/translations',
+    summary = '番組情報翻訳 API',
+    response_description = '番組 ID をキーとする、番組情報の英訳。',
+    response_model = schemas.ProgramTranslations,
+)
+async def ProgramTranslationsAPI(
+    program_ids: Annotated[list[str], Body(description='英訳を取得する番組 ID のリスト。', max_length=5000)],
+):
+    """
+    指定された番組の番組情報 (タイトル・番組概要・番組詳細) の英訳を取得する。<br>
+    英訳はバックグラウンドで Ollama により事前に生成されたもので、まだ翻訳されていない部分は日本語の原文のまま返される (is_complete が False になる)。<br>
+    存在しない番組 ID は無視される。
+    """
+
+    # 番組表の表示範囲の番組をまとめて取得できるよう、番組 ID のリストを受け取る
+    programs = await Program.filter(id__in=program_ids).values('id', 'title', 'description', 'detail')
+    translations = await EPGTranslator.translatePrograms(programs)
+    return schemas.ProgramTranslations(target_language='en', translations=translations)

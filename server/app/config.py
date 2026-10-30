@@ -358,12 +358,26 @@ class _ServerSettingsCapture(BaseModel):
     upload_folders: list[DirectoryPath] = []
     upload_folders_polling_interval: Annotated[float, Field(ge=0, strict=True, allow_inf_nan=False)] = 0.0
 
+class _ServerSettingsTranslation(BaseModel):
+    enabled: bool = False
+    ollama_url: Annotated[Url, UrlConstraints(allowed_schemes=['http', 'https'])] = Url('http://127.0.0.1:11434/')
+    model: str = 'qwen3:8b'
+    context_length: PositiveInt = 8192
+    update_interval: Annotated[float, Field(ge=1.0, strict=True, allow_inf_nan=False)] = 10.0
+
+    @field_validator('ollama_url')
+    def validate_ollama_url(cls, ollama_url: Url) -> Url:
+        # URL を末尾のスラッシュありに統一
+        ## Ollama は番組情報の翻訳にしか使わず、停止していても KonomiTV 自体は動作するため、接続確認は翻訳処理の実行時に行う
+        return Url(str(ollama_url).rstrip('/') + '/')
+
 class ServerSettings(BaseModel):
     general: _ServerSettingsGeneral = _ServerSettingsGeneral()
     server: _ServerSettingsServer = _ServerSettingsServer()
     tv: _ServerSettingsTV = _ServerSettingsTV()
     video: _ServerSettingsVideo = _ServerSettingsVideo()
     capture: _ServerSettingsCapture = _ServerSettingsCapture()
+    translation: _ServerSettingsTranslation = _ServerSettingsTranslation()
 
 
 # サーバー設定データと読み込み・保存用の関数

@@ -45,6 +45,7 @@ from app.routers import (
 )
 from app.streams.LiveStream import LiveStream
 from app.utils.edcb.EDCBTuner import EDCBTuner
+from app.utils.EPGTranslator import EPGTranslator
 from app.utils.FastAPITaskUtil import repeat_every
 
 
@@ -270,6 +271,18 @@ async def UpdateChannelAndProgram():
     await Channel.updateJikkyoStatus()
     await Program.update(multiprocess=True)
 
+# サーバー設定で指定された時間 (デフォルト: 10分) ごとに1回、まだ翻訳されていない番組情報を Ollama で英訳する
+# 初回起動時は数日分の番組情報の翻訳に数時間かかるため、番組情報の更新タスクとは別のタスクとして実行する
+# repeat_every は前回の実行が終わってから次の待機を始めるため、翻訳処理は常に1つずつ順番に実行される
+@app.on_event('startup')
+@repeat_every(
+    seconds = CONFIG.translation.update_interval * 60,
+    wait_first = 60,
+    logger = logging.logger,
+)
+async def TranslatePrograms():
+    await EPGTranslator.run()
+
 # 30秒に1回、ニコニコ実況関連のステータスを更新する
 @app.on_event('startup')
 @repeat_every(seconds=0.5 * 60, wait_first=0.5 * 60, logger=logging.logger)
@@ -304,6 +317,9 @@ async def Shutdown():
     if recorded_scan_task is not None:
         await recorded_scan_task.stop()
         recorded_scan_task = None
+
+    # 番組情報の翻訳キャッシュ DB を閉じる
+    await EPGTranslator.close()
 
     # 非同期タスクの終了処理が完全に終わるよう、もう少しだけ待つ
     # この待機を省略すると LiveEncodingTask などの終了前に Tortoise ORM の DB 接続が閉じられ、エラートレースバックが出力される
