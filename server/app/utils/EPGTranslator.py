@@ -461,6 +461,10 @@ class EPGTranslator:
                 'options': {
                     # 同じ原文には毎回同じ訳を返すよう、ランダム性をなくす
                     'temperature': 0,
+                    # 訳文では同じ語句や人名を繰り返し使うため、既出のトークンへのペナルティを無効にする
+                    ## qwen3.5 などは Modelfile で presence_penalty = 1.5 が既定値になっており、指定しないと同じ語句が言い換えられてしまう
+                    'presence_penalty': 0,
+                    'repeat_penalty': 1.0,
                     'num_ctx': config.context_length,
                 },
                 # NVEncC などが VRAM を使えるよう、翻訳処理が終わったら早めにモデルをアンロードさせる
