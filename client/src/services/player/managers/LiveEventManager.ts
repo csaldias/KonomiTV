@@ -2,6 +2,7 @@
 
 import DPlayer from 'dplayer';
 
+import i18n from '@/plugins/i18n';
 import PlayerManager from '@/services/player/PlayerManager';
 import useChannelsStore from '@/stores/ChannelsStore';
 import usePlayerStore from '@/stores/PlayerStore';
@@ -180,7 +181,7 @@ class LiveEventManager implements PlayerManager {
                     // 本来誰も視聴していないことを示す Idling ステータスを受信している場合、何らかの理由で
                     // ライブストリーミング API への接続が切断された可能性が高いので、PlayerController にプレイヤーの再起動を要求する
                     player_store.event_emitter.emit('PlayerRestartRequired', {
-                        message: 'ストリーミング接続が切断されました。(Status: Idling) プレイヤーを再起動しています…',
+                        message: i18n.global.t('messages.player.disconnected_idling'),
                     });
 
                     break;
@@ -211,9 +212,9 @@ class LiveEventManager implements PlayerManager {
 
                     // 「ライブストリームは Offline です。」のステータス詳細を受信すること自体が不正な状態
                     // ストリーミング API への接続が切断された可能性が高いので、PlayerController にプレイヤーの再起動を要求する
-                    if (event.detail === 'ライブストリームは Offline です。') {
+                    if (event.detail === i18n.global.t('messages.player.stream_offline')) {
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: 'ストリーミング接続が切断されました。(Status: Offline) プレイヤーを再起動しています…',
+                            message: i18n.global.t('messages.player.disconnected_offline'),
                         });
                     }
 

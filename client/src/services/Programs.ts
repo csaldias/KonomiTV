@@ -1,5 +1,6 @@
 import type { Dayjs } from 'dayjs';
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IChannel } from '@/services/Channels';
 
@@ -37,8 +38,8 @@ export const IProgramDefault: IProgram = {
     network_id: 0,
     service_id: 0,
     event_id: 0,
-    title: '取得中…',
-    description: '取得中…',
+    title: i18n.global.t('messages.programs.loading'),
+    description: i18n.global.t('messages.programs.loading'),
     detail: {},
     start_time: '2000-01-01T00:00:00+09:00',
     end_time: '2000-01-01T00:00:00+09:00',
@@ -208,10 +209,10 @@ class Programs {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, '番組検索機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.programs.search_edcb_only'));
                     break;
                 default:
-                    APIClient.showGenericError(response, '番組情報の検索に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.programs.search_failed'));
                     break;
             }
             return null;
@@ -256,7 +257,7 @@ class Programs {
         const response = await APIClient.get<ITimeTable>(`/programs/timetable?${params.toString()}`);
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '番組表データの取得に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.programs.timetable_failed'));
             return null;
         }
 
@@ -273,7 +274,7 @@ class Programs {
         const response = await APIClient.post<IProgramTranslations>('/programs/translations', program_ids);
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '番組情報の英訳の取得に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.programs.translations_failed'));
             return null;
         }
 

@@ -3,6 +3,7 @@
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
+import i18n from '@/plugins/i18n';
 import OfflineVideos from '@/services/OfflineVideos';
 import OfflineVideoStorage from '@/services/OfflineVideoStorage';
 
@@ -52,18 +53,19 @@ self.addEventListener('backgroundfetchsuccess', (event: BackgroundFetchEvent) =>
 });
 
 // ブラウザが報告した失敗理由を保存し、次回 KonomiTV を開いたときにアプリ内で確認できるようにする
+// Service Worker からは LocalStorage の表示言語の設定を参照できないため、文言はブラウザの言語設定に従う
 self.addEventListener('backgroundfetchfail', (event: BackgroundFetchEvent) => {
     event.waitUntil((async () => {
         const jobID = event.registration.id.replace('konomitv-offline-', '');
         const failureMessages: Record<BackgroundFetchRegistration['failureReason'], string> = {
-            '': '原因を特定できませんでした。',
-            'aborted': 'ブラウザによって保存が中止されました。',
-            'bad-status': 'サーバーがエラーを返しました。',
-            'fetch-error': '通信に失敗しました。',
-            'quota-exceeded': '端末の空き容量が不足しています。',
-            'download-total-exceeded': '受信量がブラウザへ通知した容量を超えました。',
+            '': i18n.global.t('messages.offline.bg_reason_unknown'),
+            'aborted': i18n.global.t('messages.offline.bg_reason_aborted'),
+            'bad-status': i18n.global.t('messages.offline.bg_reason_bad_status'),
+            'fetch-error': i18n.global.t('messages.offline.bg_reason_fetch_error'),
+            'quota-exceeded': i18n.global.t('messages.offline.bg_reason_quota'),
+            'download-total-exceeded': i18n.global.t('messages.offline.bg_reason_total_exceeded'),
         };
-        await OfflineVideos.markJobFailed(jobID, `バックグラウンド保存に失敗しました。${failureMessages[event.registration.failureReason]}`);
+        await OfflineVideos.markJobFailed(jobID, i18n.global.t('messages.offline.bg_failed', [failureMessages[event.registration.failureReason]]));
     })());
 });
 

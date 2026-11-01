@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 
 
@@ -21,7 +22,7 @@ class Niconico {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ニコニコアカウントとの連携用の認証 URL を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.niconico.auth_url_failed'));
             return null;
         }
 
@@ -40,7 +41,7 @@ class Niconico {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ニコニコアカウントとの連携を解除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.niconico.unlink_failed'));
             return false;
         }
 

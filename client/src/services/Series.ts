@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IChannel } from '@/services/Channels';
 import { IRecordedProgram } from '@/services/Videos';
@@ -50,7 +51,7 @@ class Series {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'シリーズ一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.series.list_failed'));
             return null;
         }
 
@@ -78,7 +79,7 @@ class Series {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'シリーズ番組の検索に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.series.search_failed'));
             return null;
         }
 
@@ -98,7 +99,7 @@ class Series {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'シリーズ情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.series.info_failed'));
             return null;
         }
 

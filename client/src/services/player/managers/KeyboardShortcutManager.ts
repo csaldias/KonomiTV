@@ -3,6 +3,7 @@
 import DPlayer from 'dplayer';
 import { watch } from 'vue';
 
+import i18n from '@/plugins/i18n';
 import router from '@/router';
 import PlayerManager from '@/services/player/PlayerManager';
 import useChannelsStore from '@/stores/ChannelsStore';
@@ -234,9 +235,9 @@ class KeyboardShortcutManager implements PlayerManager {
                     this.player.template.volumeButtonIcon.click();
                 }
                 if (this.player.video.muted === true) {
-                    this.player.notice('音量をミュート中');
+                    this.player.notice(i18n.global.t('messages.player.muted'));
                 } else {
-                    this.player.notice('音量をミュート解除');
+                    this.player.notice(i18n.global.t('messages.player.unmuted'));
                 }
             }},
 
@@ -248,7 +249,7 @@ class KeyboardShortcutManager implements PlayerManager {
             // R: プレイヤーを再起動する
             {mode: 'Both', key: 'KeyR', repeat: false, ctrl: false, shift: false, alt: false, handler: () => {
                 player_store.event_emitter.emit('PlayerRestartRequired', {
-                    message: 'プレイヤーを再起動しました。',
+                    message: i18n.global.t('messages.player.restarted'),
                     is_error_message: false,  // 明示的に上記メッセージがエラーメッセージではないことを示す (通知時の色がデフォルトになる)
                 });
             }},

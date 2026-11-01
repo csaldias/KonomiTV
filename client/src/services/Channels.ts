@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IProgram, IProgramDefault } from '@/services/Programs';
 
@@ -62,7 +63,7 @@ export const ILiveChannelDefault: ILiveChannel = {
     remocon_id: 0,
     channel_number: '---',
     type: 'GR',
-    name: '取得中…',
+    name: i18n.global.t('messages.channels.loading'),
     jikkyo_force: null,
     is_subchannel: false,
     is_radiochannel: false,
@@ -107,7 +108,7 @@ class Channels {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'チャンネル情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.channels.info_failed'));
             return null;
         }
 
@@ -128,7 +129,7 @@ class Channels {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'チャンネル情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.channels.info_failed'));
             return null;
         }
 
@@ -148,7 +149,7 @@ class Channels {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'コメント送受信用 WebSocket API の情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.channels.websocket_info_failed'));
             return null;
         }
 

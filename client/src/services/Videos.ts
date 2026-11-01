@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from  '@/services/APIClient';
 import { IChannel } from '@/services/Channels';
 import Utils, { CommentUtils } from '@/utils';
@@ -146,11 +147,11 @@ export const IRecordedProgramDefault: IRecordedProgram = {
     event_id: null,
     series_id: null,
     series_broadcast_period_id: null,
-    title: '取得中…',
+    title: i18n.global.t('messages.videos.loading'),
     series_title: null,
     episode_number: null,
     subtitle: null,
-    description: '取得中…',
+    description: i18n.global.t('messages.videos.loading'),
     detail: {},
     start_time: '2000-01-01T00:00:00+09:00',
     end_time: '2000-01-01T00:00:00+09:00',
@@ -216,7 +217,7 @@ class Videos {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画番組一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.videos.list_failed'));
             return null;
         }
 
@@ -244,7 +245,7 @@ class Videos {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画番組の検索に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.videos.search_failed'));
             return null;
         }
 
@@ -264,7 +265,7 @@ class Videos {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画番組情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.videos.info_failed'));
             return null;
         }
 
@@ -284,11 +285,11 @@ class Videos {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '過去ログコメントを取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.videos.comments_failed'));
             return {
                 is_success: false,
                 comments: [],
-                detail: '過去ログコメントを取得できませんでした。',
+                detail: i18n.global.t('messages.videos.comments_failed'),
             };
         }
 
@@ -317,7 +318,7 @@ class Videos {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'メタデータの再解析に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.videos.reanalyze_failed'));
                     break;
             }
             return false;
@@ -353,7 +354,7 @@ class Videos {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画番組のサムネイルを変更できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.videos.thumbnail_change_failed'));
             return false;
         }
 
@@ -378,7 +379,7 @@ class Videos {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'サムネイルの再生成に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.videos.thumbnail_regenerate_failed'));
                     break;
             }
             return false;
@@ -401,7 +402,7 @@ class Videos {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, '録画ファイルの削除に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.videos.delete_failed'));
                     break;
             }
             return false;

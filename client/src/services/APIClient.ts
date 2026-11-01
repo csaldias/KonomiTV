@@ -7,6 +7,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import useUserStore from '@/stores/UserStore';
 import Utils from '@/utils';
 
@@ -219,26 +220,26 @@ class APIClient {
         switch (error_response.data.detail) {
             case 'Not authenticated': {
                 user_store.logout(true);
-                Message.error(`${template}\nログインし直してください。`);
+                Message.error(i18n.global.t('messages.api.not_authenticated', [template]));
                 return;
             }
             case 'Access token data is invalid': {
                 user_store.logout(true);
-                Message.error(`${template}\nログインセッションが不正です。もう一度ログインし直してください。`);
+                Message.error(i18n.global.t('messages.api.session_invalid', [template]));
                 return;
             }
             case 'Access token is invalid': {
                 user_store.logout(true);
-                Message.error(`${template}\nログインセッションの有効期限が切れています。もう一度ログインし直してください。`);
+                Message.error(i18n.global.t('messages.api.session_expired', [template]));
                 return;
             }
             case 'User associated with access token does not exist': {
                 user_store.logout(true);
-                Message.error(`${template}\nログインセッションに紐づくユーザーが存在しないか、削除されています。`);
+                Message.error(i18n.global.t('messages.api.user_not_found', [template]));
                 return;
             }
             case 'Don\'t have permission to access this resource': {
-                Message.error(`${template}\nこのリソースにアクセスする権限がありません。`);
+                Message.error(i18n.global.t('messages.api.forbidden', [template]));
                 return;
             }
             default: {
@@ -259,13 +260,13 @@ class APIClient {
                     // HTTP リクエスト自体が失敗し、HTTP ステータスコードが取得できなかった場合
                     if (error_response.error.code === AxiosError.ECONNABORTED) {
                         // ネットワーク接続エラーの場合
-                        Message.error(`${template}\nサーバーへの接続が切断されました。(${error_response.error.message})`);
+                        Message.error(i18n.global.t('messages.api.connection_closed', [template, error_response.error.message]));
                     } else if (error_response.error.code === AxiosError.ETIMEDOUT) {
                         // タイムアウトの場合
-                        Message.error(`${template}\nサーバーへの接続がタイムアウトしました。(${error_response.error.message})`);
+                        Message.error(i18n.global.t('messages.api.connection_timeout', [template, error_response.error.message]));
                     } else if (error_response.error.code === AxiosError.ERR_NETWORK) {
                         // 予期しないネットワークエラーの場合
-                        Message.error(`${template}\n予期しないネットワークエラーが発生しました。(${error_response.error.message})`);
+                        Message.error(i18n.global.t('messages.api.network_error', [template, error_response.error.message]));
                     } else {
                         // それ以外のエラーの場合
                         Message.error(`${template}(${error_response.error.message})`);
@@ -273,7 +274,7 @@ class APIClient {
                 } else {
                     // HTTP リクエスト自体は成功したが、API からエラーレスポンスが返ってきた場合
                     if (error_response.status === 502) {
-                        Message.error(`${template}\n現在サーバーを起動/再起動しています。もうしばらくお待ちください。(HTTP Error 502)`);
+                        Message.error(i18n.global.t('messages.api.server_starting', [template]));
                     } else if (error_response.data.detail !== undefined) {
                         Message.error(`${template}(HTTP Error ${error_response.status} / ${error_response.data.detail})`);
                     } else {

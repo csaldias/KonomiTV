@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import Users, { IUser, IUserUpdateRequest } from '@/services/Users';
 import useSettingsStore from '@/stores/SettingsStore';
 import Utils from '@/utils';
@@ -57,7 +58,7 @@ const useUserStore = defineStore('user', {
             // 作成したアカウントでログイン
             await this.login(username, password, true);
             console.log('Register successful.');
-            Message.success('アカウントを作成しました。');
+            Message.success(i18n.global.t('messages.user.account_created'));
             return true;
         },
 
@@ -87,7 +88,7 @@ const useUserStore = defineStore('user', {
             await this.fetchUser(true);
 
             if (silent === false) {
-                Message.success('ログインしました。');
+                Message.success(i18n.global.t('messages.user.logged_in'));
             }
 
             return true;
@@ -113,7 +114,7 @@ const useUserStore = defineStore('user', {
             this.user_icon_url = '';
 
             if (silent === false) {
-                Message.success('ログアウトしました。');
+                Message.success(i18n.global.t('messages.user.logged_out'));
             }
         },
 
@@ -175,9 +176,9 @@ const useUserStore = defineStore('user', {
             await this.fetchUser(true);
 
             if (user_update_request.username !== undefined) {
-                Message.show('ユーザー名を更新しました。');
+                Message.show(i18n.global.t('messages.user.username_updated'));
             } else if (user_update_request.password !== undefined) {
-                Message.show('パスワードを更新しました。');
+                Message.show(i18n.global.t('messages.user.password_updated'));
             }
         },
 
@@ -193,7 +194,7 @@ const useUserStore = defineStore('user', {
             // ユーザーアカウントの情報を再取得する
             await this.fetchUser(true);
 
-            Message.show('アイコン画像を更新しました。');
+            Message.show(i18n.global.t('messages.user.icon_updated'));
         },
 
         /**
@@ -207,7 +208,7 @@ const useUserStore = defineStore('user', {
             // ログアウトする
             this.logout(true);
 
-            Message.show('アカウントを削除しました。');
+            Message.show(i18n.global.t('messages.user.account_deleted'));
         }
     }
 });

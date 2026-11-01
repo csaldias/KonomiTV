@@ -4,6 +4,7 @@ import { Deinterlacer } from 'mpeg2toh264/yadif';
 import { watch } from 'vue';
 import { bmlBrowserFontNames } from 'web-bml';
 
+import i18n from '@/plugins/i18n';
 import KeyboardShortcutManager from '@/services/player/managers/KeyboardShortcutManager';
 import LiveDataBroadcastingManager from '@/services/player/managers/LiveDataBroadcastingManager';
 import PlayerManager from '@/services/player/PlayerManager';
@@ -193,11 +194,11 @@ class DocumentPiPManager implements PlayerManager {
             playing_in_pip_container.classList.add('playing-in-pip');
             const playing_in_pip_text = document.createElement('span');
             playing_in_pip_text.classList.add('playing-in-pip__text');
-            playing_in_pip_text.textContent = 'Picture-in-Picture を再生しています';
+            playing_in_pip_text.textContent = i18n.global.t('messages.player.pip_playing');
             playing_in_pip_container.append(playing_in_pip_text);
             const playing_in_pip_close_button = document.createElement('button');
             playing_in_pip_close_button.classList.add('playing-in-pip__close-button');
-            playing_in_pip_close_button.textContent = 'Picture-in-Picture を終了';
+            playing_in_pip_close_button.textContent = i18n.global.t('messages.player.pip_exit');
             playing_in_pip_close_button.onclick = () => pip_window.close();
             playing_in_pip_container.append(playing_in_pip_close_button);
             this.watch_content_element.append(playing_in_pip_container);

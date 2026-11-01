@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IChannel } from '@/services/Channels';
 import { IProgram } from '@/services/Programs';
@@ -152,7 +153,7 @@ class Reservations {
         const response = await APIClient.get<IReservations>('/recording/reservations');
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画予約一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.reservations.list_failed'));
             return null;
         }
 
@@ -168,7 +169,7 @@ class Reservations {
         const response = await APIClient.get<IReservation>(`/recording/reservations/${reservation_id}`);
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画予約情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.reservations.info_failed'));
             return null;
         }
 
@@ -198,34 +199,34 @@ class Reservations {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, '録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.edcb_only'));
                     break;
                 case 'Specified program was not found':
-                    APIClient.showGenericError(response, '指定された番組が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.program_not_found'));
                     break;
                 case 'Specified channel was not found':
-                    APIClient.showGenericError(response, '指定されたチャンネルが見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.channel_not_found'));
                     break;
                 case 'Specified program duration is unknown':
-                    APIClient.showGenericError(response, 'この番組は放送時間が未定のため、録画予約できません。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.time_undecided'));
                     break;
                 case 'Program payload does not match channel':
-                    APIClient.showGenericError(response, '番組情報とチャンネル情報が一致しないため、録画予約できません。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.program_channel_mismatch'));
                     break;
                 case 'Specified channel does not have transport_stream_id':
-                    APIClient.showGenericError(response, 'チャンネル情報に TSID がないため、録画予約できません。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.no_tsid'));
                     break;
                 case 'Specified program has already ended':
-                    APIClient.showGenericError(response, 'すでに終了した番組のため、録画予約できません。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.program_ended'));
                     break;
                 case 'The same program_id is already reserved':
-                    APIClient.showGenericError(response, 'この番組は既に録画予約されています。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.already_reserved'));
                     break;
                 case 'Failed to add a recording reservation':
-                    APIClient.showGenericError(response, '録画予約の追加に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.add_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, '録画予約の追加に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.add_failed'));
                     break;
             }
             return false;
@@ -250,16 +251,16 @@ class Reservations {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, '録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.edcb_only'));
                     break;
                 case 'Specified reservation_id was not found':
-                    APIClient.showGenericError(response, '指定された録画予約が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.reservation_not_found'));
                     break;
                 case 'Failed to update the specified recording reservation':
-                    APIClient.showGenericError(response, '録画予約の更新に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.update_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, '録画予約の更新に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.update_failed'));
                     break;
             }
             return null;
@@ -279,16 +280,16 @@ class Reservations {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, '録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.edcb_only'));
                     break;
                 case 'Specified reservation_id was not found':
-                    APIClient.showGenericError(response, '指定された録画予約が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.reservation_not_found'));
                     break;
                 case 'Failed to delete the specified recording reservation':
-                    APIClient.showGenericError(response, '録画予約の削除に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.delete_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, `録画予約 (ID: ${reservation_id}) の削除に失敗しました。`);
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservations.delete_failed_id', [reservation_id]));
                     break;
             }
             return false;
@@ -306,7 +307,7 @@ class Reservations {
         const response = await APIClient.get<IRecordSettingsPresets>('/recording/presets');
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, '録画設定プリセット一覧の取得に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.reservations.presets_failed'));
             return null;
         }
 

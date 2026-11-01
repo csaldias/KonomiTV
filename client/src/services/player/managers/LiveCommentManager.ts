@@ -2,6 +2,7 @@
 import { throttle } from '@github/mini-throttle';
 import DPlayer, { DPlayerType } from 'dplayer';
 
+import i18n from '@/plugins/i18n';
 import Channels from '@/services/Channels';
 import PlayerManager from '@/services/player/PlayerManager';
 import useChannelsStore from '@/stores/ChannelsStore';
@@ -78,6 +79,16 @@ class LiveCommentManager implements PlayerManager {
     }
 
 
+    // 通知に表示する接続先の名前 (表示言語に合わせる)
+    // 日本語では英字と日本語の間にスペースを入れるため、"NX-Jikkyo " の末尾にスペースを付けている
+    private get watch_session_label(): string {
+        if (this.watch_session_type === 'ニコニコ実況') {
+            return i18n.global.t('messages.live_comment.niconico_jikkyo');
+        }
+        return i18n.global.t('messages.live_comment.nx_jikkyo');
+    }
+
+
     /**
      * ニコニコ実況または NX-Jikkyo に接続し、セッションを初期化する
      */
@@ -101,8 +112,8 @@ class LiveCommentManager implements PlayerManager {
             console.error(`[LiveCommentManager][WatchSession] Error: ${watch_session_info.detail}`);
 
             // 通常発生しないエラーメッセージ (サーバーエラーなど) はプレイヤー側にも通知する
-            if (watch_session_info.detail !== 'このチャンネルはニコニコ実況に対応していません。') {
-                if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
+            if (watch_session_info.detail !== i18n.global.t('messages.live_comment.unsupported_channel')) {
+                if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
                     this.player.notice(watch_session_info.detail, undefined, undefined, '#FF6F6A');
                 }
             }
@@ -135,14 +146,14 @@ class LiveCommentManager implements PlayerManager {
         if (websocket_info === null) {
             return {
                 is_success: false,
-                detail: 'コメント受信用 WebSocket API の情報を取得できませんでした。',
+                detail: i18n.global.t('messages.live_comment.websocket_info_failed'),
             };
         }
         // チャンネルに対応するニコニコ実況チャンネルが存在しない場合
         if (websocket_info.watch_session_url === null) {
             return {
                 is_success: false,
-                detail: 'このチャンネルはニコニコ実況に対応していません。',
+                detail: i18n.global.t('messages.live_comment.unsupported_channel'),
             };
         }
 
@@ -179,7 +190,7 @@ class LiveCommentManager implements PlayerManager {
             // ニコニコ生放送からエラーが返された: 普通発生しないため警告メッセージとして表示
             } else if (websocket_info.nicolive_watch_session_error !== null) {
                 console.warn(`[LiveCommentManager][WatchSession] Failed to get Nicolive watch session URL. (${websocket_info.nicolive_watch_session_error})`);
-                this.player.notice(`${websocket_info.nicolive_watch_session_error}代わりに NX-Jikkyo にコメントします。`, undefined, undefined, '#FFA86A');
+                this.player.notice(i18n.global.t('messages.live_comment.fallback_nx_jikkyo', [websocket_info.nicolive_watch_session_error]), undefined, undefined, '#FFA86A');
             }
         }
 
@@ -212,8 +223,8 @@ class LiveCommentManager implements PlayerManager {
 
             // 接続切断の理由を表示
             const code = (event instanceof CloseEvent) ? event.code : 'Error';
-            if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
-                this.player.notice(`${this.watch_session_type}との接続が切断されました。(Code: ${code})`, undefined, undefined, '#FF6F6A');
+            if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
+                this.player.notice(i18n.global.t('messages.live_comment.disconnected_code', [this.watch_session_label, code]), undefined, undefined, '#FF6F6A');
             }
             console.error(`[LiveCommentManager][WatchSession] Connection closed. (Code: ${code})`);
 
@@ -270,36 +281,36 @@ class LiveCommentManager implements PlayerManager {
                         break;
                     }
 
-                    let error = `${this.watch_session_type}でエラーが発生しています。(Code: ${message.data.code})`;
+                    let error = i18n.global.t('messages.live_comment.error_code', [this.watch_session_label, message.data.code]);
                     switch (message.data.code) {
                         case 'CONNECT_ERROR':
-                            error = `${this.watch_session_type}のコメントサーバーに接続できません。`;
+                            error = i18n.global.t('messages.live_comment.comment_server_unreachable', [this.watch_session_label]);
                             break;
                         case 'CONTENT_NOT_READY':
-                            error = `${this.watch_session_type}が配信できない状態です。`;
+                            error = i18n.global.t('messages.live_comment.cannot_stream', [this.watch_session_label]);
                             break;
                         case 'NO_THREAD_AVAILABLE':
-                            error = `${this.watch_session_type}のコメントスレッドを取得できません。`;
+                            error = i18n.global.t('messages.live_comment.thread_unavailable', [this.watch_session_label]);
                             break;
                         case 'NO_ROOM_AVAILABLE':
-                            error = `${this.watch_session_type}のコメント部屋を取得できません。`;
+                            error = i18n.global.t('messages.live_comment.room_unavailable', [this.watch_session_label]);
                             break;
                         case 'NO_PERMISSION':
-                            error = `${this.watch_session_type}の API にアクセスする権限がありません。`;
+                            error = i18n.global.t('messages.live_comment.api_forbidden', [this.watch_session_label]);
                             break;
                         case 'NOT_ON_AIR':
-                            error = `${this.watch_session_type}が放送中ではありません。`;
+                            error = i18n.global.t('messages.live_comment.not_on_air', [this.watch_session_label]);
                             break;
                         case 'BROADCAST_NOT_FOUND':
-                            error = `${this.watch_session_type}の配信情報を取得できません。`;
+                            error = i18n.global.t('messages.live_comment.stream_info_unavailable', [this.watch_session_label]);
                             break;
                         case 'INTERNAL_SERVERERROR':
-                            error = `${this.watch_session_type}でサーバーエラーが発生しています。`;
+                            error = i18n.global.t('messages.live_comment.server_error', [this.watch_session_label]);
                             break;
                     }
 
                     // エラー情報を表示
-                    if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
+                    if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
                         this.player.notice(error, undefined, undefined, '#FF6F6A');
                     }
                     console.error(`[LiveCommentManager][WatchSession] Error occurred. (Code: ${message.data.code})`);
@@ -326,39 +337,39 @@ class LiveCommentManager implements PlayerManager {
                     is_disconnect_message_received = true;
 
                     // 接続切断の理由
-                    let disconnect_reason = `${this.watch_session_type}との接続が切断されました。(${message.data.reason})`;
+                    let disconnect_reason = i18n.global.t('messages.live_comment.disconnected_reason', [this.watch_session_label, message.data.reason]);
                     switch (message.data.reason) {
                         case 'TAKEOVER':
-                            disconnect_reason = `${this.watch_session_type}の番組から追い出されました。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.kicked', [this.watch_session_label]);
                             break;
                         case 'NO_PERMISSION':
-                            disconnect_reason = `${this.watch_session_type}の番組の座席を取得できませんでした。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.no_seat', [this.watch_session_label]);
                             break;
                         case 'END_PROGRAM':
-                            disconnect_reason = `${this.watch_session_type}がリセットされたか、実況枠番組が終了しました。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.reset_or_ended', [this.watch_session_label]);
                             break;
                         case 'PING_TIMEOUT':
-                            disconnect_reason = 'コメントサーバーとの接続生存確認に失敗しました。';
+                            disconnect_reason = i18n.global.t('messages.live_comment.ping_failed');
                             break;
                         case 'TOO_MANY_CONNECTIONS':
-                            disconnect_reason = `${this.watch_session_type}の同一ユーザからの接続数上限を越えています。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.too_many_connections', [this.watch_session_label]);
                             break;
                         case 'TOO_MANY_WATCHINGS':
-                            disconnect_reason = `${this.watch_session_type}の同一ユーザからの視聴番組数上限を越えています。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.too_many_programs', [this.watch_session_label]);
                             break;
                         case 'CROWDED':
-                            disconnect_reason = `${this.watch_session_type}の番組が満席です。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.full', [this.watch_session_label]);
                             break;
                         case 'MAINTENANCE_IN':
-                            disconnect_reason = `${this.watch_session_type}はメンテナンス中です。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.maintenance', [this.watch_session_label]);
                             break;
                         case 'SERVICE_TEMPORARILY_UNAVAILABLE':
-                            disconnect_reason = `${this.watch_session_type}で一時的にサーバーエラーが発生しています。`;
+                            disconnect_reason = i18n.global.t('messages.live_comment.temporary_server_error', [this.watch_session_label]);
                             break;
                     }
 
                     // 接続切断の理由を表示
-                    if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
+                    if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
                         this.player.notice(disconnect_reason, undefined, undefined, '#FF6F6A');
                     }
                     console.error(`[LiveCommentManager][WatchSession] Disconnected. (Reason: ${message.data.reason})`);
@@ -389,7 +400,7 @@ class LiveCommentManager implements PlayerManager {
                     console.log(`[LiveCommentManager][WatchSession] Connected.\nThread ID: ${message.data.threadId}`);
                     return resolve({
                         is_success: true,
-                        detail: '視聴セッションを取得しました。',
+                        detail: i18n.global.t('messages.live_comment.session_acquired'),
                         // コメントサーバーへの接続情報
                         message_server_url: message.data.messageServer.uri,
                         // コメントサーバー上のスレッド ID
@@ -415,7 +426,7 @@ class LiveCommentManager implements PlayerManager {
                     console.log('[LiveCommentManager][WatchSession] Connected.');
                     return resolve({
                         is_success: true,
-                        detail: '視聴セッションを取得しました。',
+                        detail: i18n.global.t('messages.live_comment.session_acquired'),
                         // コメントサーバーへの接続情報
                         // 常に NX-Jikkyo のニコニコ生放送互換 API に接続する
                         message_server_url: websocket_info.comment_session_url!,
@@ -483,8 +494,8 @@ class LiveCommentManager implements PlayerManager {
 
             // 接続切断の理由を表示
             const code = (event instanceof CloseEvent) ? event.code : 'Error';
-            if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
-                this.player.notice(`NX-Jikkyo との接続が切断されました。(Code: ${code})`, undefined, undefined, '#FF6F6A');
+            if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
+                this.player.notice(i18n.global.t('messages.live_comment.nx_disconnected', [code]), undefined, undefined, '#FF6F6A');
             }
             console.error(`[LiveCommentManager][CommentSession] Connection closed. (Code: ${code})`);
 
@@ -631,10 +642,10 @@ class LiveCommentManager implements PlayerManager {
         // フォールバックで代わりに NX-Jikkyo にコメントが投稿される旨を通知する
         if (settings_store.settings.prefer_posting_to_nicolive === true) {
             if (user_store.user === null) {
-                this.player.notice('ニコニコ実況にコメントするには、KonomiTV アカウントにログインしてください。代わりに NX-Jikkyo にコメントします。',
+                this.player.notice(i18n.global.t('messages.live_comment.login_required'),
                     undefined, undefined, '#FFA86A');
             } else if (user_store.user.niconico_user_id === null) {
-                this.player.notice('ニコニコ実況にコメントするには、ニコニコアカウントと連携してください。代わりに NX-Jikkyo にコメントします。',
+                this.player.notice(i18n.global.t('messages.live_comment.link_required'),
                     undefined, undefined, '#FFA86A');
             }
         }
@@ -642,11 +653,11 @@ class LiveCommentManager implements PlayerManager {
         // 視聴セッションの接続先がニコニコ生放送のときのみのバリデーション
         if (this.watch_session_type === 'ニコニコ実況') {
             if (user_store.user?.niconico_user_premium === false && (options.data.type === 'top' || options.data.type === 'bottom')) {
-                options.error('ニコニコ実況でコメントを上下に固定するには、ニコニコアカウントのプレミアム会員登録が必要です。');
+                options.error(i18n.global.t('messages.live_comment.premium_position'));
                 return;
             }
             if (user_store.user?.niconico_user_premium === false && options.data.size === 'big') {
-                options.error('ニコニコ実況でコメントサイズを大きめに設定するには、ニコニコアカウントのプレミアム会員登録が必要です。');
+                options.error(i18n.global.t('messages.live_comment.premium_size'));
                 return;
             }
         }
@@ -654,7 +665,7 @@ class LiveCommentManager implements PlayerManager {
         // 視聴セッションが null か、接続が既に切れている場合
         if (this.watch_session === null || this.watch_session.readyState !== WebSocket.OPEN) {
             console.error('[LiveCommentManager][WatchSession] Comment sending failed. (Connection is not established.)');
-            options.error('コメントの送信に失敗しました。WebSocket 接続が確立されていません。');
+            options.error(i18n.global.t('messages.live_comment.send_no_websocket'));
             return;
         }
 
@@ -733,13 +744,13 @@ class LiveCommentManager implements PlayerManager {
                 // コメント送信直後に error が送られてきた → コメント送信に失敗している
                 case 'error': {
                     // コメント失敗を DPlayer にコールバックで通知
-                    let error = `コメントの送信に失敗しました。(${message.data.code})`;
+                    let error = i18n.global.t('messages.live_comment.send_failed', [message.data.code]);
                     switch (message.data.code) {
                         case 'COMMENT_POST_NOT_ALLOWED':
-                            error = 'コメントが許可されていません。';
+                            error = i18n.global.t('messages.live_comment.not_allowed');
                             break;
                         case 'INVALID_MESSAGE':
-                            error = 'コメント内容が無効です。';
+                            error = i18n.global.t('messages.live_comment.invalid');
                             break;
                     }
                     console.error(`[LiveCommentManager][WatchSession] Comment sending failed. (Code: ${message.data.code})`);
@@ -777,8 +788,8 @@ class LiveCommentManager implements PlayerManager {
         // 再接続を開始
         this.reconnecting = true;
         console.warn('[LiveCommentManager] Reconnecting...');
-        if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
-            this.player.notice(`${this.watch_session_type}に再接続しています…`);
+        if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
+            this.player.notice(i18n.global.t('messages.live_comment.reconnecting', [this.watch_session_label]));
         }
 
         // 前の視聴セッション・コメントセッションを破棄
@@ -794,7 +805,7 @@ class LiveCommentManager implements PlayerManager {
             console.error('[LiveCommentManager] Reconnection failed.');
 
             // 無条件にエラーメッセージをプレイヤーに通知
-            if (this.player.template.notice.textContent!.includes('再起動しています…') === false) {
+            if (this.player.template.notice.textContent!.includes(i18n.global.t('messages.live_comment.restarting')) === false) {
                 this.player.notice(watch_session_info.detail, undefined, undefined, '#FF6F6A');
             }
 

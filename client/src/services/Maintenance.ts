@@ -2,6 +2,7 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import Utils from '@/utils';
 
@@ -37,7 +38,7 @@ class Maintenance {
         // アクセストークンを取得
         const access_token = Utils.getAccessToken();
         if (access_token === null) {
-            Message.error('サーバーログの表示には管理者権限が必要です。\n管理者アカウントでログインし直してください。');
+            Message.error(i18n.global.t('messages.maintenance.log_admin_required'));
             return null;
         }
 
@@ -65,7 +66,7 @@ class Maintenance {
                 console.error('Log stream error:', error);
                 // 認証エラーなどの場合は再接続を試みない
                 if (error instanceof Response && (error.status === 401 || error.status === 403)) {
-                    Message.error('サーバーログの表示には管理者権限が必要です。\n管理者アカウントでログインし直してください。');
+                    Message.error(i18n.global.t('messages.maintenance.log_admin_required'));
                     abort_controller.abort();
                     return;
                 }
@@ -90,7 +91,7 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'データベースを更新できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.database_update_failed'));
                     break;
             }
         }
@@ -113,10 +114,10 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Batch scan of recording folders is already running':
-                    APIClient.showGenericError(response, '録画フォルダの一括スキャンは既に実行中です。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.batch_scan_running'));
                     break;
                 default:
-                    APIClient.showGenericError(response, '録画フォルダの一括スキャンを開始できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.batch_scan_failed'));
                     break;
             }
             return false;
@@ -139,7 +140,7 @@ class Maintenance {
         // エラー処理
         if (response.type === 'error') {
             if (show_error === true) {
-                APIClient.showGenericError(response, '録画フォルダの一括スキャンの進捗を取得できませんでした。');
+                APIClient.showGenericError(response, i18n.global.t('messages.maintenance.batch_scan_status_failed'));
             }
             return null;
         }
@@ -164,13 +165,13 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Background analysis task is already running':
-                    APIClient.showGenericError(response, 'バックグラウンド解析タスクは既に実行中です。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.analysis_running'));
                     break;
                 case 'Background analysis failed for some recorded files':
-                    APIClient.showGenericError(response, '一部の録画番組のバックグラウンド解析に失敗しました。KonomiTV サーバーのログで失敗した録画番組と原因を確認してください。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.analysis_partial_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'バックグラウンド解析タスクを開始できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.analysis_failed'));
                     break;
             }
             return false;
@@ -193,7 +194,7 @@ class Maintenance {
         // エラー処理
         if (response.type === 'error') {
             if (show_error === true) {
-                APIClient.showGenericError(response, 'バックグラウンド解析タスクの進捗を取得できませんでした。');
+                APIClient.showGenericError(response, i18n.global.t('messages.maintenance.analysis_status_failed'));
             }
             return null;
         }
@@ -218,13 +219,13 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Batch scan of capture folders is already running':
-                    APIClient.showGenericError(response, 'キャプチャフォルダの一括スキャンは既に実行中です。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.capture_scan_running'));
                     break;
                 case 'Some capture folders could not be scanned completely':
-                    APIClient.showGenericError(response, '読み込めなかったフォルダがあったため、キャプチャフォルダの一括スキャンを最後まで行えませんでした。保存先フォルダにアクセスできるかを確認してから、もう一度実行してください。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.capture_scan_incomplete'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'キャプチャフォルダの一括スキャンを開始できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.capture_scan_failed'));
                     break;
             }
             return false;
@@ -247,7 +248,7 @@ class Maintenance {
         // エラー処理
         if (response.type === 'error') {
             if (show_error === true) {
-                APIClient.showGenericError(response, 'キャプチャフォルダの一括スキャンの進捗を取得できませんでした。');
+                APIClient.showGenericError(response, i18n.global.t('messages.maintenance.capture_scan_status_failed'));
             }
             return null;
         }
@@ -272,10 +273,10 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Database vacuum is already running':
-                    APIClient.showGenericError(response, 'データベースの最適化は既に実行中です。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.vacuum_running'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'データベースを最適化できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.vacuum_failed'));
                     break;
             }
             return false;
@@ -298,7 +299,7 @@ class Maintenance {
         // エラー処理
         if (response.type === 'error') {
             if (show_error === true) {
-                APIClient.showGenericError(response, 'データベースの最適化の進捗を取得できませんでした。');
+                APIClient.showGenericError(response, i18n.global.t('messages.maintenance.vacuum_status_failed'));
             }
             return null;
         }
@@ -319,7 +320,7 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'サーバーを再起動できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.restart_failed'));
                     break;
             }
             return false;
@@ -341,7 +342,7 @@ class Maintenance {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'サーバーをシャットダウンできませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.maintenance.shutdown_failed'));
                     break;
             }
             return false;

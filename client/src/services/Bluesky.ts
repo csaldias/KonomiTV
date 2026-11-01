@@ -2,6 +2,7 @@
 import type { IPostTweetSendResult } from '@/services/Twitter';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IPostTweetResult, ITimelineTweetsResult, ITwitterAPIResult } from '@/services/Twitter';
 
@@ -27,7 +28,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky アカウントとの連携に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.link_failed'));
             return false;
         }
 
@@ -45,7 +46,7 @@ class Bluesky {
         const response = await APIClient.delete(`/bluesky/accounts/${handle}`);
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky アカウントとの連携を解除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.unlink_failed'));
             return false;
         }
 
@@ -96,14 +97,14 @@ class Bluesky {
             // 通信自体が成立しなかった場合はステータスコードが NaN になり、HTTP エラー番号として表示できない
             if (Number.isNaN(response.status)) {
                 if (typeof response.data.detail === 'string') {
-                    return {message: `Bluesky へのポストに失敗しました。(${response.data.detail})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                    return {message: i18n.global.t('messages.bluesky.post_failed_detail', [response.data.detail]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
                 }
-                return {message: 'Bluesky へのポストに失敗しました。(HTTP リクエストに失敗しました)', is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                return {message: i18n.global.t('messages.bluesky.post_failed_request'), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
             }
             if (typeof response.data.detail === 'string') {
-                return {message: `Bluesky へのポストに失敗しました。(HTTP Error ${response.status} / ${response.data.detail})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                return {message: i18n.global.t('messages.bluesky.post_failed_http_detail', [response.status, response.data.detail]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
             }
-            return {message: `Bluesky へのポストに失敗しました。(HTTP Error ${response.status})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+            return {message: i18n.global.t('messages.bluesky.post_failed_http', [response.status]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
         }
 
         return {
@@ -130,7 +131,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky 投稿をリポストできませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.repost_failed'));
             return null;
         }
         // API としては 200 でも Bluesky 側の操作失敗は is_success=false で返るため、画面通知に変換する
@@ -156,7 +157,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky 投稿のリポストを取り消せませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.unrepost_failed'));
             return null;
         }
         if (response.data.is_success === false) {
@@ -181,7 +182,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky 投稿をいいねできませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.like_failed'));
             return null;
         }
         if (response.data.is_success === false) {
@@ -206,7 +207,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky 投稿のいいねを取り消せませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.unlike_failed'));
             return null;
         }
         if (response.data.is_success === false) {
@@ -232,7 +233,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky のホームタイムラインを取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.timeline_failed'));
             return null;
         }
         // HTTP エラーではないが、実際には処理が失敗した場合
@@ -260,7 +261,7 @@ class Bluesky {
         });
 
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Bluesky 投稿の検索に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.bluesky.search_failed'));
             return null;
         }
         // HTTP エラーではないが、実際には処理が失敗した場合

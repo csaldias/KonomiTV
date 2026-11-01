@@ -1,3 +1,4 @@
+import i18n from '@/plugins/i18n';
 import OfflineVideoStorage from '@/services/OfflineVideoStorage';
 import Videos, { type IRecordedProgram } from '@/services/Videos';
 import Utils from '@/utils';
@@ -194,14 +195,14 @@ export default class OfflineVideos {
                     if (lock === null) return;
                     const latestJob = await OfflineVideoStorage.getJob(job.job_id);
                     if (latestJob === null || ['Waiting', 'Downloading', 'Finalizing'].includes(latestJob.state) === false) return;
-                    await this.markJobFailed(latestJob.job_id, 'ページが閉じられたため、オフライン保存が中断されました。');
+                    await this.markJobFailed(latestJob.job_id, i18n.global.t('messages.offline.interrupted_page_closed'));
                 });
             }
         } else {
             // Web Locks 非対応環境では所有タブを識別できないため、前景保存の実行中ジョブは起動時に失敗へ倒して断片を回収する
             for (const job of jobs) {
                 if (job.background_fetch_id !== null || ['Waiting', 'Downloading', 'Finalizing'].includes(job.state) === false) continue;
-                await this.markJobFailed(job.job_id, 'ページが閉じられたため、オフライン保存が中断されました。');
+                await this.markJobFailed(job.job_id, i18n.global.t('messages.offline.interrupted_page_closed'));
             }
         }
     }
@@ -223,17 +224,17 @@ export default class OfflineVideos {
         return await this.withVideoStartLock(programSnapshot.id, async () => {
             const activeJob = await this.getActiveJobForVideo(programSnapshot.id);
             if (activeJob !== null) {
-                throw new Error('この録画番組はすでにオフライン保存中です。');
+                throw new Error(i18n.global.t('messages.offline.already_saving'));
             }
 
             // 進捗バーは目標ビットレート基準、空き容量判定は上限ビットレート基準で見積もる
             const estimatedSizeBytes = OfflineVideos.estimateJobSizeBytes(programSnapshot.recorded_video.duration, quality);
             if (estimatedSizeBytes === null) {
-                throw new Error(`オフライン保存に対応していない画質です。(${quality})`);
+                throw new Error(i18n.global.t('messages.offline.unsupported_quality', [quality]));
             }
             const requiredStorageBytes = OfflineVideos.estimateRequiredStorageBytes(programSnapshot.recorded_video.duration, quality);
             if (requiredStorageBytes === null) {
-                throw new Error(`オフライン保存に対応していない画質です。(${quality})`);
+                throw new Error(i18n.global.t('messages.offline.unsupported_quality', [quality]));
             }
 
             // ダイアログのスイッチがオンで、かつ Background Fetch API が使えるときだけバックグラウンド保存する
@@ -245,7 +246,7 @@ export default class OfflineVideos {
             const availableBytes = (storageEstimate.quota ?? 0) - (storageEstimate.usage ?? 0);
             const requiredBytes = requiredStorageBytes * (shouldUseBackgroundFetch === true ? 2 : 1);
             if (storageEstimate.quota !== undefined && availableBytes < requiredBytes) {
-                throw new Error(`オフライン保存に必要な空き容量が不足しています。必要: ${Utils.formatBytes(requiredBytes)} / 空き: ${Utils.formatBytes(Math.max(0, availableBytes))}`);
+                throw new Error(i18n.global.t('messages.offline.not_enough_space', [Utils.formatBytes(requiredBytes), Utils.formatBytes(Math.max(0, availableBytes))]));
             }
 
             // 同じ録画番組を保存し直す場合も、旧世代を消さず新しい世代へ書き込む
@@ -330,12 +331,12 @@ export default class OfflineVideos {
 
                 // 付随データの取得中にも別画面からキャンセルできるため、実際の動画転送を登録する直前に最新状態を確認する
                 if (await OfflineVideoStorage.updateActiveJob(job) === false) {
-                    throw new Error('オフライン保存はキャンセルされました。');
+                    throw new Error(i18n.global.t('messages.offline.cancelled'));
                 }
             } catch (error) {
             // 動画転送へ所有権を渡す前の失敗では、作成済みの断片と前景ロックをこの呼び出し内で回収する
                 releaseForegroundLock?.();
-                await this.markJobFailed(job.job_id, error instanceof Error ? error.message : 'オフライン保存を開始できませんでした。');
+                await this.markJobFailed(job.job_id, error instanceof Error ? error.message : i18n.global.t('messages.offline.start_failed'));
                 throw error;
             }
 
@@ -343,14 +344,14 @@ export default class OfflineVideos {
                 try {
                     const registration = await navigator.serviceWorker.getRegistration();
                     if (registration === undefined) {
-                        throw new Error('Service Worker の登録が見つかりません。');
+                        throw new Error(i18n.global.t('messages.offline.no_service_worker'));
                     }
                     const backgroundFetchManager = registration.backgroundFetch;
                     if (backgroundFetchManager === undefined) {
-                        throw new Error('Background Fetch API を利用できません。');
+                        throw new Error(i18n.global.t('messages.offline.no_background_fetch'));
                     }
                     await backgroundFetchManager.fetch(job.background_fetch_id, [request], {
-                        title: `${programSnapshot.title}をオフライン保存`,
+                        title: i18n.global.t('messages.offline.background_fetch_title', [programSnapshot.title]),
                         icons: [{src: '/assets/images/icons/icon-192px.png', sizes: '192x192', type: 'image/png'}],
                     });
 
@@ -359,11 +360,11 @@ export default class OfflineVideos {
                         const backgroundFetch = await backgroundFetchManager.get(job.background_fetch_id);
                         await backgroundFetch?.abort();
                         await OfflineVideoStorage.deleteGeneration(job.video_id, job.generation_id);
-                        throw new Error('オフライン保存はキャンセルされました。');
+                        throw new Error(i18n.global.t('messages.offline.cancelled'));
                     }
                 } catch (error) {
                 // 登録失敗時は先に保存した付随データを残さず、一覧へ失敗理由を引き継ぐ
-                    await this.markJobFailed(job.job_id, error instanceof Error ? error.message : 'バックグラウンド保存を登録できませんでした。');
+                    await this.markJobFailed(job.job_id, error instanceof Error ? error.message : i18n.global.t('messages.offline.background_register_failed'));
                     throw error;
                 }
                 this.notifyChange();
@@ -374,12 +375,12 @@ export default class OfflineVideos {
             try {
                 job.state = 'Downloading';
                 if (await OfflineVideoStorage.updateActiveJob(job) === false) {
-                    throw new Error('オフライン保存はキャンセルされました。');
+                    throw new Error(i18n.global.t('messages.offline.cancelled'));
                 }
             } catch (error) {
             // 転送処理へ引き渡す前の失敗は、この呼び出しで前景ロックを解放する
                 releaseForegroundLock?.();
-                await this.markJobFailed(job.job_id, error instanceof Error ? error.message : 'オフライン保存を開始できませんでした。');
+                await this.markJobFailed(job.job_id, error instanceof Error ? error.message : i18n.global.t('messages.offline.start_failed'));
                 throw error;
             }
             const abortController = new AbortController();
@@ -406,7 +407,7 @@ export default class OfflineVideos {
                     }
                     const response = await fetch(request, {signal: abortController.signal});
                     if (response.ok === false) {
-                        throw new Error(`オフライン保存 API が HTTP ${response.status} を返しました。`);
+                        throw new Error(i18n.global.t('messages.offline.api_http_error', [response.status]));
                     }
                     await this.finalizeResponse(job.job_id, response);
                 } catch (error) {
@@ -417,7 +418,7 @@ export default class OfflineVideos {
                         if (abortController.signal.aborted === true) {
                             await this.markJobCancelled(job.job_id);
                         } else {
-                            await this.markJobFailed(job.job_id, error instanceof Error ? error.message : 'オフライン保存に失敗しました。');
+                            await this.markJobFailed(job.job_id, error instanceof Error ? error.message : i18n.global.t('messages.offline.failed'));
                         }
                     }
                 } finally {
@@ -447,11 +448,11 @@ export default class OfflineVideos {
 
         const job = await OfflineVideoStorage.getJob(jobID);
         if (job === null || response.body === null) {
-            throw new Error('保存ジョブまたはレスポンス本体が見つかりません。');
+            throw new Error(i18n.global.t('messages.offline.job_or_body_missing'));
         }
         job.state = 'Downloading';
         if (await OfflineVideoStorage.updateActiveJob(job) === false) {
-            throw new Error('オフライン保存ジョブはすでに終了しています。');
+            throw new Error(i18n.global.t('messages.offline.job_already_finished'));
         }
 
         const reader = response.body.getReader();
@@ -484,14 +485,14 @@ export default class OfflineVideos {
                 const currentTime = Date.now();
                 if (job.downloaded_bytes - lastPersistedProgressBytes >= 1024 * 1024 || currentTime - lastPersistedProgressAt >= 250) {
                     if (await OfflineVideoStorage.updateActiveJob(job) === false) {
-                        throw new Error('オフライン保存がキャンセルされました。');
+                        throw new Error(i18n.global.t('messages.offline.cancelled_2'));
                     }
                     lastPersistedProgressBytes = job.downloaded_bytes;
                     lastPersistedProgressAt = currentTime;
                 }
             }
             if (pendingLength < length) {
-                throw new Error('オフライン保存データが途中で終了しました。');
+                throw new Error(i18n.global.t('messages.offline.data_truncated'));
             }
 
             // 受信済みデータの全連結を避け、呼び出し元が必要とする長さの領域だけを割り当てる
@@ -525,18 +526,18 @@ export default class OfflineVideos {
             // 固定マジック値が一致しない応答は、サーバーのエラーページや未知の将来形式なので保存しない
             const magic = await readBytes(this.STREAM_MAGIC.byteLength);
             if (magic.some((value, index) => value !== this.STREAM_MAGIC[index])) {
-                throw new Error('オフライン保存データの形式を認識できません。');
+                throw new Error(i18n.global.t('messages.offline.data_unrecognized'));
             }
 
             // 先頭 JSON から録画ファイルと画質を検証し、別リクエストの応答を混在させない
             const metadataLength = new DataView((await readBytes(4)).buffer).getUint32(0);
             if (metadataLength === 0 || metadataLength > 1024 * 1024) {
-                throw new Error('オフライン保存データのメタデータ長が不正です。');
+                throw new Error(i18n.global.t('messages.offline.metadata_length_invalid'));
             }
             const metadata = JSON.parse(new TextDecoder().decode(await readBytes(metadataLength))) as IOfflineVideoStreamMetadata;
             if (metadata.video_id !== job.video_id || metadata.file_hash !== job.program.recorded_video.file_hash ||
                 metadata.quality !== job.quality) {
-                throw new Error('オフライン保存データのメタデータが保存ジョブと一致しません。');
+                throw new Error(i18n.global.t('messages.offline.metadata_mismatch'));
             }
 
             while (true) {
@@ -545,7 +546,7 @@ export default class OfflineVideos {
                 if (sequence === 0xffffffff) {
                     const expectedSegmentCount = new DataView((await readBytes(4)).buffer).getUint32(0);
                     if (expectedSegmentCount !== segmentCount) {
-                        throw new Error('オフライン保存データのセグメント数が一致しません。');
+                        throw new Error(i18n.global.t('messages.offline.segment_count_mismatch'));
                     }
                     break;
                 }
@@ -553,7 +554,7 @@ export default class OfflineVideos {
                 const durationMilliseconds = recordHeader.getUint32(0);
                 const segmentLength = recordHeader.getUint32(4);
                 if (sequence !== segmentCount || durationMilliseconds === 0 || segmentLength === 0 || segmentLength > 128 * 1024 * 1024) {
-                    throw new Error('オフライン保存データのセグメントヘッダーが不正です。');
+                    throw new Error(i18n.global.t('messages.offline.segment_header_invalid'));
                 }
                 const segmentData = await readBytes(segmentLength);
                 await cache.put(`${generationBaseURL}/segments/${sequence}.ts`, new Response(segmentData, {
@@ -567,10 +568,10 @@ export default class OfflineVideos {
             // 保存した実データだけを指す VOD プレイリストを生成し、通常再生のセッション API から完全に切り離す
             job.state = 'Finalizing';
             if (await OfflineVideoStorage.updateActiveJob(job) === false) {
-                throw new Error('オフライン保存がキャンセルされました。');
+                throw new Error(i18n.global.t('messages.offline.cancelled_2'));
             }
             if (segmentDurations.length === 0) {
-                throw new Error('オフライン保存データに映像セグメントがありません。');
+                throw new Error(i18n.global.t('messages.offline.no_video_segments'));
             }
             const targetDuration = Math.ceil(segmentDurations.reduce((maximum, duration) => Math.max(maximum, duration), 0));
             let playlist = '#EXTM3U\n#EXT-X-VERSION:6\n#EXT-X-PLAYLIST-TYPE:VOD\n';
@@ -614,7 +615,7 @@ export default class OfflineVideos {
             } catch (cancelError) {
                 console.warn('[OfflineVideos] Failed to cancel the offline download response reader:', cancelError);
             }
-            await this.markJobFailed(job.job_id, error instanceof Error ? error.message : 'オフライン保存データを処理できませんでした。');
+            await this.markJobFailed(job.job_id, error instanceof Error ? error.message : i18n.global.t('messages.offline.process_failed'));
 
             // キャンセル処理の削除後に受信処理が書いた断片も回収し、完了済みの有効世代だけは保持する
             const savedVideo = await OfflineVideoStorage.getStoredVideo(job.video_id);
@@ -735,7 +736,7 @@ export default class OfflineVideos {
     static formatOfflineSize(bytes: number, approximate: boolean): string {
 
         const formatted = OfflineVideos.formatOfflineSizeValue(bytes, approximate);
-        return approximate === true ? `約${formatted}` : formatted;
+        return approximate === true ? i18n.global.t('messages.offline.approx', [formatted]) : formatted;
     }
 
     /**
@@ -798,7 +799,7 @@ export default class OfflineVideos {
             true,
         );
         const bitrateLabel = OfflineVideos.formatAverageBitrateLabel(apiQuality);
-        return `${qualityLabel} (${sizeLabel} / 平均${bitrateLabel})`;
+        return i18n.global.t('messages.offline.quality_label', [qualityLabel, sizeLabel, bitrateLabel]);
     }
 
     /**
@@ -965,7 +966,7 @@ export default class OfflineVideos {
             await new Promise<void>((resolve, reject) => {
                 const timeoutID = window.setTimeout(() => {
                     peerConnection.removeEventListener('icegatheringstatechange', onICEGatheringStateChange);
-                    reject(new Error('WebRTC のローカル接続準備がタイムアウトしました。'));
+                    reject(new Error(i18n.global.t('messages.offline.webrtc_prepare_timeout')));
                 }, 5_000);
                 const onICEGatheringStateChange = (): void => {
                     if (peerConnection.iceGatheringState !== 'complete') return;
@@ -987,14 +988,14 @@ export default class OfflineVideos {
             await waitForICEGathering(offerPeerConnection);
             const offerDescription = offerPeerConnection.localDescription;
             if (offerDescription === null) {
-                throw new Error('WebRTC の Offer を作成できませんでした。');
+                throw new Error(i18n.global.t('messages.offline.webrtc_offer_failed'));
             }
             await answerPeerConnection.setRemoteDescription(offerDescription);
             await answerPeerConnection.setLocalDescription(await answerPeerConnection.createAnswer());
             await waitForICEGathering(answerPeerConnection);
             const answerDescription = answerPeerConnection.localDescription;
             if (answerDescription === null) {
-                throw new Error('WebRTC の Answer を作成できませんでした。');
+                throw new Error(i18n.global.t('messages.offline.webrtc_answer_failed'));
             }
             await offerPeerConnection.setRemoteDescription(answerDescription);
 
@@ -1002,7 +1003,7 @@ export default class OfflineVideos {
             if (offerDataChannel.readyState !== 'open') {
                 await new Promise<void>((resolve, reject) => {
                     const timeoutID = window.setTimeout(() => {
-                        reject(new Error('WebRTC のローカル接続がタイムアウトしました。'));
+                        reject(new Error(i18n.global.t('messages.offline.webrtc_timeout')));
                     }, 5_000);
                     offerDataChannel.addEventListener('open', () => {
                         window.clearTimeout(timeoutID);

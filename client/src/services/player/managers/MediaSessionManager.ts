@@ -2,6 +2,7 @@
 
 import DPlayer from 'dplayer';
 
+import i18n from '@/plugins/i18n';
 import router from '@/router';
 import PlayerManager from '@/services/player/PlayerManager';
 import Videos from '@/services/Videos';
@@ -71,7 +72,7 @@ class MediaSessionManager implements PlayerManager {
         // ライブ視聴: 番組タイトル・チャンネル名・アイコンを表示
         if (this.playback_mode === 'Live') {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: channels_store.channel.current.program_present?.title ?? '放送休止',
+                title: channels_store.channel.current.program_present?.title ?? i18n.global.t('messages.player.off_air'),
                 artist: channels_store.channel.current.name,
                 artwork: artwork,
             });
@@ -118,7 +119,7 @@ class MediaSessionManager implements PlayerManager {
             // ライブ視聴: 前のチャンネルに切り替え
             if (this.playback_mode === 'Live') {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: channels_store.channel.previous.program_present?.title ?? '放送休止',
+                    title: channels_store.channel.previous.program_present?.title ?? i18n.global.t('messages.player.off_air'),
                     artist: channels_store.channel.previous.name,
                     artwork: artwork,
                 });
@@ -134,7 +135,7 @@ class MediaSessionManager implements PlayerManager {
             // ライブ視聴: 次のチャンネルに切り替え
             if (this.playback_mode === 'Live') {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: channels_store.channel.next.program_present?.title ?? '放送休止',
+                    title: channels_store.channel.next.program_present?.title ?? i18n.global.t('messages.player.off_air'),
                     artist: channels_store.channel.next.name,
                     artwork: artwork,
                 });

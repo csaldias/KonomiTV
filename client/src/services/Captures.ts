@@ -2,6 +2,7 @@
 import { AxiosError } from 'axios';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import Utils, { Semaphore } from '@/utils';
 
@@ -192,15 +193,15 @@ class Captures {
             // エラー処理
             switch (response.data.detail) {
                 case 'Permission denied to save the file': {
-                    Message.error('キャプチャのアップロードに失敗しました。保存先フォルダに書き込み権限がありません。');
+                    Message.error(i18n.global.t('messages.captures.upload_no_permission'));
                     return;
                 }
                 case 'No space left on the device': {
-                    Message.error('キャプチャのアップロードに失敗しました。保存先フォルダに空き容量がありません。');
+                    Message.error(i18n.global.t('messages.captures.upload_no_space'));
                     return;
                 }
                 case 'Unexpected error occurred while saving the file': {
-                    Message.error('キャプチャのアップロードに失敗しました。保存中に予期しないエラーが発生しました。');
+                    Message.error(i18n.global.t('messages.captures.upload_unexpected'));
                     return;
                 }
                 default: {
@@ -211,22 +212,22 @@ class Captures {
                         const sleep_time_seconds = 1 + Math.random() * 15;
                         if (response.error.code === AxiosError.ECONNABORTED) {
                             // ネットワーク接続エラーの場合
-                            Message.warning(`キャプチャのアップロード中にサーバーへの接続が切断されました。${sleep_time_seconds.toFixed(2)} 秒後にリトライします。`);
+                            Message.warning(i18n.global.t('messages.captures.upload_retry_closed', [sleep_time_seconds.toFixed(2)]));
                         } else if (response.error.code === AxiosError.ETIMEDOUT) {
                             // タイムアウトの場合
-                            Message.warning(`キャプチャのアップロード中にサーバーへの接続がタイムアウトしました。${sleep_time_seconds.toFixed(2)} 秒後にリトライします。`);
+                            Message.warning(i18n.global.t('messages.captures.upload_retry_timeout', [sleep_time_seconds.toFixed(2)]));
                         } else if (response.error.code === AxiosError.ERR_NETWORK) {
                             // 予期しないネットワークエラーの場合
-                            Message.warning(`キャプチャのアップロード中に予期しないネットワークエラーが発生しました。${sleep_time_seconds.toFixed(2)} 秒後にリトライします。`);
+                            Message.warning(i18n.global.t('messages.captures.upload_retry_network', [sleep_time_seconds.toFixed(2)]));
                         } else {
                             // それ以外のエラーの場合
-                            Message.warning(`キャプチャのアップロードに失敗しました。${sleep_time_seconds.toFixed(2)} 秒後にリトライします。`);
+                            Message.warning(i18n.global.t('messages.captures.upload_retry', [sleep_time_seconds.toFixed(2)]));
                         }
                         await Utils.sleep(sleep_time_seconds);  // 秒単位で指定
                         // ループ先頭に戻ってリトライ
                         continue;
                     } else {
-                        APIClient.showGenericError(response, 'キャプチャのアップロードに失敗しました。');
+                        APIClient.showGenericError(response, i18n.global.t('messages.captures.upload_failed'));
                         return;
                     }
                 }
@@ -259,7 +260,7 @@ class Captures {
             this.semaphore.release();
         }
         if (response.type === 'error') {
-            APIClient.showGenericError(response, `${file.name} のアップロードに失敗しました。`);
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.file_upload_failed', [file.name]));
             return null;
         }
         return response.data;
@@ -320,7 +321,7 @@ class Captures {
             },
         });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャの一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.list_failed'));
             return null;
         }
         return response.data;
@@ -385,7 +386,7 @@ class Captures {
             },
         });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャの日付ごとの件数を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.date_counts_failed'));
             return null;
         }
         return response.data;
@@ -399,7 +400,7 @@ class Captures {
     static async fetchChannels(): Promise<ICaptureChannel[] | null> {
         const response = await APIClient.get<ICaptureChannel[]>('/captures/channels');
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャのあるチャンネルの一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.channels_failed'));
             return null;
         }
         return response.data;
@@ -414,7 +415,7 @@ class Captures {
     static async fetchCapture(capture_id: number): Promise<ICaptureDetail | null> {
         const response = await APIClient.get<ICaptureDetail>(`/captures/${capture_id}`);
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャの情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.info_failed'));
             return null;
         }
         return response.data;
@@ -460,7 +461,7 @@ class Captures {
         }
         const response = await APIClient.get<ICapturePrograms>('/captures/programs', { params });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャの番組の一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.programs_failed'));
             return null;
         }
         return response.data;
@@ -475,7 +476,7 @@ class Captures {
     static async fetchProgram(capture_program_id: number): Promise<ICaptureProgramAlbum | null> {
         const response = await APIClient.get<ICaptureProgramAlbum>(`/captures/programs/${capture_program_id}`);
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャの番組の情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.program_failed'));
             return null;
         }
         return response.data;
@@ -493,7 +494,7 @@ class Captures {
             await APIClient.post('/captures/favorites', { capture_ids }) :
             await APIClient.delete('/captures/favorites', { data: { capture_ids } });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, is_favorite ? 'お気に入りに追加できませんでした。' : 'お気に入りから外せませんでした。');
+            APIClient.showGenericError(response, is_favorite ? i18n.global.t('messages.captures.favorite_add_failed') : i18n.global.t('messages.captures.favorite_remove_failed'));
             return false;
         }
         return true;
@@ -507,7 +508,7 @@ class Captures {
     static async fetchTags(): Promise<ICaptureTag[] | null> {
         const response = await APIClient.get<ICaptureTag[]>('/captures/tags');
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'タグの一覧を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.tags_failed'));
             return null;
         }
         return response.data;
@@ -524,10 +525,10 @@ class Captures {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Capture tag name already exists':
-                    Message.error('同じ名前のタグがすでにあります。別の名前を入力してください。');
+                    Message.error(i18n.global.t('messages.captures.tag_duplicate'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'タグを作成できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.captures.tag_create_failed'));
                     break;
             }
             return null;
@@ -547,10 +548,10 @@ class Captures {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Capture tag name already exists':
-                    Message.error('同じ名前のタグがすでにあります。別の名前を入力してください。');
+                    Message.error(i18n.global.t('messages.captures.tag_duplicate'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'タグの名前を変更できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.captures.tag_rename_failed'));
                     break;
             }
             return null;
@@ -567,7 +568,7 @@ class Captures {
     static async deleteTag(tag_id: number): Promise<boolean> {
         const response = await APIClient.delete(`/captures/tags/${tag_id}`);
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'タグを削除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.tag_delete_failed'));
             return false;
         }
         return true;
@@ -586,7 +587,7 @@ class Captures {
             await APIClient.post(`/captures/tags/${tag_id}/items`, { capture_ids }) :
             await APIClient.delete(`/captures/tags/${tag_id}/items`, { data: { capture_ids } });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, is_tagged ? 'タグを付けられませんでした。' : 'タグを外せませんでした。');
+            APIClient.showGenericError(response, is_tagged ? i18n.global.t('messages.captures.tag_add_failed') : i18n.global.t('messages.captures.tag_remove_failed'));
             return false;
         }
         return true;
@@ -601,7 +602,7 @@ class Captures {
     static async deleteCaptures(capture_ids: number[]): Promise<ICaptureDeleteResult | null> {
         const response = await APIClient.delete<ICaptureDeleteResult>('/captures', { data: { capture_ids } });
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'キャプチャを削除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.captures.delete_failed'));
             return null;
         }
         return response.data;

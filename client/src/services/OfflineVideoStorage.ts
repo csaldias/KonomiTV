@@ -2,6 +2,7 @@ import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 
 import type { IOfflineDownloadJob, IOfflineVideo } from '@/services/OfflineVideos';
 
+import i18n from '@/plugins/i18n';
 import MPEGTSSecondaryAudioExtractor from '@/utils/TSSecondaryAudioExtractor';
 
 
@@ -60,7 +61,7 @@ export default class OfflineVideoStorage {
         // 完了済み動画はプレイリストが最後に書かれるため、入口の1件だけで保存完了を確認する
         const cache = await this.openCache();
         if (await cache.match(`${this.getGenerationBaseURL(video.video_id, video.generation_id)}/playlist.m3u8`) === undefined) {
-            await this.markVideoUnavailable(video, '保存済み動画のデータが端末から失われました。');
+            await this.markVideoUnavailable(video, i18n.global.t('messages.offline.data_lost'));
             return null;
         }
         return video;
@@ -99,7 +100,7 @@ export default class OfflineVideoStorage {
         if (jobs.some(existingJob => existingJob.video_id === job.video_id &&
             ['Waiting', 'Downloading', 'Finalizing'].includes(existingJob.state))) {
             await transaction.done;
-            throw new Error('この録画番組はすでにオフライン保存中です。');
+            throw new Error(i18n.global.t('messages.offline.already_saving'));
         }
 
         // 再保存を始める録画では過去の失敗・キャンセル表示を削除し、新しいジョブの進捗を一覧へ表示する

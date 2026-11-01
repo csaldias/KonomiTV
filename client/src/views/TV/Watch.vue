@@ -125,7 +125,7 @@ export default defineComponent({
 
             // もしこの時点でチャンネル名が「チャンネル情報取得エラー」の場合、
             // URL で指定された display_channel_id に紐づくチャンネル情報がないことを示しているので、404 ページにリダイレクト
-            if (this.channelsStore.channel.current.name === 'チャンネル情報取得エラー') {
+            if (this.channelsStore.channel.current.name === this.$t('messages.channels.channel_error')) {
                 await Utils.sleep(3);  // 3秒待機
                 this.$router.push({path: '/not-found/'});
                 return;

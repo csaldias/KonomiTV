@@ -91,13 +91,13 @@ const { updateServiceWorker } = useRegisterSW({
         console.log('New content is available; please refresh.');
         // Safari などの前景保存中はリロードで通信が切れるため、完了またはキャンセルまで更新を保留する
         if (await OfflineVideos.hasActiveForegroundDownload() === true) {
-            Message.show('オフライン保存の完了後にクライアントを更新します。', 10);
+            Message.show(i18n.global.t('messages.app.update_after_offline'), 10);
             while (await OfflineVideos.hasActiveForegroundDownload() === true) {
                 await Utils.sleep(1);
             }
         }
         // リロードするまでトーストを表示し続ける
-        Message.show('クライアントが新しいバージョンに更新されました。5秒後にリロードします。', 10);  // 10秒間表示
+        Message.show(i18n.global.t('messages.app.updated'), 10);  // 10秒間表示
         await Utils.sleep(5);  // 5秒待つ
         // PWA (Service Worker) を更新し、ページをリロードする
         updateServiceWorker(true);

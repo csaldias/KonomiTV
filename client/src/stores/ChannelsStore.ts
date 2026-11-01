@@ -1,6 +1,7 @@
 
 import { defineStore } from 'pinia';
 
+import i18n from '@/plugins/i18n';
 import Channels, { ChannelType, ChannelTypePretty, ILiveChannelsList, ILiveChannel, ILiveChannelDefault } from '@/services/Channels';
 import { IProgram, IProgramDefault } from '@/services/Programs';
 import useSettingsStore from '@/stores/SettingsStore';
@@ -72,12 +73,12 @@ const useChannelsStore = defineStore('channels', {
             // エラー発生時用のダミーのチャンネル情報
             const IProgramError: IProgram = {
                 ...IProgramDefault,
-                title: 'チャンネル情報取得エラー',
-                description: 'このチャンネル ID のチャンネル情報は存在しません。',
+                title: i18n.global.t('messages.channels.channel_error'),
+                description: i18n.global.t('messages.channels.channel_error_description'),
             };
             const ILiveChannelError: ILiveChannel = {
                 ...ILiveChannelDefault,
-                name: 'チャンネル情報取得エラー',
+                name: i18n.global.t('messages.channels.channel_error'),
                 program_present: IProgramError,
                 program_following: IProgramError,
             };

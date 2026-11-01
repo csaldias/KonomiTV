@@ -1,5 +1,6 @@
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import useTwitterStore from '@/stores/TwitterStore';
 
@@ -118,15 +119,15 @@ class Twitter {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'No valid cookies found in the provided cookies.txt': {
-                    Message.error('Cookie データのフォーマットが不正です。Netscape 形式の Cookie データを入力してください。');
+                    Message.error(i18n.global.t('messages.twitter.cookie_invalid'));
                     break;
                 }
                 case 'Failed to get user information': {
-                    Message.error('Twitter アカウント情報の取得に失敗しました。');
+                    Message.error(i18n.global.t('messages.twitter.account_info_failed'));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, 'Twitter アカウントとの連携に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.twitter.link_failed'));
                     break;
                 }
             }
@@ -149,7 +150,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'Twitter アカウントとの連携を解除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.unlink_failed'));
             return false;
         }
 
@@ -168,7 +169,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ヘッドレスブラウザへの Keep-Alive 送信に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.keep_alive_failed'));
             return;
         }
 
@@ -211,13 +212,13 @@ class Twitter {
             if (typeof response.data.detail === 'string') {
                 if (Number.isNaN(response.status)) {
                     // HTTP リクエスト自体が失敗し、HTTP ステータスコードが取得できなかった場合
-                    return {message: `Twitter へのツイートに失敗しました。(${response.data.detail})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                    return {message: i18n.global.t('messages.twitter.tweet_failed_detail', [response.data.detail]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
                 } else {
                     // HTTP リクエスト自体は成功したが、API からエラーレスポンスが返ってきた場合
-                    return {message: `Twitter へのツイートに失敗しました。(HTTP Error ${response.status} / ${response.data.detail})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                    return {message: i18n.global.t('messages.twitter.tweet_failed_http_detail', [response.status, response.data.detail]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
                 }
             } else {
-                return {message: `Twitter へのツイートに失敗しました。(HTTP Error ${response.status})`, is_error: true, tweet_id: null, post_uri: null, post_cid: null};
+                return {message: i18n.global.t('messages.twitter.tweet_failed_http', [response.status]), is_error: true, tweet_id: null, post_uri: null, post_cid: null};
             }
         }
 
@@ -256,7 +257,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ツイートをリツイートできませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.retweet_failed'));
             return null;
         }
 
@@ -288,7 +289,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'リツイートを取り消せませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.unretweet_failed'));
             return null;
         }
 
@@ -320,7 +321,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ツイートをいいねできませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.like_failed'));
             return null;
         }
 
@@ -352,7 +353,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'いいねを取り消せませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.unlike_failed'));
             return null;
         }
 
@@ -396,7 +397,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ホームタイムラインを取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.timeline_failed'));
             return null;
         }
 
@@ -436,7 +437,7 @@ class Twitter {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ツイートの検索に失敗しました。');
+            APIClient.showGenericError(response, i18n.global.t('messages.twitter.search_failed'));
             return null;
         }
 

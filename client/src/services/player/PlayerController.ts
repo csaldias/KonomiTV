@@ -8,6 +8,7 @@ import { Deinterlacer, probeDecoder, supportsDeinterlace, type DecoderProbe } fr
 import mpegts from 'mpegts.js';
 import { watch } from 'vue';
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import OfflineVideos from '@/services/OfflineVideos';
 import CustomBufferController from '@/services/player/CustomBufferController';
@@ -344,7 +345,7 @@ class PlayerController {
                 // CM 終了位置に「本編」マーカーを追加（動画終了2秒以内は除外）
                 if (section.end_time <= endThreshold) {
                     highlights.push({
-                        text: '本編',
+                        text: i18n.global.t('messages.player.main_part'),
                         time: section.end_time
                     });
                 }
@@ -363,8 +364,9 @@ class PlayerController {
             container: document.querySelector<HTMLDivElement>('.watch-player__dplayer')!,
             // テーマカラー
             theme: '#E64F97',
-            // 言語 (日本語固定)
-            lang: 'ja-jp',
+            // 言語 (表示言語に合わせる)
+            // DPlayer の文言は英語が原文のため、英語では 'en' を指定して翻訳しない
+            lang: i18n.global.locale.value === 'en' ? 'en' : 'ja-jp',
             // ライブモード (ビデオ視聴では無効)
             live: this.playback_mode === 'Live' ? true : false,
             // ライブモードで同期する際の最小バッファサイズ
@@ -474,7 +476,7 @@ class PlayerController {
                 } else {
                     // オフライン保存では保存済みの1画質だけを hls.js へ渡し、通常の配信セッションを一切作らない
                     if (player_store.is_offline_playback === true && player_store.offline_video !== null) {
-                        const offlineQualityName = `オフライン保存 (${OfflineVideos.formatQualityLabel(player_store.offline_video.quality)})`;
+                        const offlineQualityName = i18n.global.t('messages.player.offline_quality', [OfflineVideos.formatQualityLabel(player_store.offline_video.quality)]);
                         const tileInfo = player_store.recorded_program.recorded_video.thumbnail_info?.tile ?? null;
                         return {
                             quality: [{
@@ -620,7 +622,7 @@ class PlayerController {
                             const empty_jikkyo_comments: IJikkyoComments = {
                                 is_success: true,
                                 comments: [],
-                                detail: '保存時点の過去ログコメントはありません。',
+                                detail: i18n.global.t('messages.player.no_saved_comments'),
                             };
                             try {
                                 const response = await fetch(OfflineVideos.getAssetURL(player_store.offline_video, 'jikkyo.json'));
@@ -651,7 +653,7 @@ class PlayerController {
                             // 取得に失敗した場合はコメントリストにエラーメッセージを表示する
                             // ただし「この録画番組の過去ログコメントは存在しないか、現在取得中です。」の場合はエラー扱いしない
                             player_store.video_comment_init_failed_message = jikkyo_comments.detail;
-                            if (jikkyo_comments.detail !== 'この録画番組の過去ログコメントは存在しないか、現在取得中です。') {
+                            if (jikkyo_comments.detail !== i18n.global.t('messages.player.no_archived_comments')) {
                                 options.error(jikkyo_comments.detail);
                             } else {
                                 options.success([]);
@@ -705,7 +707,7 @@ class PlayerController {
                         }
                     } else {
                         // ビデオ視聴: 過去ログにはコメントできないのでエラーを返す
-                        options.error('録画番組にはコメントできません。');
+                        options.error(i18n.global.t('messages.player.cannot_comment_recording'));
                     }
                 },
             },
@@ -1036,7 +1038,7 @@ class PlayerController {
                 // 視聴履歴から再生を再開する場合のみ通知を表示
                 // そうでない場合 (URL で指定された再生位置から始める場合を含む) は seek() 実行後に表示される通知を即座に非表示にする
                 if (seek_seconds > player_store.recorded_program.recording_start_margin + 2 && is_url_playback_position === false) {
-                    this.player.notice('前回視聴した続きから再生します');
+                    this.player.notice(i18n.global.t('messages.player.resume'));
                 } else {
                     this.player.hideNotice();
                 }
@@ -1088,7 +1090,7 @@ class PlayerController {
             if (this.playback_mode === 'Live' && mpegts.isSupported() !== true) {  // mpegts.js 非対応環境では undefined が返る
                 console.warn('\u001b[31m[PlayerController] PlayerRestartRequired event received, but mpegts.js is not supported. Ignored.');
                 // iOS 17.0 以下は mpegts.js がサポートされていないため、再生できない
-                this.player?.notice('iOS (Safari) 17.0 以下での視聴には対応していません。速やかに iOS を 17.1 以降に更新してください。', -1, undefined, '#FF6F6A');
+                this.player?.notice(i18n.global.t('messages.player.ios_unsupported'), -1, undefined, '#FF6F6A');
                 return;
             }
 
@@ -1163,7 +1165,7 @@ class PlayerController {
         // プレイヤー再起動ボタンを DPlayer の UI に追加する (再生が止まった際などに利用する想定)
         // insertAdjacentHTML で .dplayer-icons-right の一番左側に配置する
         this.player.container.querySelector('.dplayer-icons.dplayer-icons-right')!.insertAdjacentHTML('afterbegin', `
-            <div class="dplayer-icon dplayer-player-restart-icon" aria-label="プレイヤーを再起動"
+            <div class="dplayer-icon dplayer-player-restart-icon" aria-label="${i18n.global.t('messages.player.restart_player')}"
                 data-balloon-nofocus="" data-balloon-pos="up">
                 <span class="dplayer-icon-content">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V3.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V7c3.31 0 6 2.69 6 6c0 2.72-1.83 5.02-4.31 5.75c-.42.12-.69.52-.69.95c0 .65.62 1.16 1.25.97A7.991 7.991 0 0 0 20 13c0-4.42-3.58-8-8-8zm-6 8c0-1.34.44-2.58 1.19-3.59c.3-.4.26-.95-.09-1.31c-.42-.42-1.14-.38-1.5.1a7.991 7.991 0 0 0 4.15 12.47c.63.19 1.25-.32 1.25-.97c0-.43-.27-.83-.69-.95C7.83 18.02 6 15.72 6 13z"/></svg>
@@ -1192,7 +1194,7 @@ class PlayerController {
             });
 
             // 通知を表示してから PlayerController を破棄すると DPlayer の DOM 要素ごと消えてしまうので、DPlayer を作り直した後に通知を表示する
-            this.player?.notice('プレイヤーを再起動しました。', undefined, undefined, undefined);
+            this.player?.notice(i18n.global.t('messages.player.restarted'), undefined, undefined, undefined);
         });
 
         // Screen Wake Lock API を利用して画面の自動スリープを抑制する
@@ -1425,7 +1427,7 @@ class PlayerController {
                         if (this.destroyed === true || this.player?.plugins.mpeg2toh264 !== mpeg2toh264_player ||
                             on_canplay_called === true) return;
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: '再生開始までに時間が掛かっています。プレイヤーを再起動しています…',
+                            message: i18n.global.t('messages.player.slow_start'),
                         });
                     }, 15 * 1000);  // 15 秒でタイムアウト
                     const on_canplay = () => {
@@ -1468,7 +1470,7 @@ class PlayerController {
 
                     // もしこの時点でオフラインの場合、ネットワーク接続の変更による接続切断の可能性が高いので、オンラインになるまで待機する
                     if (navigator.onLine === false) {
-                        this.player.notice('現在ネットワーク接続がありません。オンラインになるまで待機しています…', undefined, undefined, '#FF6F6A');
+                        this.player.notice(i18n.global.t('messages.player.offline_waiting'), undefined, undefined, '#FF6F6A');
                         console.warn('\u001b[31m[PlayerController] mpegts.js error event: Network error. Waiting for online...');
                         await Utils.waitUntilOnline();
                     }
@@ -1476,7 +1478,7 @@ class PlayerController {
                     // PlayerController の再起動を要求する
                     console.error('\u001b[31m[PlayerController] mpegts.js error event:', error_type, detail);
                     player_store.event_emitter.emit('PlayerRestartRequired', {
-                        message: `再生中にエラーが発生しました。(${error_type}: ${detail}) プレイヤーを再起動しています…`,
+                        message: i18n.global.t('messages.player.playback_error', [error_type, detail]),
                     });
                 });
 
@@ -1496,13 +1498,13 @@ class PlayerController {
                     if (this.player.video.error) {
                         console.error('\u001b[31m[PlayerController] HTMLVideoElement error event:', this.player.video.error);
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: `再生中にエラーが発生しました。(Native: ${this.player.video.error.code}: ${this.player.video.error.message}) プレイヤーを再起動しています…`,
+                            message: i18n.global.t('messages.player.playback_error_native', [this.player.video.error.code, this.player.video.error.message]),
                         });
                     } else {
                         // MediaError オブジェクトは場合によっては存在しないことがあるらしい…
                         // 存在しない場合は unknown error として扱う
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: '再生中にエラーが発生しました。(Native: unknown error) プレイヤーを再起動しています…',
+                            message: i18n.global.t('messages.player.playback_error_native_unknown'),
                         });
                     }
                 });
@@ -1662,7 +1664,7 @@ class PlayerController {
                 if (this.destroyed === true || this.player === null) return;
                 if (player_store.live_stream_status === 'ONAir' && player_store.is_video_buffering === true && on_canplay_called === false) {
                     player_store.event_emitter.emit('PlayerRestartRequired', {
-                        message: '再生開始までに時間が掛かっています。プレイヤーを再起動しています…',
+                        message: i18n.global.t('messages.player.slow_start'),
                     });
                 }
 
@@ -1710,7 +1712,7 @@ class PlayerController {
                         player_store.is_offline_playback = true;
                         player_store.offline_video = offlineVideo;
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: '通信できないため、オフライン保存した映像へ切り替えました。',
+                            message: i18n.global.t('messages.player.switched_to_offline'),
                             should_resume_quality: false,
                             is_error_message: false,
                         });
@@ -1719,7 +1721,7 @@ class PlayerController {
                     // 実はなぜか hls.js を使わずとも Safari では普通に Native HLS 再生できてしまうようなので、警告を出しつつ何もしない
                     // DPlayer 側の機能により、Native HLS 再生であっても字幕は表示される
                     console.warn('\u001b[31m[PlayerController] hls.js plugin not found. (Native HLS playback may be supported on Safari.)');
-                    this.player.notice('お使いの iOS / iPadOS Safari は hls.js での再生に対応していません。代わりに Native HLS での再生を試みますが、正常に再生できない可能性があります。',
+                    this.player.notice(i18n.global.t('messages.player.ios_hlsjs_unsupported'),
                         undefined, undefined, '#FFA86A');
                 }
 
@@ -1764,13 +1766,13 @@ class PlayerController {
                     if (this.player.video.error) {
                         console.error('\u001b[31m[PlayerController] HTMLVideoElement error event:', this.player.video.error);
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: `再生中にエラーが発生しました。(Native: ${this.player.video.error.code}: ${this.player.video.error.message}) プレイヤーを再起動しています…`,
+                            message: i18n.global.t('messages.player.playback_error_native', [this.player.video.error.code, this.player.video.error.message]),
                         });
                     } else {
                         // MediaError オブジェクトは場合によっては存在しないことがあるらしい…
                         // 存在しない場合は unknown error として扱う
                         player_store.event_emitter.emit('PlayerRestartRequired', {
-                            message: '再生中にエラーが発生しました。(Native: unknown error) プレイヤーを再起動しています…',
+                            message: i18n.global.t('messages.player.playback_error_native_unknown'),
                         });
                     }
                 });
@@ -1917,7 +1919,7 @@ class PlayerController {
                 fullscreen_container.requestFullscreen();
             } else {
                 // フルスクリーンがサポートされていない場合はエラーを表示
-                this.player.notice('iPhone Safari は動画のフルスクリーン表示に対応していません。', undefined, undefined, '#FF6F6A');
+                this.player.notice(i18n.global.t('messages.player.iphone_fullscreen_unsupported'), undefined, undefined, '#FF6F6A');
                 return;
             }
             // 画面の向きを横に固定 (Screen Orientation API がサポートされている場合)
@@ -1984,7 +1986,7 @@ class PlayerController {
             // ライブでは再生速度項目が非表示のため、見た目上は音声の直下に出る
             this.player.template.speed.insertAdjacentHTML('afterend', `
                 <div class="dplayer-setting-item dplayer-setting-mobile-profile">
-                    <span class="dplayer-label">モバイル回線向け画質</span>
+                    <span class="dplayer-label">${i18n.global.t('messages.player.mobile_quality')}</span>
                     <div class="dplayer-toggle">
                         <input class="dplayer-mobile-profile-setting-input" type="checkbox" name="dplayer-toggle-mobile-profile">
                         <label for="dplayer-toggle-mobile-profile" style="--theme-color:#E64F97"></label>
@@ -2006,7 +2008,7 @@ class PlayerController {
                     this.quality_profile_type = 'Cellular';
                     player_store.selected_quality_profile_type = this.quality_profile_type;
                     player_store.event_emitter.emit('PlayerRestartRequired', {
-                        message: 'モバイル回線向けの画質プロファイルに切り替えました。',
+                        message: i18n.global.t('messages.player.mobile_profile'),
                         // 他の通知と被らないように、メッセージを遅らせて表示する
                         message_delay_seconds: this.quality_profile.tv_low_latency_mode || this.playback_mode === 'Video' ? 2 : 4.5,
                         is_error_message: false,
@@ -2018,7 +2020,7 @@ class PlayerController {
                     this.quality_profile_type = 'Wi-Fi';
                     player_store.selected_quality_profile_type = this.quality_profile_type;
                     player_store.event_emitter.emit('PlayerRestartRequired', {
-                        message: 'Wi-Fi 回線向けの画質プロファイルに切り替えました。',
+                        message: i18n.global.t('messages.player.wifi_profile'),
                         // 他の通知と被らないように、メッセージを遅らせて表示する
                         message_delay_seconds: this.quality_profile.tv_low_latency_mode || this.playback_mode === 'Video' ? 2 : 4.5,
                         is_error_message: false,
@@ -2032,7 +2034,7 @@ class PlayerController {
         // 設定パネルにL字画面のクロップ設定を表示するボタンを動的に追加する
         this.player.template.settingOriginPanel.insertAdjacentHTML('beforeend', `
             <div class="dplayer-setting-item dplayer-setting-lshaped-screen-crop">
-                <span class="dplayer-label">Ｌ字画面のクロップ</span>
+                <span class="dplayer-label">${i18n.global.t('watch.lshaped_crop.title')}</span>
                 <div class="dplayer-toggle">
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">
                         <path d="M22 16l-10.105-10.6-1.895 1.987 8.211 8.613-8.211 8.612 1.895 1.988 8.211-8.613z"></path>
@@ -2055,7 +2057,7 @@ class PlayerController {
         if (Utils.isTouchDevice() === false) {
             this.player.template.settingOriginPanel.insertAdjacentHTML('beforeend', `
                 <div class="dplayer-setting-item dplayer-setting-keyboard-shortcut">
-                    <span class="dplayer-label">キーボードショートカット</span>
+                    <span class="dplayer-label">${i18n.global.t('captures.header.keyboard_shortcuts')}</span>
                     <div class="dplayer-toggle">
                         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">
                             <path d="M22 16l-10.105-10.6-1.895 1.987 8.211 8.613-8.211 8.612 1.895 1.988 8.211-8.613z"></path>

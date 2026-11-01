@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { getSyncableClientSettings, ITimeTableGenreColors, TimeTableSizeOption } from '@/stores/SettingsStore';
 
@@ -243,7 +244,7 @@ class Settings {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'サーバー設定を取得できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.settings.server_settings_failed'));
                     break;
             }
             return null;
@@ -266,7 +267,7 @@ class Settings {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 default:
-                    APIClient.showGenericError(response, 'サーバー設定を更新できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.settings.server_settings_update_failed'));
                     break;
             }
             return false;

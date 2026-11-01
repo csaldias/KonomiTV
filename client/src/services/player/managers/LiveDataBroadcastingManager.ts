@@ -5,6 +5,7 @@ import { Deinterlacer } from 'mpeg2toh264/yadif';
 import { isEqual } from 'ohash';
 import { AribKeyCode, BMLBrowser, BMLBrowserFontFace } from 'web-bml';
 
+import i18n from '@/plugins/i18n';
 import router from '@/router';
 import APIClient from '@/services/APIClient';
 import PlayerManager from '@/services/player/PlayerManager';
@@ -202,7 +203,7 @@ class LiveDataBroadcastingManager implements PlayerManager {
                         // network_id と service_id が一致するチャンネルが見つからなかった
                         // 3秒間エラーメッセージを表示する
                         console.error(`[LiveDataBroadcastingManager] Channel not found (network_id: ${network_id} / service_id: ${service_id})`);
-                        this_.player.notice(`切り替え先のチャンネルが見つかりませんでした。(network_id: ${network_id} / service_id: ${service_id})`, 3000, undefined, '#FF6F6A');
+                        this_.player.notice(i18n.global.t('messages.player.channel_not_found', [network_id, service_id]), 3000, undefined, '#FF6F6A');
                         // エラーメッセージを表示し終わったタイミングで、非同期で LiveDataBroadcastingManager を再起動
                         // チャンネル切り替えに失敗すると BML ブラウザがフリーズするため
                         Utils.sleep(3).then(async () => {

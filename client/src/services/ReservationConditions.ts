@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IProgramSearchCondition } from '@/services/Programs';
 import { IRecordSettings } from '@/services/Reservations';
@@ -53,13 +54,13 @@ class ReservationConditions {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, 'キーワード自動予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.edcb_only'));
                     break;
                 case 'Failed to get the list of reserve conditions':
-                    APIClient.showGenericError(response, 'キーワード自動予約条件一覧の取得に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.list_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'キーワード自動予約条件一覧を取得できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.list_get_failed'));
                     break;
             }
             return null;
@@ -79,13 +80,13 @@ class ReservationConditions {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, 'キーワード自動予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.edcb_only'));
                     break;
                 case 'Specified reservation_condition_id was not found':
-                    APIClient.showGenericError(response, '指定されたキーワード自動予約条件が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.not_found'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'キーワード自動予約条件情報を取得できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.info_failed'));
                     break;
             }
             return null;
@@ -111,13 +112,13 @@ class ReservationConditions {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, 'キーワード自動予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.edcb_only'));
                     break;
                 case 'Failed to register the reserve condition':
-                    APIClient.showGenericError(response, 'キーワード自動予約条件の登録に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.register_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'キーワード自動予約条件の追加に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.add_failed'));
                     break;
             }
             return false;
@@ -148,16 +149,16 @@ class ReservationConditions {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, 'キーワード自動予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.edcb_only'));
                     break;
                 case 'Specified reservation_condition_id was not found':
-                    APIClient.showGenericError(response, '指定されたキーワード自動予約条件が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.not_found'));
                     break;
                 case 'Failed to update the specified reserve condition':
-                    APIClient.showGenericError(response, 'キーワード自動予約条件の更新に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.update_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, 'キーワード自動予約条件の更新に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.update_failed'));
                     break;
             }
             return null;
@@ -177,16 +178,16 @@ class ReservationConditions {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'This API is only available when the backend is EDCB':
-                    APIClient.showGenericError(response, 'キーワード自動予約機能は EDCB バックエンド選択時のみ利用できます。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.edcb_only'));
                     break;
                 case 'Specified reservation_condition_id was not found':
-                    APIClient.showGenericError(response, '指定されたキーワード自動予約条件が見つかりませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.not_found'));
                     break;
                 case 'Failed to delete the specified reserve condition':
-                    APIClient.showGenericError(response, 'キーワード自動予約条件の削除に失敗しました。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.delete_failed'));
                     break;
                 default:
-                    APIClient.showGenericError(response, `キーワード自動予約条件 (ID: ${condition_id}) の削除に失敗しました。`);
+                    APIClient.showGenericError(response, i18n.global.t('messages.reservation_conditions.delete_failed_id', [condition_id]));
                     break;
             }
             return false;

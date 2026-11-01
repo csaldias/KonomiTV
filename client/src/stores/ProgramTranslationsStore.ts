@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import Programs, { type IProgramTranslation } from '@/services/Programs';
 import useServerSettingsStore from '@/stores/ServerSettingsStore';
 import useSettingsStore from '@/stores/SettingsStore';
@@ -166,7 +167,7 @@ const useProgramTranslationsStore = defineStore('programTranslations', () => {
 
         // 翻訳機能が無効なサーバーでは英訳が生成されないため、英語に切り替えずに有効にする方法を案内する
         if (server_settings.translation.enabled === false) {
-            Message.warning('このサーバーでは番組情報の翻訳機能が無効です。config.yaml の translation.enabled を true にしてから、KonomiTV サーバーを再起動してください。');
+            Message.warning(i18n.global.t('messages.program_translations.disabled'));
             return;
         }
         settings_store.settings.program_info_display_language = 'English';

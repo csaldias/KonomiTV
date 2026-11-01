@@ -1,5 +1,6 @@
 
 import Message from '@/message';
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 
 
@@ -91,15 +92,15 @@ class Users {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Specified username is duplicated': {
-                    Message.error('ユーザー名が重複しています。');
+                    Message.error(i18n.global.t('messages.users.duplicate_username'));
                     break;
                 }
                 case 'Specified username is not accepted due to system limitations': {
-                    Message.error('ユーザー名に token と me は使えません。');
+                    Message.error(i18n.global.t('messages.users.reserved_username'));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, 'アカウントを作成できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.users.create_failed'));
                     break;
                 }
             }
@@ -125,11 +126,11 @@ class Users {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Incorrect username or password': {
-                    Message.error('ログインできませんでした。ユーザー名かパスワードを間違えていませんか？');
+                    Message.error(i18n.global.t('messages.users.login_wrong'));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, 'ログインできませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.users.login_failed'));
                     break;
                 }
             }
@@ -151,7 +152,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'アカウント情報を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.users.info_failed'));
             return null;
         }
 
@@ -170,7 +171,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'アイコン画像を取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.users.icon_failed'));
             return null;
         }
 
@@ -192,15 +193,15 @@ class Users {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Specified username is duplicated': {
-                    Message.error('ユーザー名が重複しています。');
+                    Message.error(i18n.global.t('messages.users.duplicate_username'));
                     break;
                 }
                 case 'Specified username is not accepted due to system limitations': {
-                    Message.error('ユーザー名に token と me は使えません。');
+                    Message.error(i18n.global.t('messages.users.reserved_username'));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, 'アカウント情報を更新できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.users.update_failed'));
                     break;
                 }
             }
@@ -230,11 +231,11 @@ class Users {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Please upload JPEG or PNG image': {
-                    Message.error('JPEG または PNG 画像をアップロードしてください。');
+                    Message.error(i18n.global.t('messages.users.icon_type_invalid'));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, 'アイコン画像を更新できませんでした。');
+                    APIClient.showGenericError(response, i18n.global.t('messages.users.icon_update_failed'));
                     break;
                 }
             }
@@ -253,7 +254,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'アカウントを削除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.users.delete_failed'));
             return;
         }
     }
@@ -270,7 +271,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'ユーザー情報リストを取得できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.users.list_failed'));
             return null;
         }
 
@@ -292,11 +293,11 @@ class Users {
         if (response.type === 'error') {
             switch (response.data.detail) {
                 case 'Specified user was not found': {
-                    Message.error(`${username} のユーザーが見つかりませんでした。`);
+                    Message.error(i18n.global.t('messages.users.user_not_found', [username]));
                     break;
                 }
                 default: {
-                    APIClient.showGenericError(response, `${username} のユーザー情報を取得できませんでした。`);
+                    APIClient.showGenericError(response, i18n.global.t('messages.users.user_info_failed', [username]));
                     break;
                 }
             }
@@ -319,7 +320,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, `${username} のユーザー情報を更新できませんでした。`);
+            APIClient.showGenericError(response, i18n.global.t('messages.users.user_update_failed', [username]));
             return false;
         }
 
@@ -339,7 +340,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, `${username} のユーザーアイコン画像を取得できませんでした。`);
+            APIClient.showGenericError(response, i18n.global.t('messages.users.user_icon_failed', [username]));
             throw new Error('Failed to get specified user icon');
         }
 
@@ -361,7 +362,7 @@ class Users {
 
         // エラー処理
         if (response.type === 'error') {
-            APIClient.showGenericError(response, `${username} のユーザーアカウントを削除できませんでした。`);
+            APIClient.showGenericError(response, i18n.global.t('messages.users.user_delete_failed', [username]));
             return false;
         }
 

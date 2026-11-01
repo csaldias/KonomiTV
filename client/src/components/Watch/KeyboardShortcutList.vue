@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold">
                 <Icon icon="fluent:keyboard-20-filled" height="28px" />
-                <span class="ml-3">キーボードショートカット</span>
+                <span class="ml-3">{{ $t('captures.header.keyboard_shortcuts') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="playerStore.shortcut_key_modal = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -14,21 +14,21 @@
                     <v-col cols="6" v-for="(shortcut_key_column, shortcut_key_column_name) in shortcut_list" :key="shortcut_key_column_name">
                         <div class="mt-3" v-for="shortcut_keys in shortcut_key_column" :key="shortcut_keys.name">
                             <div class="text-subtitle-1 d-flex align-center font-weight-bold">
-                                <Icon v-if="shortcut_keys.name !== 'データ放送'" :icon="shortcut_keys.icon" :height="shortcut_keys.icon_height" />
+                                <Icon v-if="shortcut_keys.name !== 'watch.shortcuts.group_data_broadcasting'" :icon="shortcut_keys.icon" :height="shortcut_keys.icon_height" />
                                 <svg v-else width="24px" height="24px" viewBox="0 0 512 512">
                                     <path fill="currentColor" d="M248.039 381.326L355.039 67.8258C367.539 28.3257 395.039 34.3258 406.539 34.3258C431.039 34.3258 453.376 61.3258 441.039 96.8258C362.639 322.426 343.539 375.326 340.539 384.826C338.486 391.326 342.039 391.326 345.539 391.326C377.039 391.326 386.539 418.326 386.539 435.326C386.539 458.826 371.539 477.326 350.039 477.326H214.539C179.039 477.326 85.8269 431.3 88.0387 335.826C91.0387 206.326 192.039 183.326 243.539 183.326H296.539L265.539 272.326H243.539C185.539 272.326 174.113 314.826 176.039 334.326C180.039 374.826 215.039 389.814 237.039 390.326C244.539 390.5 246.039 386.826 248.039 381.326Z" />
                                 </svg>
-                                <span class="ml-2">{{shortcut_keys.name}}</span>
+                                <span class="ml-2">{{ $t(shortcut_keys.name) }}</span>
                             </div>
                             <div class="mt-3" v-for="shortcut in shortcut_keys.shortcuts" :key="shortcut.name">
                                 <div class="text-subtitle-2 mt-2 d-flex align-center font-weight-medium">
-                                    <span class="mr-2" v-html="shortcut.name"></span>
+                                    <span class="mr-2" v-html="$t(shortcut.name, {d_button: DATA_BROADCASTING_BUTTON_ICON})"></span>
                                     <div class="ml-auto d-flex align-center flex-shrink-0">
                                         <div class="ml-auto d-flex align-center" v-for="(key, index) in shortcut.keys" :key="key.name">
                                             <span class="shortcut-key">
                                                 <Icon v-show="key.icon === true" :icon="key_name" height="18px"
                                                     v-for="key_name in key.name.split(';')" :key="key_name" />
-                                                <span v-if="key.icon === false" v-html="key.name"></span>
+                                                <span v-if="key.icon === false" v-html="key.name.startsWith('watch.shortcuts.') ? $t(key.name) : key.name"></span>
                                             </span>
                                             <span class="shortcut-key-plus" v-if="index < (shortcut.keys.length - 1)">+</span>
                                         </div>
@@ -71,58 +71,62 @@ interface IShortcut {
     }[];
 }
 
+// ショートカットの説明の {d_button} に差し込む、リモコンの d ボタンのアイコン
+const DATA_BROADCASTING_BUTTON_ICON = '<svg width="17px" height="17px" style="margin-bottom: -2.5px;" viewBox="0 0 512 512"><path fill="currentColor" d="M248.039 381.326L355.039 67.8258C367.539 28.3257 395.039 34.3258 406.539 34.3258C431.039 34.3258 453.376 61.3258 441.039 96.8258C362.639 322.426 343.539 375.326 340.539 384.826C338.486 391.326 342.039 391.326 345.539 391.326C377.039 391.326 386.539 418.326 386.539 435.326C386.539 458.826 371.539 477.326 350.039 477.326H214.539C179.039 477.326 85.8269 431.3 88.0387 335.826C91.0387 206.326 192.039 183.326 243.539 183.326H296.539L265.539 272.326H243.539C185.539 272.326 174.113 314.826 176.039 334.326C180.039 374.826 215.039 389.814 237.039 390.326C244.539 390.5 246.039 386.826 248.039 381.326Z" /></svg>';
+
 // キーボードショートカットの一覧に表示するショートカットキーのリスト (ライブ視聴)
+// グループ・ショートカット・キーの name のうち、'watch.shortcuts.' で始まるものは、表示言語に合わせてテンプレートで翻訳する文言のキー
 const LIVE_SHORTCUT_LIST: IShortcutList = {
     left_column: [
         {
-            name: '全般',
+            name: 'watch.shortcuts.group_general',
             icon: 'fluent:home-20-filled',
             icon_height: '22px',
             shortcuts: [
-                { name: '数字キー/テンキーに対応するリモコン番号 (1~12) の地デジチャンネルに切り替える', keys: [{name: '1~9, 0, -(=), ^(~)', icon: false}] },
-                { name: '数字キー/テンキーに対応するリモコン番号 (1~12) の BS チャンネルに切り替える', keys: [{name: 'Shift', icon: false}, {name: '1~9, 0, -(=), ^(~)', icon: false}] },
-                { name: '前のチャンネルに切り替える', keys: [{name: 'fluent:arrow-up-12-filled', icon: true}] },
-                { name: '次のチャンネルに切り替える', keys: [{name: 'fluent:arrow-down-12-filled', icon: true}] },
-                { name: 'キーボードショートカットの一覧を表示する', keys: [{name: '／(？)', icon: false}] },
+                { name: 'watch.shortcuts.select_terrestrial', keys: [{name: '1~9, 0, -(=), ^(~)', icon: false}] },
+                { name: 'watch.shortcuts.select_bs', keys: [{name: 'Shift', icon: false}, {name: '1~9, 0, -(=), ^(~)', icon: false}] },
+                { name: 'watch.shortcuts.previous_channel', keys: [{name: 'fluent:arrow-up-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.next_channel', keys: [{name: 'fluent:arrow-down-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.show_shortcuts', keys: [{name: '／(？)', icon: false}] },
             ]
         },
         {
-            name: 'プレイヤー',
+            name: 'watch.shortcuts.group_player',
             icon: 'fluent:play-20-filled',
             icon_height: '20px',
             shortcuts: [
-                { name: '再生 / 一時停止の切り替え', keys: [{name: 'Space', icon: false}] },
-                { name: '再生 / 一時停止の切り替え (キャプチャタブ表示時)', keys: [{name: 'Shift', icon: false}, {name: 'Space', icon: false}] },
-                { name: '停止して0.5秒早戻し', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: '停止して0.5秒早送り', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量を上げる', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量を下げる', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量をミュートする', keys: [{name: 'Q', icon: false}] },
-                { name: 'ライブストリームを同期する', keys: [{name: 'W', icon: false}] },
-                { name: 'プレイヤーを再起動する', keys: [{name: 'R', icon: false}] },
-                { name: 'フルスクリーンの切り替え', keys: [{name: 'F', icon: false}] },
-                { name: 'Picture-in-Picture の表示切り替え', keys: [{name: 'E', icon: false}] },
-                { name: '字幕の表示切り替え', keys: [{name: 'S', icon: false}] },
-                { name: 'コメントの表示切り替え', keys: [{name: 'D', icon: false}] },
-                { name: '映像をキャプチャする', keys: [{name: 'C', icon: false}] },
-                { name: '映像をコメントを付けてキャプチャする', keys: [{name: 'V', icon: false}] },
-                { name: 'コメント入力フォームにフォーカスする', keys: [{name: 'M', icon: false}] },
-                { name: 'コメント入力フォームを閉じる', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'M', icon: false}] },
-                { name: 'コメントを送信する', keys: [{name: 'コメント入力フォームを表示', icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.toggle_play', keys: [{name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.toggle_play_captures_tab', keys: [{name: 'Shift', icon: false}, {name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.step_back', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.step_forward', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.volume_up', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.volume_down', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.mute', keys: [{name: 'Q', icon: false}] },
+                { name: 'watch.shortcuts.sync_live', keys: [{name: 'W', icon: false}] },
+                { name: 'watch.shortcuts.restart_player', keys: [{name: 'R', icon: false}] },
+                { name: 'watch.shortcuts.toggle_fullscreen', keys: [{name: 'F', icon: false}] },
+                { name: 'watch.shortcuts.toggle_pip', keys: [{name: 'E', icon: false}] },
+                { name: 'watch.shortcuts.toggle_captions', keys: [{name: 'S', icon: false}] },
+                { name: 'watch.shortcuts.toggle_comments', keys: [{name: 'D', icon: false}] },
+                { name: 'watch.shortcuts.capture', keys: [{name: 'C', icon: false}] },
+                { name: 'watch.shortcuts.capture_with_comments', keys: [{name: 'V', icon: false}] },
+                { name: 'watch.shortcuts.focus_comment_form', keys: [{name: 'M', icon: false}] },
+                { name: 'watch.shortcuts.close_comment_form', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'M', icon: false}] },
+                { name: 'watch.shortcuts.send_comment', keys: [{name: 'watch.shortcuts.key_comment_form_shown', icon: false}, {name: 'Enter', icon: false}] },
             ]
         },
     ],
     right_column: [
         {
-            name: 'パネル',
+            name: 'watch.shortcuts.group_panel',
             icon: 'fluent:panel-right-20-filled',
             icon_height: '24px',
             shortcuts: [
-                { name: 'パネルの表示切り替え', keys: [{name: 'P', icon: false}] },
-                { name: '番組情報タブを表示する', keys: [{name: 'K', icon: false}] },
-                { name: 'チャンネルタブを表示する', keys: [{name: 'L', icon: false}] },
-                { name: 'コメントタブを表示する', keys: [{name: '；(＋)', icon: false}] },
-                { name: 'Twitter タブを表示する', keys: [{name: '：(＊)', icon: false}] },
+                { name: 'watch.shortcuts.toggle_panel', keys: [{name: 'P', icon: false}] },
+                { name: 'watch.shortcuts.show_program_tab', keys: [{name: 'K', icon: false}] },
+                { name: 'watch.shortcuts.show_channel_tab', keys: [{name: 'L', icon: false}] },
+                { name: 'watch.shortcuts.show_comment_tab', keys: [{name: '；(＋)', icon: false}] },
+                { name: 'watch.shortcuts.show_twitter_tab', keys: [{name: '：(＊)', icon: false}] },
             ]
         },
         {
@@ -130,36 +134,36 @@ const LIVE_SHORTCUT_LIST: IShortcutList = {
             icon: 'fa-brands:twitter',
             icon_height: '22px',
             shortcuts: [
-                { name: 'ツイート検索タブを表示する', keys: [{name: '［ (「)', icon: false}] },
-                { name: 'タイムラインタブを表示する', keys: [{name: '］ (」)', icon: false}] },
-                { name: 'キャプチャタブを表示する', keys: [{name: '_', icon: false}] },
-                { name: '検索結果を更新する', keys: [{name: 'ツイート検索タブを表示', icon: false}, {name: '＼(｜)', icon: false}] },
-                { name: 'タイムラインを更新する', keys: [{name: 'タイムラインタブを表示', icon: false}, {name: '＼(｜)', icon: false}] },
-                { name: 'キャプチャにフォーカスする', keys: [{name: 'キャプチャタブを表示', icon: false}, {name: 'fluent:arrow-up-12-filled;fluent:arrow-down-12-filled;fluent:arrow-left-12-filled;fluent:arrow-right-12-filled', icon: true}] },
-                { name: 'キャプチャを拡大表示する/<br>キャプチャの拡大表示を閉じる', keys: [{name: 'キャプチャにフォーカス', icon: false}, {name: 'Enter', icon: false}] },
-                { name: 'キャプチャを選択する/<br>キャプチャの選択を解除する', keys: [{name: 'キャプチャにフォーカス', icon: false}, {name: 'Space', icon: false}] },
-                { name: 'ツイート入力フォームにフォーカスを当てる/フォーカスを外す', keys: [{name: 'Tab', icon: false}] },
-                { name: 'ツイート送信先を切り替える<br>（紐付け済アカウント選択時のみ）', keys: [{name: 'Twitter タブを表示', icon: false}, {name: 'Shift', icon: false}, {name: 'Tab', icon: false}] },
-                { name: 'ツイートを送信する', keys: [{name: 'Twitter タブを表示', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'Enter', icon: false}] },
-                { name: 'クリップボード内の画像を<br>キャプチャとして取り込む', keys: [{name: 'ツイート入力<br>フォームにフォーカス', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'V', icon: false}] },
+                { name: 'watch.shortcuts.show_search_tab', keys: [{name: '［ (「)', icon: false}] },
+                { name: 'watch.shortcuts.show_timeline_tab', keys: [{name: '］ (」)', icon: false}] },
+                { name: 'watch.shortcuts.show_captures_tab', keys: [{name: '_', icon: false}] },
+                { name: 'watch.shortcuts.refresh_search', keys: [{name: 'watch.shortcuts.key_search_tab_shown', icon: false}, {name: '＼(｜)', icon: false}] },
+                { name: 'watch.shortcuts.refresh_timeline', keys: [{name: 'watch.shortcuts.key_timeline_tab_shown', icon: false}, {name: '＼(｜)', icon: false}] },
+                { name: 'watch.shortcuts.focus_captures', keys: [{name: 'watch.shortcuts.key_captures_tab_shown', icon: false}, {name: 'fluent:arrow-up-12-filled;fluent:arrow-down-12-filled;fluent:arrow-left-12-filled;fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.toggle_capture_zoom', keys: [{name: 'watch.shortcuts.key_captures_focused', icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.toggle_capture_selection', keys: [{name: 'watch.shortcuts.key_captures_focused', icon: false}, {name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.toggle_tweet_focus', keys: [{name: 'Tab', icon: false}] },
+                { name: 'watch.shortcuts.switch_tweet_target', keys: [{name: 'watch.shortcuts.key_twitter_tab_shown', icon: false}, {name: 'Shift', icon: false}, {name: 'Tab', icon: false}] },
+                { name: 'watch.shortcuts.send_tweet', keys: [{name: 'watch.shortcuts.key_twitter_tab_shown', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.paste_capture', keys: [{name: 'watch.shortcuts.key_tweet_form_focused', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'V', icon: false}] },
             ]
         },
         {
-            name: 'データ放送',
+            name: 'watch.shortcuts.group_data_broadcasting',
             icon: '',  // これだけアイコンが独自なので空にする
             icon_height: '',
             shortcuts: [
-                { name: 'リモコンの <svg v-else width="17px" height="17px" style="margin-bottom: -2.5px;" viewBox="0 0 512 512"><path fill="currentColor" d="M248.039 381.326L355.039 67.8258C367.539 28.3257 395.039 34.3258 406.539 34.3258C431.039 34.3258 453.376 61.3258 441.039 96.8258C362.639 322.426 343.539 375.326 340.539 384.826C338.486 391.326 342.039 391.326 345.539 391.326C377.039 391.326 386.539 418.326 386.539 435.326C386.539 458.826 371.539 477.326 350.039 477.326H214.539C179.039 477.326 85.8269 431.3 88.0387 335.826C91.0387 206.326 192.039 183.326 243.539 183.326H296.539L265.539 272.326H243.539C185.539 272.326 174.113 314.826 176.039 334.326C180.039 374.826 215.039 389.814 237.039 390.326C244.539 390.5 246.039 386.826 248.039 381.326Z" /></svg> ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'D', icon: false}] },
-                { name: 'リモコンの戻るボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'Backspace', icon: false}] },
-                { name: 'リモコンの決定ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'Enter', icon: false}] },
-                { name: 'リモコンの ⬆ ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
-                { name: 'リモコンの ⬅️ ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: 'リモコンの ➡ ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: 'リモコンの ⬇ ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
-                { name: 'リモコンの 🟦 ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F9', icon: false}] },
-                { name: 'リモコンの 🟥 ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F10', icon: false}] },
-                { name: 'リモコンの 🟩 ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F11', icon: false}] },
-                { name: 'リモコンの 🟨 ボタンを押す', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F12', icon: false}] },
+                { name: 'watch.shortcuts.remote_d', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'D', icon: false}] },
+                { name: 'watch.shortcuts.remote_back', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'Backspace', icon: false}] },
+                { name: 'watch.shortcuts.remote_select', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.remote_up', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.remote_left', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.remote_right', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.remote_down', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.remote_blue', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F9', icon: false}] },
+                { name: 'watch.shortcuts.remote_red', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F10', icon: false}] },
+                { name: 'watch.shortcuts.remote_green', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F11', icon: false}] },
+                { name: 'watch.shortcuts.remote_yellow', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'F12', icon: false}] },
             ]
         },
     ],
@@ -169,52 +173,52 @@ const LIVE_SHORTCUT_LIST: IShortcutList = {
 const VIDEO_SHORTCUT_LIST: IShortcutList = {
     left_column: [
         {
-            name: '全般',
+            name: 'watch.shortcuts.group_general',
             icon: 'fluent:home-20-filled',
             icon_height: '22px',
             shortcuts: [
-                { name: 'キーボードショートカットの一覧を表示する', keys: [{name: '／(？)', icon: false}] },
+                { name: 'watch.shortcuts.show_shortcuts', keys: [{name: '／(？)', icon: false}] },
             ]
         },
         {
-            name: 'プレイヤー',
+            name: 'watch.shortcuts.group_player',
             icon: 'fluent:play-20-filled',
             icon_height: '20px',
             shortcuts: [
-                { name: '再生 / 一時停止の切り替え', keys: [{name: 'Space', icon: false}] },
-                { name: '再生 / 一時停止の切り替え (キャプチャタブ表示時)', keys: [{name: 'Shift', icon: false}, {name: 'Space', icon: false}] },
-                { name: '5秒早戻し', keys: [{name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: '5秒早送り', keys: [{name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: '15秒早戻し', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: '15秒早送り', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: '30秒早戻し', keys: [{name: 'Shift', icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: '30秒早送り', keys: [{name: 'Shift', icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: '60秒早戻し', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
-                { name: '60秒早送り', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量を上げる', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量を下げる', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
-                { name: 'プレイヤーの音量をミュートする', keys: [{name: 'Q', icon: false}] },
-                { name: 'プレイヤーを再起動する', keys: [{name: 'R', icon: false}] },
-                { name: 'フルスクリーンの切り替え', keys: [{name: 'F', icon: false}] },
-                { name: 'Picture-in-Picture の表示切り替え', keys: [{name: 'E', icon: false}] },
-                { name: '字幕の表示切り替え', keys: [{name: 'S', icon: false}] },
-                { name: 'コメントの表示切り替え', keys: [{name: 'D', icon: false}] },
-                { name: '映像をキャプチャする', keys: [{name: 'C', icon: false}] },
-                { name: '映像をコメントを付けてキャプチャする', keys: [{name: 'V', icon: false}] },
+                { name: 'watch.shortcuts.toggle_play', keys: [{name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.toggle_play_captures_tab', keys: [{name: 'Shift', icon: false}, {name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.rewind_5', keys: [{name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.forward_5', keys: [{name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.rewind_15', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.forward_15', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.rewind_30', keys: [{name: 'Shift', icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.forward_30', keys: [{name: 'Shift', icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.rewind_60', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-left-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.forward_60', keys: [{name: Utils.AltOrOption(), icon: false}, {name: 'fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.volume_up', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-up-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.volume_down', keys: [{name: Utils.CtrlOrCmd(), icon: false}, {name: 'fluent:arrow-down-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.mute', keys: [{name: 'Q', icon: false}] },
+                { name: 'watch.shortcuts.restart_player', keys: [{name: 'R', icon: false}] },
+                { name: 'watch.shortcuts.toggle_fullscreen', keys: [{name: 'F', icon: false}] },
+                { name: 'watch.shortcuts.toggle_pip', keys: [{name: 'E', icon: false}] },
+                { name: 'watch.shortcuts.toggle_captions', keys: [{name: 'S', icon: false}] },
+                { name: 'watch.shortcuts.toggle_comments', keys: [{name: 'D', icon: false}] },
+                { name: 'watch.shortcuts.capture', keys: [{name: 'C', icon: false}] },
+                { name: 'watch.shortcuts.capture_with_comments', keys: [{name: 'V', icon: false}] },
             ]
         },
     ],
     right_column: [
         {
-            name: 'パネル',
+            name: 'watch.shortcuts.group_panel',
             icon: 'fluent:panel-right-20-filled',
             icon_height: '24px',
             shortcuts: [
-                { name: 'パネルの表示切り替え', keys: [{name: 'P', icon: false}] },
-                { name: '番組情報タブを表示する', keys: [{name: 'K', icon: false}] },
-                { name: 'シリーズタブを表示する', keys: [{name: 'L', icon: false}] },
-                { name: 'コメントタブを表示する', keys: [{name: '；(＋)', icon: false}] },
-                { name: 'Twitter タブを表示する', keys: [{name: '：(＊)', icon: false}] },
+                { name: 'watch.shortcuts.toggle_panel', keys: [{name: 'P', icon: false}] },
+                { name: 'watch.shortcuts.show_program_tab', keys: [{name: 'K', icon: false}] },
+                { name: 'watch.shortcuts.show_series_tab', keys: [{name: 'L', icon: false}] },
+                { name: 'watch.shortcuts.show_comment_tab', keys: [{name: '；(＋)', icon: false}] },
+                { name: 'watch.shortcuts.show_twitter_tab', keys: [{name: '：(＊)', icon: false}] },
             ]
         },
         {
@@ -222,18 +226,18 @@ const VIDEO_SHORTCUT_LIST: IShortcutList = {
             icon: 'fa-brands:twitter',
             icon_height: '22px',
             shortcuts: [
-                { name: 'ツイート検索タブを表示する', keys: [{name: '［ (「)', icon: false}] },
-                { name: 'タイムラインタブを表示する', keys: [{name: '］ (」)', icon: false}] },
-                { name: 'キャプチャタブを表示する', keys: [{name: '_', icon: false}] },
-                { name: '検索結果を更新する', keys: [{name: 'ツイート検索タブを表示', icon: false}, {name: '＼(｜)', icon: false}] },
-                { name: 'タイムラインを更新する', keys: [{name: 'タイムラインタブを表示', icon: false}, {name: '＼(｜)', icon: false}] },
-                { name: 'キャプチャにフォーカスする', keys: [{name: 'キャプチャタブを表示', icon: false}, {name: 'fluent:arrow-up-12-filled;fluent:arrow-down-12-filled;fluent:arrow-left-12-filled;fluent:arrow-right-12-filled', icon: true}] },
-                { name: 'キャプチャを拡大表示する/<br>キャプチャの拡大表示を閉じる', keys: [{name: 'キャプチャにフォーカス', icon: false}, {name: 'Enter', icon: false}] },
-                { name: 'キャプチャを選択する/<br>キャプチャの選択を解除する', keys: [{name: 'キャプチャにフォーカス', icon: false}, {name: 'Space', icon: false}] },
-                { name: 'ツイート入力フォームにフォーカスを当てる/フォーカスを外す', keys: [{name: 'Tab', icon: false}] },
-                { name: 'ツイート送信先を切り替える<br>（紐付け済アカウント選択時のみ）', keys: [{name: 'Twitter タブを表示', icon: false}, {name: 'Shift', icon: false}, {name: 'Tab', icon: false}] },
-                { name: 'ツイートを送信する', keys: [{name: 'Twitter タブを表示', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'Enter', icon: false}] },
-                { name: 'クリップボード内の画像を<br>キャプチャとして取り込む', keys: [{name: 'ツイート入力<br>フォームにフォーカス', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'V', icon: false}] },
+                { name: 'watch.shortcuts.show_search_tab', keys: [{name: '［ (「)', icon: false}] },
+                { name: 'watch.shortcuts.show_timeline_tab', keys: [{name: '］ (」)', icon: false}] },
+                { name: 'watch.shortcuts.show_captures_tab', keys: [{name: '_', icon: false}] },
+                { name: 'watch.shortcuts.refresh_search', keys: [{name: 'watch.shortcuts.key_search_tab_shown', icon: false}, {name: '＼(｜)', icon: false}] },
+                { name: 'watch.shortcuts.refresh_timeline', keys: [{name: 'watch.shortcuts.key_timeline_tab_shown', icon: false}, {name: '＼(｜)', icon: false}] },
+                { name: 'watch.shortcuts.focus_captures', keys: [{name: 'watch.shortcuts.key_captures_tab_shown', icon: false}, {name: 'fluent:arrow-up-12-filled;fluent:arrow-down-12-filled;fluent:arrow-left-12-filled;fluent:arrow-right-12-filled', icon: true}] },
+                { name: 'watch.shortcuts.toggle_capture_zoom', keys: [{name: 'watch.shortcuts.key_captures_focused', icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.toggle_capture_selection', keys: [{name: 'watch.shortcuts.key_captures_focused', icon: false}, {name: 'Space', icon: false}] },
+                { name: 'watch.shortcuts.toggle_tweet_focus', keys: [{name: 'Tab', icon: false}] },
+                { name: 'watch.shortcuts.switch_tweet_target', keys: [{name: 'watch.shortcuts.key_twitter_tab_shown', icon: false}, {name: 'Shift', icon: false}, {name: 'Tab', icon: false}] },
+                { name: 'watch.shortcuts.send_tweet', keys: [{name: 'watch.shortcuts.key_twitter_tab_shown', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'Enter', icon: false}] },
+                { name: 'watch.shortcuts.paste_capture', keys: [{name: 'watch.shortcuts.key_tweet_form_focused', icon: false}, {name: Utils.CtrlOrCmd(), icon: false}, {name: 'V', icon: false}] },
             ]
         },
     ],
@@ -252,6 +256,9 @@ export default defineComponent({
 
             // ユーティリティをテンプレートで使えるように
             Utils: Object.freeze(Utils),
+
+            // ショートカットの説明に差し込む、リモコンの d ボタンのアイコン
+            DATA_BROADCASTING_BUTTON_ICON,
 
             // キーボードショートカットの一覧に表示するショートカットキーのリスト (ライブ視聴)
             // created() で設定を反映するため、コンポーネントの破棄後に変更が残らないよう structuredClone() でクローンする
@@ -279,8 +286,8 @@ export default defineComponent({
         // チャンネル切り替えボタンとショートカットキーの上下方向を反転する設定が有効なら、
         // キーボードショートカット一覧の表示文言を反転方向に合わせる
         if (this.settingsStore.settings.tv_channel_up_down_buttons_reverse === true) {
-            this.live_shortcut_list.left_column[0].shortcuts[2].name = '次のチャンネルに切り替える';
-            this.live_shortcut_list.left_column[0].shortcuts[3].name = '前のチャンネルに切り替える';
+            this.live_shortcut_list.left_column[0].shortcuts[2].name = 'watch.shortcuts.next_channel';
+            this.live_shortcut_list.left_column[0].shortcuts[3].name = 'watch.shortcuts.previous_channel';
         }
 
         // チャンネル選局のキーボードショートカットを Alt or Option + 数字キー/テンキーに変更する設定が有効なら、

@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 import { IAccountLink } from '@/services/Users';
 
@@ -20,7 +21,7 @@ class AccountLinks {
         // 紐付け作成後は返却された Twitter / Bluesky の子レコードをそのまま画面の選択候補に反映する
         const response = await APIClient.post<IAccountLink>('/users/me/account-links', request);
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'アカウントの紐付けを作成できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.account_links.create_failed'));
             return null;
         }
         return response.data;
@@ -36,7 +37,7 @@ class AccountLinks {
         // 紐付け解除はリンクレコードだけを削除し、個別の Twitter / Bluesky 連携は維持する
         const response = await APIClient.delete(`/users/me/account-links/${link_id}`);
         if (response.type === 'error') {
-            APIClient.showGenericError(response, 'アカウントの紐付けを解除できませんでした。');
+            APIClient.showGenericError(response, i18n.global.t('messages.account_links.delete_failed'));
             return false;
         }
         return true;

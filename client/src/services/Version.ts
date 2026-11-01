@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import APIClient from '@/services/APIClient';
 
 
@@ -27,7 +28,7 @@ class Version {
         // エラー処理
         if (response.type === 'error') {
             if (suppress_error === false) {
-                APIClient.showGenericError(response, 'バージョン情報を取得できませんでした。');
+                APIClient.showGenericError(response, i18n.global.t('messages.version.info_failed'));
             }
             return null;
         }
