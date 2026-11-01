@@ -83,6 +83,7 @@ class ClientSettings(BaseModel):
     tv_channel_selection_requires_alt_key: bool = False
     use_28hour_clock: bool = False
     show_original_broadcast_time_during_playback: bool = False
+    program_info_display_language: Literal['Japanese', 'English'] = 'Japanese'
     panel_display_state: Literal['RestorePreviousState', 'AlwaysDisplay', 'AlwaysFold'] = 'RestorePreviousState'
     tv_panel_active_tab: Literal['Program', 'Channel', 'Comment', 'Twitter'] = 'Program'
     video_panel_active_tab: Literal['RecordedProgram', 'Series', 'Comment', 'Twitter'] = 'RecordedProgram'

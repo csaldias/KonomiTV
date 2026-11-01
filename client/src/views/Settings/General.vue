@@ -106,6 +106,19 @@
                     v-model="settingsStore.settings.show_original_broadcast_time_during_playback">
                 </v-switch>
             </div>
+            <div class="settings__item">
+                <div class="settings__item-heading">番組情報の表示言語</div>
+                <div class="settings__item-label">
+                    テレビの番組情報 (番組名・番組概要・番組詳細) を表示する言語を設定します。デフォルトは日本語です。<br>
+                    英語を選択すると、KonomiTV サーバーが番組表の取得時に機械翻訳した英訳を表示します。まだ翻訳されていない部分は、日本語のまま表示されます。<br>
+                    ヘッダーの <Icon icon="fluent:translate-20-regular" height="16px" style="margin-bottom: -3px;" /> ボタンからも、日本語と英語を切り替えられます。<br>
+                    英語で表示するには、サーバー設定 (config.yaml) で番組情報の翻訳機能を有効にする必要があります。録画番組とキャプチャの番組情報は、常に日本語で表示されます。<br>
+                </div>
+                <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
+                    :density="is_form_dense ? 'compact' : 'default'"
+                    :items="program_info_display_language" v-model="settingsStore.settings.program_info_display_language">
+                </v-select>
+            </div>
             <v-divider class="mt-6"></v-divider>
             <div class="settings__item">
                 <div class="settings__item-heading">デフォルトのパネルの表示状態</div>
@@ -268,6 +281,12 @@ export default defineComponent({
 
             // 番組表の表示設定のモーダルを表示するか
             timetable_settings_modal: false,
+
+            // 番組情報の表示言語の選択肢
+            program_info_display_language: [
+                {title: '日本語 (原文)', value: 'Japanese'},
+                {title: '英語 (機械翻訳)', value: 'English'},
+            ],
 
             // デフォルトのパネルの表示状態の選択肢
             panel_display_state: [

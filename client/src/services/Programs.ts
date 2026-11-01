@@ -64,6 +64,30 @@ export interface IProgramPF {
 }
 
 /**
+ * 番組情報の英訳を表すインターフェイス
+ * サーバーが Ollama で事前に生成した英訳で、まだ翻訳されていない部分は日本語の原文のまま返される
+ */
+export interface IProgramTranslation {
+    // 番組記号 ([字] [再] など) を取り除いたタイトルの英訳
+    title: string;
+    // タイトルから取り除いた番組記号 (例: ['[字]', '[再]'])
+    title_symbols: string[];
+    description: string;
+    detail: { [key: string]: string };
+    // タイトル・番組概要・番組詳細のすべてが英訳済みかどうか
+    is_complete: boolean;
+}
+
+/**
+ * 番組情報翻訳 API のレスポンス
+ */
+export interface IProgramTranslations {
+    target_language: 'en';
+    // 番組 ID をキーとする英訳 (サーバーに存在しない番組 ID は含まれない)
+    translations: { [program_id: string]: IProgramTranslation };
+}
+
+/**
  * 番組情報リスト API のレスポンス
  */
 export interface IPrograms {
@@ -233,6 +257,23 @@ class Programs {
 
         if (response.type === 'error') {
             APIClient.showGenericError(response, '番組表データの取得に失敗しました。');
+            return null;
+        }
+
+        return response.data;
+    }
+
+
+    /**
+     * 番組情報の英訳を取得する
+     * @param program_ids 英訳を取得する番組 ID のリスト (最大 5000 件)
+     * @returns 番組 ID をキーとする英訳、取得失敗時は null
+     */
+    static async fetchProgramTranslations(program_ids: string[]): Promise<IProgramTranslations | null> {
+        const response = await APIClient.post<IProgramTranslations>('/programs/translations', program_ids);
+
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, '番組情報の英訳の取得に失敗しました。');
             return null;
         }
 

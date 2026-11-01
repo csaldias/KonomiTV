@@ -63,7 +63,8 @@
 
 import { computed, nextTick, ref, watch } from 'vue';
 
-import { ITimeTableChannel, ITimeTableProgram } from '@/services/Programs';
+import { IProgramTranslation, ITimeTableChannel, ITimeTableProgram } from '@/services/Programs';
+import useProgramTranslationsStore from '@/stores/ProgramTranslationsStore';
 import useSettingsStore from '@/stores/SettingsStore';
 import useTimeTableStore from '@/stores/TimeTableStore';
 import { dayjs } from '@/utils';
@@ -74,6 +75,8 @@ import Utils from '@/utils/Utils';
 type DecoratedProgramInfoCache = {
     raw_title: string;
     raw_description: string;
+    // 装飾したときに使った英訳 (日本語で表示したとき・英訳が届いていなかったときは null)
+    translation: IProgramTranslation | null;
     title: string;
     description: string;
 };
@@ -96,15 +99,25 @@ function getDecoratedProgramInfo(program: ITimeTableProgram, key: 'title' | 'des
         return ProgramUtils.decorateProgramInfo(program, key);
     }
 
+    // 英語で表示する設定のときは、英訳が届いたときや表示言語を切り替えたときに装飾し直す
+    // ストアから英訳を参照することで、英訳が届いたときにこのセルの computed が再計算される
+    const program_translations_store = useProgramTranslationsStore();
+    let translation: IProgramTranslation | null = null;
+    if (program_translations_store.isEnglishEnabled() === true) {
+        translation = program_translations_store.getTranslation(program.id);
+    }
+
     const cache = decorated_program_info_cache.get(program.id);
     if (cache === undefined ||
         cache.raw_title !== raw_title ||
-        cache.raw_description !== raw_description) {
+        cache.raw_description !== raw_description ||
+        cache.translation !== translation) {
         const decorated_title = ProgramUtils.decorateProgramInfo(program, 'title');
         const decorated_description = ProgramUtils.decorateProgramInfo(program, 'description');
         decorated_program_info_cache.set(program.id, {
             raw_title,
             raw_description,
+            translation,
             title: decorated_title,
             description: decorated_description,
         });

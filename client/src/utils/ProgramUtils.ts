@@ -2,6 +2,7 @@
 import { ICaptureProgram } from '@/services/Captures';
 import { IProgram } from '@/services/Programs';
 import { IRecordedProgram } from '@/services/Videos';
+import useProgramTranslationsStore from '@/stores/ProgramTranslationsStore';
 import Utils, { dayjs } from '@/utils';
 
 
@@ -323,6 +324,36 @@ export class ProgramUtils {
         0b111: '48kHz',
     };
 
+    // 番組記号の英語表記
+    // 英訳したタイトルでは、サーバーが取り除いた番組記号をこの表記で末尾に表示する
+    // ここにない記号 ([HV] [4K] など) は、元からアルファベットなので大かっこを外してそのまま表示する
+    static readonly SYMBOL_ENGLISH_LABELS: { [symbol: string]: string } = {
+        '[手]': 'Sign',
+        '[字]': 'CC',
+        '[双]': 'Interactive',
+        '[デ]': 'Data',
+        '[二]': 'Bilingual',
+        '[多]': 'Multi-Audio',
+        '[解]': 'AD',
+        '[天]': 'Weather',
+        '[交]': 'Traffic',
+        '[映]': 'Movie',
+        '[無]': 'Free',
+        '[料]': 'Pay',
+        '[前]': 'Part 1',
+        '[後]': 'Part 2',
+        '[再]': 'Rerun',
+        '[新]': 'New',
+        '[初]': 'Premiere',
+        '[終]': 'Final',
+        '[生]': 'Live',
+        '[販]': 'Sale',
+        '[声]': 'Voice',
+        '[吹]': 'Dub',
+        '[ほか]': 'etc.',
+        '[配]': 'Streaming',
+    };
+
     // 事前に文字列の変換テーブルを構築しておく
     private static readonly format_string_translation_map = ProgramUtils.buildFormatStringTranslationMap();
 
@@ -339,6 +370,7 @@ export class ProgramUtils {
 
     /**
      * 番組情報中の[字]や[解]などの記号をいい感じに装飾する
+     * 番組情報を英語で表示する設定のときは、放送予定の番組 (IProgram) のタイトルと番組概要を英訳で返す
      * @param program 番組情報のオブジェクト
      * @param key 番組情報のオブジェクトから取り出すプロパティのキー
      * @returns 装飾した文字列
@@ -349,7 +381,29 @@ export class ProgramUtils {
         if (program !== null && program[key] !== null) {
 
             // 番組情報に含まれる HTML の特殊文字で表示がバグらないように、事前に HTML エスケープしておく
-            const text = Utils.escapeHTML(program[key]);
+            let text = Utils.escapeHTML(program[key]);
+
+            // 英訳したタイトルの末尾に表示する、番組記号の HTML
+            let translated_symbols_html = '';
+
+            // 英語で表示する設定のときは、英訳を取得済みならタイトルと番組概要を英訳に差し替える
+            // 英訳があるのは番組 ID が文字列の放送予定の番組 (IProgram) だけで、録画番組とキャプチャの番組情報は常に原文を表示する
+            // 英訳が届くまでは原文を表示し、届いた時点でストアの変更により再描画される
+            const program_id = program.id;
+            const program_translations_store = useProgramTranslationsStore();
+            if (typeof program_id === 'string' && (key === 'title' || key === 'description') &&
+                program_translations_store.isEnglishEnabled() === true) {
+                const translation = program_translations_store.getTranslation(program_id);
+                if (translation !== null && key === 'title') {
+                    text = Utils.escapeHTML(translation.title);
+                    for (const symbol of translation.title_symbols) {
+                        const label = ProgramUtils.SYMBOL_ENGLISH_LABELS[symbol] ?? symbol.slice(1, -1);
+                        translated_symbols_html += `<span class="decorate-symbol">${Utils.escapeHTML(label)}</span>`;
+                    }
+                } else if (translation !== null && key === 'description') {
+                    text = Utils.escapeHTML(translation.description);
+                }
+            }
 
             // 本来 ARIB 外字である記号の一覧
             // ref: https://ja.wikipedia.org/wiki/%E7%95%AA%E7%B5%84%E8%A1%A8
@@ -364,7 +418,7 @@ export class ProgramUtils {
 
             // 正規表現で置換した結果を返す
             return text.replace(pattern1, '<span class="decorate-symbol">$1</span>')
-                .replace(pattern2, '<span class="decorate-symbol">$1</span>');
+                .replace(pattern2, '<span class="decorate-symbol">$1</span>') + translated_symbols_html;
 
         // 番組情報がない時間帯
         } else {
@@ -395,6 +449,33 @@ export class ProgramUtils {
                 }
             }
         }
+    }
+
+
+    /**
+     * 表示する番組詳細を取得する
+     * 番組情報を英語で表示する設定のときは、英訳を取得済みなら番組詳細の英訳を返す
+     * @param program 番組情報
+     * @returns 見出しをキー、本文を値とする番組詳細 (番組情報がない場合は空のオブジェクト)
+     */
+    static getProgramDetail(program: IProgram | null): { [key: string]: string } {
+
+        // 番組情報がない時間帯は、番組詳細を表示しない
+        if (program === null) {
+            return {};
+        }
+
+        // 英語で表示する設定のときは、英訳を取得済みなら英訳を返す
+        // 英訳が届くまでは原文を返し、届いた時点でストアの変更により再描画される
+        const program_translations_store = useProgramTranslationsStore();
+        if (program_translations_store.isEnglishEnabled() === true) {
+            const translation = program_translations_store.getTranslation(program.id);
+            if (translation !== null) {
+                return translation.detail;
+            }
+        }
+
+        return program.detail ?? {};
     }
 
 
