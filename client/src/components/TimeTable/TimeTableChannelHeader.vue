@@ -25,9 +25,12 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { ITimeTableChannel } from '@/services/Programs';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
@@ -57,7 +60,7 @@ const nameFontSize = computed(() => {
 });
 
 const tooltipText = computed(() => {
-    return `${props.channel.name} を視聴`;
+    return t('timetable.watch_channel', {name: props.channel.name});
 });
 
 </script>

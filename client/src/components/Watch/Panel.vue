@@ -4,7 +4,7 @@
         <div class="watch-panel__header">
             <div v-ripple class="panel-close-button" @click="playerStore.is_panel_display = false">
                 <Icon class="panel-close-button__icon" icon="akar-icons:chevron-right" width="25px" />
-                <span class="panel-close-button__text">閉じる</span>
+                <span class="panel-close-button__text">{{ $t('common.close') }}</span>
             </div>
             <v-spacer></v-spacer>
             <div class="panel-broadcaster" v-if="playback_mode === 'Live'">
@@ -40,32 +40,32 @@
                  :class="{'panel-navigation-button--active': panel_active_tab === 'Program'}"
                  @click="playerStore.tv_panel_active_tab = 'Program'">
                 <Icon class="panel-navigation-button__icon" icon="fa-solid:info-circle" width="33px" />
-                <span class="panel-navigation-button__text">番組情報</span>
+                <span class="panel-navigation-button__text">{{ $t('watch.panel.program') }}</span>
             </div>
             <div v-ripple class="panel-navigation-button" v-if="playback_mode === 'Video'"
                  :class="{'panel-navigation-button--active': panel_active_tab === 'RecordedProgram'}"
                  @click="playerStore.video_panel_active_tab = 'RecordedProgram'">
                 <Icon class="panel-navigation-button__icon" icon="fa-solid:info-circle" width="33px" />
-                <span class="panel-navigation-button__text">番組情報</span>
+                <span class="panel-navigation-button__text">{{ $t('watch.panel.program') }}</span>
             </div>
             <div v-ripple class="panel-navigation-button" v-if="playback_mode === 'Live'"
                  :class="{'panel-navigation-button--active': panel_active_tab === 'Channel'}"
                  @click="playerStore.tv_panel_active_tab = 'Channel'">
                 <Icon class="panel-navigation-button__icon" icon="fa-solid:broadcast-tower" width="34px" />
-                <span class="panel-navigation-button__text">チャンネル</span>
+                <span class="panel-navigation-button__text">{{ $t('watch.panel.channel') }}</span>
             </div>
             <div v-ripple class="panel-navigation-button" v-if="playback_mode === 'Video'"
                  :class="{'panel-navigation-button--active': panel_active_tab === 'Series'}"
                  @click="playerStore.video_panel_active_tab = 'Series'">
                 <Icon class="panel-navigation-button__icon" icon="fluent:video-clip-multiple-16-filled" width="34px"
                     style="width: 39px; height: 39px; margin-top: -4px; margin-bottom: -4px;" />
-                <span class="panel-navigation-button__text">シリーズ</span>
+                <span class="panel-navigation-button__text">{{ $t('watch.panel.series') }}</span>
             </div>
             <div v-ripple class="panel-navigation-button"
                  :class="{'panel-navigation-button--active': panel_active_tab === 'Comment'}"
                  @click="playback_mode === 'Live' ? playerStore.tv_panel_active_tab = 'Comment' : playerStore.video_panel_active_tab = 'Comment'">
                 <Icon class="panel-navigation-button__icon" icon="bi:chat-left-text-fill" width="29px" />
-                <span class="panel-navigation-button__text">コメント</span>
+                <span class="panel-navigation-button__text">{{ $t('watch.panel.comment') }}</span>
             </div>
             <div v-ripple class="panel-navigation-button"
                  :class="{'panel-navigation-button--active': panel_active_tab === 'Twitter'}"

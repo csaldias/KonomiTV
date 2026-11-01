@@ -1,6 +1,6 @@
 <template>
     <router-link v-if="variant === 'header'" v-ripple class="offline-download-badge" to="/offline-videos/"
-        v-ftooltip="activeJobCount > 0 ? `${activeJobCount}件のオフライン保存を処理中` : 'オフライン保存'">
+        v-ftooltip="activeJobCount > 0 ? $t('navigation.offline_jobs_processing', {count: activeJobCount}) : $t('navigation.offline_videos')">
         <Icon icon="fluent:cloud-arrow-down-16-regular" width="23px" />
         <span v-if="activeJobCount > 0">{{activeJobCount}}</span>
     </router-link>

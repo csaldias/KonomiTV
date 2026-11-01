@@ -7,7 +7,7 @@
             <div class="d-flex justify-center align-center w-100">
                 <div class="d-flex justify-center align-center flex-column">
                     <h1>Not Found, or Under Development...</h1>
-                    <span class="mt-4 text-text-darken-1">お探しのページは存在しないか、鋭意開発中です。</span>
+                    <span class="mt-4 text-text-darken-1">{{ $t('not_found.message') }}</span>
                 </div>
             </div>
         </main>

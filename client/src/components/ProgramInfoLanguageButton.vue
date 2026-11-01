@@ -1,7 +1,7 @@
 <template>
     <div v-ripple class="program-info-language-button" role="button"
         :class="{'program-info-language-button--english': isEnglish}"
-        :title="isEnglish ? '番組情報を日本語 (原文) で表示' : '番組情報を英語 (機械翻訳) で表示'"
+        :title="isEnglish ? $t('header.program_info_language_to_japanese') : $t('header.program_info_language_to_english')"
         @click="programTranslationsStore.toggleDisplayLanguage()">
         <Icon icon="fluent:translate-20-regular" height="20px" />
         <span class="program-info-language-button__label">{{isEnglish ? 'EN' : 'JA'}}</span>

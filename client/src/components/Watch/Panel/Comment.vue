@@ -3,11 +3,11 @@
         <section class="comment-header">
             <h2 class="comment-header__title">
                 <Icon class="comment-header__title-icon" icon="bi:chat-left-text-fill" height="18.5px" />
-                <span class="comment-header__title-text">コメント</span>
+                <span class="comment-header__title-text">{{ $t('watch.comment.title') }}</span>
             </h2>
             <button v-ripple class="comment-header__button ml-auto" @click="comment_mute_settings_modal = !comment_mute_settings_modal">
                 <Icon icon="heroicons-solid:filter" height="11px" />
-                <span class="ml-1">ミュート設定</span>
+                <span class="ml-1">{{ $t('watch.comment.mute_settings') }}</span>
             </button>
         </section>
         <section class="comment-list-wrapper" ref="comment_list_wrapper">
@@ -17,25 +17,25 @@
                     <v-list-item density="compact" style="min-height: 30px" @click="copyTextToClipboard()">
                         <v-list-item-title class="d-flex align-center">
                             <Icon icon="fluent:clipboard-paste-20-filled" width="20px" />
-                            <span class="ml-2">クリップボードにコピー</span>
+                            <span class="ml-2">{{ $t('watch.comment.copy') }}</span>
                         </v-list-item-title>
                     </v-list-item>
                     <v-list-item density="compact" style="min-height: 30px" @click="copyUserIDToClipboard()">
                         <v-list-item-title class="d-flex align-center">
                             <Icon icon="fluent:person-20-filled" width="20px" />
-                            <span class="ml-2">このコメントのユーザー ID をコピー</span>
+                            <span class="ml-2">{{ $t('watch.comment.copy_user_id') }}</span>
                         </v-list-item-title>
                     </v-list-item>
                     <v-list-item density="compact" style="min-height: 30px" @click="addMutedKeywords()">
                         <v-list-item-title class="d-flex align-center">
                             <Icon icon="fluent:comment-dismiss-20-filled" width="20px" />
-                            <span class="ml-2">このコメントをミュート</span>
+                            <span class="ml-2">{{ $t('watch.comment.mute_comment') }}</span>
                         </v-list-item-title>
                     </v-list-item>
                     <v-list-item density="compact" style="min-height: 30px" @click="addMutedNiconicoUserIds()">
                         <v-list-item-title class="d-flex align-center" >
                             <Icon icon="fluent:person-prohibited-20-filled" width="20px" />
-                            <span class="ml-2">このコメントの投稿者をミュート</span>
+                            <span class="ml-2">{{ $t('watch.comment.mute_user') }}</span>
                         </v-list-item-title>
                     </v-list-item>
                 </v-list>
@@ -93,28 +93,28 @@
             </template>
             <div class="comment-announce"
                 v-if="playback_mode === 'Live' && playerStore.live_comment_init_failed_message === null && comment_list.length === 0">
-                <div class="comment-announce__heading">まだコメントがありません。</div>
+                <div class="comment-announce__heading">{{ $t('watch.comment.no_comments_yet') }}</div>
                 <div class="comment-announce__text">
-                    <p class="mt-0 mb-0">このチャンネルに対応するニコニコ実況のコメントが、リアルタイムで表示されます。</p>
+                    <p class="mt-0 mb-0">{{ $t('watch.comment.live_hint') }}</p>
                 </div>
             </div>
             <div class="comment-announce"
                 v-if="playback_mode === 'Live' && playerStore.live_comment_init_failed_message !== null && comment_list.length === 0">
-                <div class="comment-announce__heading">コメントがありません。</div>
+                <div class="comment-announce__heading">{{ $t('watch.comment.no_comments') }}</div>
                 <div class="comment-announce__text">
                     <p class="mt-0 mb-0">{{playerStore.live_comment_init_failed_message}}</p>
                 </div>
             </div>
             <div class="comment-announce"
                 v-if="playback_mode === 'Video' && playerStore.video_comment_init_failed_message === null && comment_list.length === 0">
-                <div class="comment-announce__heading">まだコメントがありません。</div>
+                <div class="comment-announce__heading">{{ $t('watch.comment.no_comments_yet') }}</div>
                 <div class="comment-announce__text">
-                    <p class="mt-0 mb-0">この録画番組に対応する、ニコニコ実況の過去ログコメントを取得しています...</p>
+                    <p class="mt-0 mb-0">{{ $t('watch.comment.video_loading') }}</p>
                 </div>
             </div>
             <div class="comment-announce"
                 v-if="playback_mode === 'Video' && playerStore.video_comment_init_failed_message !== null && comment_list.length === 0">
-                <div class="comment-announce__heading">コメントがありません。</div>
+                <div class="comment-announce__heading">{{ $t('watch.comment.no_comments') }}</div>
                 <div class="comment-announce__text">
                     <p class="mt-0 mb-0">{{playerStore.video_comment_init_failed_message}}</p>
                 </div>

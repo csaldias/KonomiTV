@@ -13,7 +13,7 @@
                         <div class="program-info__broadcaster-name">{{playerStore.recorded_program.channel.name}}</div>
                     </div>
                     <div class="d-flex align-center" v-else>
-                        <div class="program-info__broadcaster-number">チャンネル情報なし</div>
+                        <div class="program-info__broadcaster-number">{{ $t('watch.recorded_program.no_channel_info') }}</div>
                     </div>
                     <div class="program-info__broadcaster-time">
                         {{ProgramUtils.getProgramTime(playerStore.recorded_program)}}
@@ -26,18 +26,18 @@
             <div class="program-info__genre-container" v-if="playerStore.recorded_program.genres && playerStore.recorded_program.genres.length > 0">
                 <div class="program-info__genre" :key="genre_index"
                     v-for="(genre, genre_index) in playerStore.recorded_program.genres">
-                    {{genre.major}} / {{genre.middle}}
+                    {{ProgramUtils.getGenreLabel(genre.major)}} / {{ProgramUtils.getGenreLabel(genre.major, genre.middle)}}
                 </div>
             </div>
             <div class="mt-5">
                 <div class="program-info__status">
                     <Icon icon="ic:round-date-range" height="17px" style="margin-left: -2px; margin-right: -1.7px; margin-bottom: -3px;" />
-                    <span class="ml-2">録画期間: {{playerStore.recorded_program.is_partially_recorded ? '(一部のみ録画)' : ''}}</span><br>
+                    <span class="ml-2">{{ $t('watch.recorded_program.recording_period') }} {{playerStore.recorded_program.is_partially_recorded ? $t('watch.recorded_program.partially_recorded') : ''}}</span><br>
                     <span>{{ProgramUtils.getRecordingTime(playerStore.recorded_program)}}</span>
                 </div>
                 <div class="program-info__status">
                     <Icon icon="bi:chat-left-text-fill" height="12.5px" style="margin-bottom: -3px" />
-                    <span class="ml-2">コメント数:</span>
+                    <span class="ml-2">{{ $t('watch.recorded_program.comment_count') }}</span>
                     <span class="ml-2">{{comment_count ?? '--'}}</span>
                 </div>
                 <div class="program-info__buttons">
@@ -45,32 +45,32 @@
                         <template v-if="isInMylist">
                             <Icon icon="fluent:checkmark-16-filled" width="18px" height="18px"
                                 style="color: rgb(var(--v-theme-primary)); margin-bottom: -1px" />
-                            <span style="margin-left: 6px;">マイリストに追加済み</span>
+                            <span style="margin-left: 6px;">{{ $t('watch.recorded_program.mylist_added') }}</span>
                         </template>
                         <template v-else>
                             <Icon icon="fluent:add-16-filled" width="18px" height="18px" style="margin-bottom: -1px" />
-                            <span style="margin-left: 6px;">マイリストに追加</span>
+                            <span style="margin-left: 6px;">{{ $t('watch.recorded_program.mylist_add') }}</span>
                         </template>
                     </div>
                     <div v-ripple class="program-info__button" @click="showOfflineDownload = true">
                         <template v-if="isOfflineDownloading">
                             <Icon icon="fluent:cloud-arrow-down-20-filled" width="18px" height="18px"
                                 style="color: rgb(var(--v-theme-primary)); margin-bottom: -1px" />
-                            <span style="margin-left: 6px;">オフライン保存中</span>
+                            <span style="margin-left: 6px;">{{ $t('watch.recorded_program.offline_saving') }}</span>
                         </template>
                         <template v-else-if="isOfflineSaved">
                             <Icon icon="fluent:checkmark-16-filled" width="18px" height="18px"
                                 style="color: rgb(var(--v-theme-primary)); margin-bottom: -1px" />
-                            <span style="margin-left: 6px;">オフライン保存済み</span>
+                            <span style="margin-left: 6px;">{{ $t('watch.recorded_program.offline_saved') }}</span>
                         </template>
                         <template v-else>
                             <Icon icon="fluent:cloud-arrow-down-20-regular" width="18px" height="18px" />
-                            <span style="margin-left: 6px;">オフライン保存</span>
+                            <span style="margin-left: 6px;">{{ $t('watch.recorded_program.offline_save') }}</span>
                         </template>
                     </div>
                     <router-link v-ripple class="program-info__button" :to="`/captures/recorded/${playerStore.recorded_program.id}`">
                         <Icon icon="fluent:image-multiple-20-regular" width="18px" height="18px" style="margin-bottom: -1px" />
-                        <span style="margin-left: 5.7px;">この番組のキャプチャ</span>
+                        <span style="margin-left: 5.7px;">{{ $t('watch.program.captures_of_program') }}</span>
                     </router-link>
                 </div>
             </div>
@@ -191,7 +191,7 @@ export default defineComponent({
                 this.settingsStore.settings.mylist = this.settingsStore.settings.mylist.filter(item =>
                     !(item.type === 'RecordedProgram' && item.id === program.id)
                 );
-                Message.show('マイリストから削除しました。');
+                Message.show(this.$t('watch.recorded_program.mylist_removed'));
             } else {
                 // マイリストに追加
                 this.settingsStore.settings.mylist.push({

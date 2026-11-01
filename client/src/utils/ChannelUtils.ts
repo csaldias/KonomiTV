@@ -1,11 +1,29 @@
 
-import { ChannelType } from '@/services/Channels';
+import i18n from '@/plugins/i18n';
+import { ChannelType, ChannelTypePretty } from '@/services/Channels';
 
 
 /**
  * チャンネル周りのユーティリティ
  */
 export class ChannelUtils {
+
+    /**
+     * チャンネルの種類 (ChannelsStore のタブのキー) から、表示言語に合わせた表示名を取得する
+     * BS・CS などの略称は表示言語に関わらずそのまま表示する
+     * @param channel_type チャンネルの種類
+     * @returns 表示名
+     */
+    static getChannelTypeLabel(channel_type: ChannelTypePretty): string {
+        if (channel_type === 'ピン留め') {
+            return i18n.global.t('channel_type.pinned');
+        }
+        if (channel_type === '地デジ') {
+            return i18n.global.t('channel_type.terrestrial');
+        }
+        return channel_type;
+    }
+
 
     /**
      * display_channel_id からチャンネルタイプを取得する

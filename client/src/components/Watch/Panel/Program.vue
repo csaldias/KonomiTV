@@ -18,7 +18,7 @@
             <div class="program-info__genre-container" v-if="channelsStore.channel.current.program_present?.genres && channelsStore.channel.current.program_present.genres.length > 0">
                 <div class="program-info__genre" :key="genre_index"
                     v-for="(genre, genre_index) in channelsStore.channel.current.program_present.genres">
-                    {{genre.major}} / {{genre.middle}}
+                    {{ProgramUtils.getGenreLabel(genre.major)}} / {{ProgramUtils.getGenreLabel(genre.major, genre.middle)}}
                 </div>
             </div>
             <div class="program-info__next">
@@ -35,12 +35,12 @@
                 <div class="program-info__status-force"
                     :class="`program-info__status-force--${ChannelUtils.getChannelForceType(channelsStore.channel.current.jikkyo_force)}`">
                     <Icon icon="fa-solid:fire-alt" height="14px" />
-                    <span class="ml-2">勢い:</span>
-                    <span class="ml-2">{{channelsStore.channel.current.jikkyo_force ?? '--'}} コメ/分</span>
+                    <span class="ml-2">{{ $t('tv.home.jikkyo_force') }}</span>
+                    <span class="ml-2">{{channelsStore.channel.current.jikkyo_force ?? '--'}} {{ $t('tv.home.jikkyo_force_unit') }}</span>
                 </div>
                 <div class="program-info__status-viewers ml-5">
                     <Icon icon="fa-solid:eye" height="14px" />
-                    <span class="ml-2">視聴数:</span>
+                    <span class="ml-2">{{ $t('tv.home.viewer_count') }}</span>
                     <span class="ml-1">{{channelsStore.channel.current.viewer_count}}</span>
                 </div>
             </div>
@@ -55,37 +55,37 @@
                 <!-- 録画中: 静止した赤いドット + テキスト (クリックで停止ダイアログを表示) -->
                 <template v-if="isRecording">
                     <div class="program-info__recording-dot"></div>
-                    <span style="margin-left: 6px;">録画中</span>
+                    <span style="margin-left: 6px;">{{ $t('watch.program.recording') }}</span>
                 </template>
                 <!-- 録画開始中: 予約投入済みだが録画がまだ開始されていない -->
                 <template v-else-if="isPreparing">
                     <Icon icon="fluent:record-16-regular" width="17px" height="17px"
                         style="color: #EF5350; margin-bottom: -1px" />
-                    <span style="margin-left: 5px;">録画開始中...</span>
+                    <span style="margin-left: 5px;">{{ $t('watch.program.recording_starting') }}</span>
                 </template>
                 <!-- 未予約 (EDCB バックエンド): クリックで録画開始 -->
                 <template v-else-if="isEDCBBackend">
                     <Icon icon="fluent:record-16-regular" width="17px" height="17px"
                         style="color: #EF5350; margin-bottom: -1px" />
-                    <span style="margin-left: 5px;">録画開始</span>
+                    <span style="margin-left: 5px;">{{ $t('watch.program.start_recording') }}</span>
                 </template>
                 <!-- Mirakurun バックエンド: グレーアウト表示 -->
                 <template v-else>
                     <Icon icon="fluent:record-16-regular" width="17px" height="17px" style="margin-bottom: -1px" />
-                    <span style="margin-left: 5px;">録画開始 (EDCB 専用)</span>
+                    <span style="margin-left: 5px;">{{ $t('watch.program.start_recording_edcb_only') }}</span>
                 </template>
             </div>
             <a v-if="channelsStore.channel.current.program_present" v-ripple class="program-info__captures"
                 href="/captures/broadcast" @click.prevent="openCaptures()">
                 <Icon icon="fluent:image-multiple-20-regular" width="17px" height="17px" style="margin-bottom: -1px" />
-                <span style="margin-left: 4.5px;">この番組のキャプチャ</span>
+                <span style="margin-left: 4.5px;">{{ $t('watch.program.captures_of_program') }}</span>
             </a>
         </section>
         <!-- 録画停止確認ダイアログ -->
         <v-dialog v-model="show_stop_recording_dialog" max-width="715">
             <v-card>
                 <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                    録画を停止しますか？
+                    {{ $t('watch.program.stop_recording_title') }}
                 </v-card-title>
                 <v-card-text class="pt-2 pb-0">
                     <!-- 予約の基本情報 -->
@@ -100,8 +100,7 @@
                     <div class="warning-banner warning-banner--recording">
                         <Icon icon="fluent:warning-16-filled" class="warning-banner__icon" />
                         <span class="warning-banner__text">
-                            この番組は現在録画中です。<br>
-                            録画を停止すると、現在までの録画ファイルは残りますが、残りの期間の録画は中断されます。
+                            <span v-html="$t('watch.program.stop_recording_warning')"></span>
                         </span>
                     </div>
                 </v-card-text>
@@ -109,11 +108,11 @@
                     <v-spacer></v-spacer>
                     <v-btn color="text" variant="text" @click="show_stop_recording_dialog = false">
                         <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                        <span class="ml-1">キャンセル</span>
+                        <span class="ml-1">{{ $t('common.cancel') }}</span>
                     </v-btn>
                     <v-btn class="px-3" color="error" variant="flat" @click="confirmStopRecording">
                         <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                        <span class="ml-1">録画を停止</span>
+                        <span class="ml-1">{{ $t('watch.program.stop_recording') }}</span>
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -327,7 +326,7 @@ export default defineComponent({
             }
             // Mirakurun バックエンドの場合は警告を表示
             if (this.isEDCBBackend !== true) {
-                Message.warning('録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+                Message.warning(this.$t('watch.program.edcb_only'));
                 return;
             }
             // 未予約の場合は録画を開始
@@ -350,7 +349,7 @@ export default defineComponent({
             }
             // EIT[p/f] の duration が未定の場合は、EDCB に投入する録画時間を決められないため予約しない
             if (Number.isFinite(programPresent.duration) !== true || programPresent.duration <= 0) {
-                Message.warning('この番組は放送時間が未定のため、録画予約できません。');
+                Message.warning(this.$t('watch.program.time_undecided'));
                 return;
             }
             this.is_starting_recording = true;
@@ -365,7 +364,7 @@ export default defineComponent({
                 // 予約追加に失敗した場合も、外部で既に予約済みの可能性があるため状態を再取得する
                 await this.checkReservationStatus();
                 if (result === true) {
-                    Message.show('録画予約を追加しました。録画を開始しています...');
+                    Message.show(this.$t('watch.program.reservation_added_starting'));
                     // まだ録画が開始されていない場合はポーリングを開始し、録画開始を待機する
                     if (this.isRecording !== true) {
                         this.startPolling();
@@ -387,7 +386,7 @@ export default defineComponent({
             }
             const result = await Reservations.deleteReservation(this.reservation.id);
             if (result === true) {
-                Message.show('録画を停止しました。');
+                Message.show(this.$t('watch.program.recording_stopped'));
                 this.stopPolling();
                 // 予約状態を再チェックして UI を更新
                 await this.checkReservationStatus();
@@ -409,7 +408,7 @@ export default defineComponent({
                 // 録画が開始された場合はポーリングを停止
                 if (this.isRecording === true) {
                     // 視聴中なので success などの色のついたメッセージは使わず、あえて控えめに表示する
-                    Message.show('録画を開始しました。');
+                    Message.show(this.$t('watch.program.recording_started'));
                     this.stopPolling();
                     return;
                 }

@@ -13,7 +13,7 @@
                     {{ getDateLabel(hourTime) }}
                 </span>
                 <span class="timetable-time-scale__hour-number">{{ formatHour(hourTime) }}</span>
-                <span class="timetable-time-scale__hour-label">時</span>
+                <span class="timetable-time-scale__hour-label">{{ $t('timetable.hour_label') }}</span>
             </div>
         </div>
     </div>

@@ -13,7 +13,7 @@
                         <v-btn variant="flat" class="channels-tab__button"
                             v-for="([channels_type,], index) in Array.from(channelsStore.channels_list_with_pinned)" :key="channels_type"
                             @click="active_tab_index = index">
-                            {{channels_type}}
+                            {{ChannelUtils.getChannelTypeLabel(channels_type)}}
                         </v-btn>
                         <div class="channels-tab__highlight"></div>
                     </div>
@@ -39,21 +39,21 @@
                                                 <svg class="iconify iconify--fa-solid" width="10.5px" height="12px" viewBox="0 0 448 512">
                                                     <path fill="currentColor" d="M323.56 51.2c-20.8 19.3-39.58 39.59-56.22 59.97C240.08 73.62 206.28 35.53 168 0C69.74 91.17 0 209.96 0 281.6C0 408.85 100.29 512 224 512s224-103.15 224-230.4c0-53.27-51.98-163.14-124.44-230.4zm-19.47 340.65C282.43 407.01 255.72 416 226.86 416C154.71 416 96 368.26 96 290.75c0-38.61 24.31-72.63 72.79-130.75c6.93 7.98 98.83 125.34 98.83 125.34l58.63-66.88c4.14 6.85 7.91 13.55 11.27 19.97c27.35 52.19 15.81 118.97-33.43 153.42z"></path>
                                                 </svg>
-                                                <span class="ml-1">勢い:</span>
+                                                <span class="ml-1">{{ $t('tv.home.jikkyo_force') }}</span>
                                                 <span class="ml-1">{{channel.jikkyo_force ?? '--'}}</span>
-                                                <span style="margin-left: 3px;"> コメ/分</span>
+                                                <span style="margin-left: 3px;"> {{ $t('tv.home.jikkyo_force_unit') }}</span>
                                             </div>
                                             <div class="channel__broadcaster-status-viewers ml-4">
                                                 <svg class="iconify iconify--fa-solid" width="15.75px" height="14px" viewBox="0 0 576 512">
                                                     <path fill="currentColor" d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144a143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79a47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z"></path>
                                                 </svg>
-                                                <span class="ml-1">視聴数:</span>
+                                                <span class="ml-1">{{ $t('tv.home.viewer_count') }}</span>
                                                 <span class="ml-1">{{channel.viewer_count}}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div v-ripple class="channel__broadcaster-pin"
-                                        v-ftooltip="isPinnedChannel(channel) ? 'ピン留めを外す' : 'ピン留めする'"
+                                        v-ftooltip="isPinnedChannel(channel) ? $t('tv.home.unpin') : $t('tv.home.pin')"
                                         :class="{'channel__broadcaster-pin--pinned': isPinnedChannel(channel)}"
                                         @click.prevent.stop="isPinnedChannel(channel) ? removePinnedChannel(channel) : addPinnedChannel(channel)"
                                         @mousedown.prevent.stop=""> <!-- ← 親要素の波紋が広がらないように -->
@@ -91,9 +91,11 @@
                             <div class="pinned-container d-flex justify-center align-center w-100"
                                 v-if="channels_type === 'ピン留め' && channels.length === 0">
                                 <div class="d-flex justify-center align-center flex-column">
-                                    <h2>ピン留めされているチャンネルが<br>ありません。</h2>
-                                    <div class="mt-4 text-text-darken-1">各チャンネルの <Icon style="position: relative; bottom: -5px;" icon="fluent:pin-20-filled" width="22px" /> アイコンから、よくみる<br>チャンネルをこのタブにピン留めできます。</div>
-                                    <div class="mt-2 text-text-darken-1">チャンネルをピン留めすると、<br>このタブが最初に表示されます。</div>
+                                    <h2 v-html="$t('tv.home.pinned_empty_heading')"></h2>
+                                    <i18n-t keypath="tv.home.pinned_empty_hint" tag="div" class="mt-4 text-text-darken-1" scope="global" style="max-width: 340px; text-align: center;">
+                                        <template #icon><Icon style="position: relative; bottom: -5px;" icon="fluent:pin-20-filled" width="22px" /></template>
+                                    </i18n-t>
+                                    <div class="mt-2 text-text-darken-1" v-html="$t('tv.home.pinned_empty_hint_2')"></div>
                                 </div>
                             </div>
                         </div>
@@ -102,9 +104,9 @@
                 <div class="channels-list pinned-container d-flex justify-center align-center w-100" style="flex-grow: 1;"
                     v-if="Array.from(channelsStore.channels_list_with_pinned).length === 0">
                     <div class="d-flex justify-center align-center flex-column">
-                        <h2>視聴可能なチャンネルが<br class="d-sm-none">ありません。</h2>
-                        <div class="mt-4 text-text-darken-1">前回チャンネルスキャンしたときに<br class="d-sm-none">受信可能なチャンネルを見つけられませんでした。</div>
-                        <div class="mt-1 text-text-darken-1">再度チャンネルスキャンを行ってください。</div>
+                        <h2 v-html="$t('tv.home.no_channels_heading')"></h2>
+                        <div class="mt-4 text-text-darken-1" v-html="$t('tv.home.no_channels_reason')"></div>
+                        <div class="mt-1 text-text-darken-1">{{ $t('tv.home.no_channels_action') }}</div>
                     </div>
                 </div>
             </div>
@@ -112,7 +114,7 @@
         <div v-ripple class="floating-button" @click="$router.push('/timetable/')">
             <div class="floating-button__content">
                 <Icon class="floating-button__icon" icon="fluent:calendar-20-regular" width="26px" />
-                <div class="floating-button__text">番組表</div>
+                <div class="floating-button__text">{{ $t('navigation.timetable') }}</div>
             </div>
         </div>
     </div>
@@ -251,7 +253,7 @@ export default defineComponent({
             this.settingsStore.settings.pinned_channel_ids = [...this.settingsStore.settings.pinned_channel_ids, channel.id];
 
             // ピン留めしたチャンネルを通知
-            Message.show(`${channel.name}をピン留めしました。`);
+            Message.show(this.$t('tv.home.pinned_message', {name: channel.name}));
         },
 
         // チャンネルをピン留めから外す
@@ -267,7 +269,7 @@ export default defineComponent({
             }
 
             // ピン留めを外したチャンネルを通知
-            Message.show(`${channel.name}のピン留めを外しました。`);
+            Message.show(this.$t('tv.home.unpinned_message', {name: channel.name}));
         },
 
         // チャンネルがピン留めされているか

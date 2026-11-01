@@ -4,7 +4,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16.25px" height="13px" viewBox="0 0 640 512" style="color: rgb(var(--v-theme-success-lighten-1));">
                 <path fill="currentColor" d="M629.657 343.598L528.971 444.284c-9.373 9.372-24.568 9.372-33.941 0L394.343 343.598c-9.373-9.373-9.373-24.569 0-33.941l10.823-10.823c9.562-9.562 25.133-9.34 34.419.492L480 342.118V160H292.451a24.005 24.005 0 0 1-16.971-7.029l-16-16C244.361 121.851 255.069 96 276.451 96H520c13.255 0 24 10.745 24 24v222.118l40.416-42.792c9.285-9.831 24.856-10.054 34.419-.492l10.823 10.823c9.372 9.372 9.372 24.569-.001 33.941m-265.138 15.431A23.999 23.999 0 0 0 347.548 352H160V169.881l40.416 42.792c9.286 9.831 24.856 10.054 34.419.491l10.822-10.822c9.373-9.373 9.373-24.569 0-33.941L144.971 67.716c-9.373-9.373-24.569-9.373-33.941 0L10.343 168.402c-9.373 9.373-9.373 24.569 0 33.941l10.822 10.822c9.562 9.562 25.133 9.34 34.419-.491L96 169.881V392c0 13.255 10.745 24 24 24h243.549c21.382 0 32.09-25.851 16.971-40.971z"></path>
             </svg>
-            <span class="ml-2"><a class="tweet__retweet-info-link" :href="getUserUrl(tweet.user)" target="_blank" @click.stop>{{ tweet.user.name }}</a>さんがリツイートしました</span>
+            <i18n-t keypath="watch.twitter.tweet_card.retweeted_by" tag="span" class="ml-2" scope="global">
+                <template #name><a class="tweet__retweet-info-link" :href="getUserUrl(tweet.user)" target="_blank" @click.stop>{{ tweet.user.name }}</a></template>
+            </i18n-t>
         </div>
         <div class="tweet__main-content">
             <a class="tweet__user-icon" :href="getUserUrl(displayedTweet.user)" target="_blank" @click.stop>
@@ -60,6 +62,7 @@
 
 import { storeToRefs } from 'pinia';
 import { computed, toRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Message from '@/message';
 import Bluesky from '@/services/Bluesky';
@@ -67,6 +70,8 @@ import Twitter, { ITweet } from '@/services/Twitter';
 import { ITweetUser } from '@/services/Twitter';
 import useTwitterStore from '@/stores/TwitterStore';
 import Utils, { dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     tweet: ITweet;
@@ -186,7 +191,7 @@ const handleRetweet = async () => {
         const handle = getSelectedBlueskyHandle();
         // Bluesky の ID は AT URI で、CID はサーバー側で直前取得する
         if (handle === null) {
-            Message.warning('Bluesky 投稿を操作するには、Bluesky アカウントまたは紐付けアカウントを選択してください。');
+            Message.warning(t('watch.twitter.tweet_card.bluesky_account_required'));
             return;
         }
         if (displayedTweet.value.retweeted) {
@@ -208,7 +213,7 @@ const handleRetweet = async () => {
     // Twitter 投稿への操作は TwitterScrapeBrowser の選択アカウントが必要
     // Bluesky 単独アカウント選択中に Twitter 投稿が残っていても操作 API を呼ばない
     if (selected_twitter_account.value === null) {
-        Message.warning('Twitter 投稿を操作するには、Twitter アカウントまたは紐付けアカウントを選択してください。');
+        Message.warning(t('watch.twitter.tweet_card.twitter_account_required'));
         return;
     }
 
@@ -232,7 +237,7 @@ const handleFavorite = async () => {
         const handle = getSelectedBlueskyHandle();
         // いいねも AT URI だけを渡し、作成時の CID と取り消し時の viewer.like はサーバー側で引き直す
         if (handle === null) {
-            Message.warning('Bluesky 投稿を操作するには、Bluesky アカウントまたは紐付けアカウントを選択してください。');
+            Message.warning(t('watch.twitter.tweet_card.bluesky_account_required'));
             return;
         }
         if (displayedTweet.value.favorited) {
@@ -253,7 +258,7 @@ const handleFavorite = async () => {
 
     // Twitter のいいね操作は現在の Twitter アカウントに紐づけて実行する
     if (selected_twitter_account.value === null) {
-        Message.warning('Twitter 投稿を操作するには、Twitter アカウントまたは紐付けアカウントを選択してください。');
+        Message.warning(t('watch.twitter.tweet_card.twitter_account_required'));
         return;
     }
 

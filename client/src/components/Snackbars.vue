@@ -19,7 +19,7 @@
                 </div>
             </div>
             <v-btn class="snackbar__action" :class="{'text-primary': snackbar.level === 'default'}" variant="text"
-                @click="snackbar.hide()">閉じる</v-btn>
+                @click="snackbar.hide()">{{ $t('common.close') }}</v-btn>
         </div>
     </div>
 </template>

@@ -16,7 +16,7 @@
                         <Icon icon="fluent:chevron-left-12-filled" width="26px" height="26px"></Icon>
                     </button>
                     <button v-ripple class="remote-control-button-select" data-arib-key-code="18">
-                        決定
+                        {{ $t('watch.remocon.select') }}
                     </button>
                     <button v-ripple class="remote-control-button-right" data-arib-key-code="4">
                         <Icon icon="fluent:chevron-right-12-filled" width="26px" height="26px"></Icon>
@@ -30,16 +30,16 @@
                         <svg width="20px" height="20px" viewBox="0 0 512 512">
                             <path fill="currentColor" d="M248.039 381.326L355.039 67.8258C367.539 28.3257 395.039 34.3258 406.539 34.3258C431.039 34.3258 453.376 61.3258 441.039 96.8258C362.639 322.426 343.539 375.326 340.539 384.826C338.486 391.326 342.039 391.326 345.539 391.326C377.039 391.326 386.539 418.326 386.539 435.326C386.539 458.826 371.539 477.326 350.039 477.326H214.539C179.039 477.326 85.8269 431.3 88.0387 335.826C91.0387 206.326 192.039 183.326 243.539 183.326H296.539L265.539 272.326H243.539C185.539 272.326 174.113 314.826 176.039 334.326C180.039 374.826 215.039 389.814 237.039 390.326C244.539 390.5 246.039 386.826 248.039 381.326Z" />
                         </svg>
-                        <span class="ml-1">データ</span>
+                        <span class="ml-1">{{ $t('watch.remocon.data') }}</span>
                     </button>
                     <button v-ripple class="remote-control-button-back" data-arib-key-code="19">
                         <Icon icon="fluent:chevron-left-12-filled" width="20px" />
-                        <span class="ml-1">戻る</span>
+                        <span class="ml-1">{{ $t('watch.remocon.back') }}</span>
                     </button>
-                    <button v-ripple class="remote-control-button-blue bg-blue-darken-3" data-arib-key-code="21">青</button>
-                    <button v-ripple class="remote-control-button-red bg-red-darken-3" data-arib-key-code="22">赤</button>
-                    <button v-ripple class="remote-control-button-green bg-green-darken-3" data-arib-key-code="23">緑</button>
-                    <button v-ripple class="remote-control-button-yellow bg-yellow-darken-3 text-text" data-arib-key-code="24">黄</button>
+                    <button v-ripple class="remote-control-button-blue bg-blue-darken-3" data-arib-key-code="21">{{ $t('watch.remocon.blue') }}</button>
+                    <button v-ripple class="remote-control-button-red bg-red-darken-3" data-arib-key-code="22">{{ $t('watch.remocon.red') }}</button>
+                    <button v-ripple class="remote-control-button-green bg-green-darken-3" data-arib-key-code="23">{{ $t('watch.remocon.green') }}</button>
+                    <button v-ripple class="remote-control-button-yellow bg-yellow-darken-3 text-text" data-arib-key-code="24">{{ $t('watch.remocon.yellow') }}</button>
                 </div>
             </div>
             <div class="remote-control__number-key">

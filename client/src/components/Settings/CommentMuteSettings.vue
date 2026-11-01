@@ -3,7 +3,7 @@
         <v-card class="comment-mute-settings">
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="heroicons-solid:filter" height="26px" />
-                <span class="ml-3">コメントのミュート設定</span>
+                <span class="ml-3">{{ $t('settings_dialogs.comment_mute.title') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="comment_mute_settings_modal = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -12,14 +12,14 @@
             <div class="px-5 pb-6">
                 <div class="text-subtitle-1 d-flex align-center font-weight-bold mt-4">
                     <Icon icon="fa-solid:sliders-h" width="24px" height="20px" />
-                    <span class="ml-2">クイック設定</span>
+                    <span class="ml-2">{{ $t('settings_dialogs.comment_mute.quick_settings') }}</span>
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_vulgar_comments">
-                        露骨な表現を含むコメントをミュートする
+                        {{ $t('settings_dialogs.comment_mute.vulgar_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_vulgar_comments">
-                        性的な単語などの露骨・下品な表現を含むコメントを、一括でミュートするかを設定します。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.vulgar_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_vulgar_comments" hide-details
                         v-model="settingsStore.settings.mute_vulgar_comments">
@@ -27,10 +27,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_abusive_discriminatory_prejudiced_comments">
-                        ネガティブな表現、差別的な表現、政治的に偏った表現を含むコメントをミュートする
+                        {{ $t('settings_dialogs.comment_mute.abusive_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_abusive_discriminatory_prejudiced_comments">
-                        『死ね』『殺す』などのネガティブな表現、特定の国や人々への差別的な表現、政治的に偏った表現を含むコメントを、一括でミュートするかを設定します。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.abusive_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_abusive_discriminatory_prejudiced_comments" hide-details
                         v-model="settingsStore.settings.mute_abusive_discriminatory_prejudiced_comments">
@@ -38,11 +38,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_big_size_comments">
-                        文字サイズが大きいコメントをミュートする
+                        {{ $t('settings_dialogs.comment_mute.big_size_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_big_size_comments">
-                        通常より大きい文字サイズで表示されるコメントを、一括でミュートするかを設定します。<br>
-                        文字サイズが大きいコメントには迷惑なコメントが多いです。基本的にはオンにしておくのがおすすめです。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.big_size_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_big_size_comments" hide-details
                         v-model="settingsStore.settings.mute_big_size_comments">
@@ -50,11 +49,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_fixed_comments">
-                        映像の上下に固定表示されるコメントをミュートする
+                        {{ $t('settings_dialogs.comment_mute.fixed_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_fixed_comments">
-                        映像の上下に固定された状態で表示されるコメントを、一括でミュートするかを設定します。<br>
-                        固定表示されるコメントが煩わしい方におすすめです。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.fixed_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_fixed_comments" hide-details
                         v-model="settingsStore.settings.mute_fixed_comments">
@@ -62,11 +60,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_colored_comments">
-                       色付きのコメントをミュートする
+                       {{ $t('settings_dialogs.comment_mute.colored_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_colored_comments">
-                        白以外の色で表示される色付きのコメントを、一括でミュートするかを設定します。<br>
-                        オンにしておくと、目立つ色のコメントを一掃できます。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.colored_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_colored_comments" hide-details
                         v-model="settingsStore.settings.mute_colored_comments">
@@ -74,11 +71,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_consecutive_same_characters_comments">
-                        8文字以上同じ文字が連続しているコメントをミュートする
+                        {{ $t('settings_dialogs.comment_mute.repeated_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_consecutive_same_characters_comments">
-                        『wwwwwwwwwww』『あばばばばばばばばば』など、8文字以上同じ文字が連続しているコメントを、一括でミュートするかを設定します。<br>
-                        しばしばあるテンプレコメントが煩わしい方におすすめです。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.repeated_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_consecutive_same_characters_comments" hide-details
                         v-model="settingsStore.settings.mute_consecutive_same_characters_comments">
@@ -86,11 +82,10 @@
                 </div>
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="mute_comment_keywords_normalize_alphanumeric_width_case">
-                        ミュート対象キーワード内の英数字・記号を、大文字小文字や全角半角の違いを無視して判定する
+                        {{ $t('settings_dialogs.comment_mute.normalize_heading') }}
                     </label>
                     <label class="settings__item-label" for="mute_comment_keywords_normalize_alphanumeric_width_case">
-                        オンにすると、ミュート対象キーワードの判定時に、英数字・記号を正規化し、大文字/小文字・全角/半角の違いを無視した上でミュート判定を行います。デフォルトはオンです。<br>
-                        例えば、「NTR」と「ｎｔｒ」、「33-4」と「３３－４」が同じキーワードとして判定されるようになります。<br>
+                        <span v-html="$t('settings_dialogs.comment_mute.normalize_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="mute_comment_keywords_normalize_alphanumeric_width_case" hide-details
                         v-model="settingsStore.settings.mute_comment_keywords_normalize_alphanumeric_width_case">
@@ -98,11 +93,11 @@
                 </div>
                 <div class="text-subtitle-1 d-flex align-center font-weight-bold mt-4">
                     <Icon icon="fluent:comment-dismiss-20-filled" width="24px" />
-                    <span class="ml-2 mr-2">ミュート済みのキーワード</span>
+                    <span class="ml-2 mr-2">{{ $t('settings_dialogs.comment_mute.muted_keywords') }}</span>
                     <v-btn class="ml-auto" color="background-lighten-1" variant="flat"
                         @click="settingsStore.settings.muted_comment_keywords.unshift({match: 'partial', pattern: ''})">
                         <Icon icon="fluent:add-12-filled" height="17px" />
-                        <span class="ml-1">追加</span>
+                        <span class="ml-1">{{ $t('common.add') }}</span>
                     </v-btn>
                 </div>
                 <div class="muted-comment-items">
@@ -111,7 +106,7 @@
                         <!-- 以下では Icon コンポーネントを使うと個数が多いときに高負荷になるため、意図的に SVG を直書きしている -->
                         <v-text-field type="search" class="muted-comment-item__input" color="primary"
                             density="compact" variant="outlined" hide-details
-                            placeholder="ミュートするキーワードを入力"
+                            :placeholder="$t('settings_dialogs.comment_mute.keyword_placeholder')"
                             v-model="settingsStore.settings.muted_comment_keywords[index].pattern">
                         </v-text-field>
                         <v-select class="muted-comment-item__match-type" color="primary"
@@ -130,11 +125,11 @@
                 </div>
                 <div class="text-subtitle-1 d-flex align-center font-weight-bold mt-4">
                     <Icon icon="fluent:person-prohibited-20-filled" width="24px" />
-                    <span class="ml-2 mr-2">ミュート済みのニコニコユーザー ID</span>
+                    <span class="ml-2 mr-2">{{ $t('settings_dialogs.comment_mute.muted_user_ids') }}</span>
                     <v-btn class="ml-auto" color="background-lighten-1" variant="flat"
                         @click="settingsStore.settings.muted_niconico_user_ids.unshift('')">
                         <Icon icon="fluent:add-12-filled" height="17px" />
-                        <span class="ml-1">追加</span>
+                        <span class="ml-1">{{ $t('common.add') }}</span>
                     </v-btn>
                 </div>
                 <div class="muted-comment-items">
@@ -143,7 +138,7 @@
                         <!-- 以下では Icon コンポーネントを使うと個数が多いときに高負荷になるため、意図的に SVG を直書きしている -->
                         <v-text-field type="search" class="muted-comment-item__input" color="primary"
                             density="compact" variant="outlined" hide-details
-                            placeholder="ミュートするニコニコユーザー ID を入力" v-model="settingsStore.settings.muted_niconico_user_ids[index]">
+                            :placeholder="$t('settings_dialogs.comment_mute.user_id_placeholder')" v-model="settingsStore.settings.muted_niconico_user_ids[index]">
                         </v-text-field>
                         <button v-ripple class="muted-comment-item__delete-button"
                             @click="settingsStore.settings.muted_niconico_user_ids
@@ -181,18 +176,20 @@ export default defineComponent({
 
             // コメントのミュート設定のモーダルを表示するか
             comment_mute_settings_modal: false,
-
-            // ミュート済みのキーワードのマッチタイプ
-            muted_comment_keyword_match_type: [
-                {title: '部分一致', value: 'partial'},
-                {title: '前方一致', value: 'forward'},
-                {title: '後方一致', value: 'backward'},
-                {title: '完全一致', value: 'exact'},
-                {title: '正規表現', value: 'regex'},
-            ],
         };
     },
     computed: {
+
+        // ミュート済みのキーワードのマッチタイプ
+        muted_comment_keyword_match_type(): {title: string; value: string}[] {
+            return [
+                {title: this.$t('settings_dialogs.comment_mute.match_partial'), value: 'partial'},
+                {title: this.$t('settings_dialogs.comment_mute.match_forward'), value: 'forward'},
+                {title: this.$t('settings_dialogs.comment_mute.match_backward'), value: 'backward'},
+                {title: this.$t('settings_dialogs.comment_mute.match_exact'), value: 'exact'},
+                {title: this.$t('settings_dialogs.comment_mute.match_regex'), value: 'regex'},
+            ];
+        },
         ...mapStores(useSettingsStore),
     },
     watch: {

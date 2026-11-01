@@ -3,7 +3,7 @@
         <v-card class="user-manage-settings">
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="fluent:person-board-20-filled" height="26px" />
-                <span class="ml-3">アカウントの管理</span>
+                <span class="ml-3">{{ $t('settings_dialogs.account_manage.title') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="account_manage_settings_modal = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -11,16 +11,15 @@
             </v-card-title>
             <div class="px-5 pb-6">
                 <div class="user-manage-settings__label">
-                    管理者ユーザーには、サーバー設定やアカウントの管理権限が与えられます。<br>
-                    変更内容はすぐに反映されます。<br>
+                    <span v-html="$t('settings_dialogs.account_manage.label')"></span>
                 </div>
                 <div class="user-manage-settings__label text-error-lighten-1">
-                    <strong>アカウントを削除すると、そのアカウントに紐づくすべてのユーザーデータが削除されます。元に戻すことはできません。</strong>
+                    <span v-html="$t('settings_dialogs.account_manage.delete_warning')"></span>
                 </div>
                 <div class="user-manage-settings__label"
                     v-if="user_accounts.length === 0">
-                    <div><b>まだ KonomiTV アカウントが一つも作成されていません。</b></div>
-                    <div class="mt-1">KonomiTV アカウントを作成すると、より便利な機能が使えます！ぜひログインしての利用をおすすめします。</div>
+                    <div><b>{{ $t('settings_dialogs.account_manage.empty') }}</b></div>
+                    <div class="mt-1">{{ $t('settings_dialogs.account_manage.empty_hint') }}</div>
                 </div>
                 <div class="user-accounts" v-if="user_accounts.length > 0">
                     <div v-for="user_account in user_accounts" :key="user_account.id" class="user-account">
@@ -31,7 +30,7 @@
                         </div>
                         <v-select class="user-account__role" color="primary"
                             density="compact" variant="outlined" hide-details
-                            :items="['一般', '管理者']"
+                            :items="[{title: $t('settings_dialogs.account_manage.role_general'), value: '一般'}, {title: $t('settings_dialogs.account_manage.role_admin'), value: '管理者'}]"
                             v-model="user_roles[user_account.id]"
                         />
                         <button v-ripple class="user-account__delete-button"
@@ -47,16 +46,15 @@
         </v-card>
         <v-dialog max-width="440" v-model="account_delete_confirm_dialog">
             <v-card>
-                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">本当にアカウントを削除しますか？</v-card-title>
+                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('settings_dialogs.account_manage.delete_confirm_title') }}</v-card-title>
                 <v-card-text class="pt-2 pb-0">
-                    アカウントに紐づくすべてのユーザーデータが削除されます。元に戻すことはできません。<br>
-                    本当にアカウントを削除しますか？
+                    <span v-html="$t('settings_dialogs.account_manage.delete_confirm_text')"></span>
                 </v-card-text>
                 <v-card-actions class="pt-4 px-6 pb-6">
                     <v-spacer></v-spacer>
-                    <v-btn color="text" variant="text" @click="account_delete_confirm_dialog = false">キャンセル</v-btn>
+                    <v-btn color="text" variant="text" @click="account_delete_confirm_dialog = false">{{ $t('common.cancel') }}</v-btn>
                     <v-btn color="error" variant="flat" class="px-3" height="40" @click="deleteAccount()">
-                        <Icon icon="fluent:delete-16-filled" class="mr-1" />削除
+                        <Icon icon="fluent:delete-16-filled" class="mr-1" />{{ $t('common.delete') }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -66,11 +64,14 @@
 <script lang='ts' setup>
 
 import { PropType, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Message from '@/message';
 import Users, { IUser } from '@/services/Users';
 import useUserStore from '@/stores/UserStore';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 // 親コンポーネントと子コンポーネントでモーダルの表示状態を同期する
 const props = defineProps({
@@ -108,7 +109,9 @@ watch(user_roles, (new_value) => {
             if (user.is_admin !== is_admin) {
                 Users.updateSpecifiedUser(user.name, is_admin).then((result) => {
                     if (result) {
-                        Message.success(`ユーザー ${user.name} の権限を ${role} に変更しました。`);
+                        // ロールの値は日本語の内部値なので、通知には表示言語に合わせた表示名を使う
+                        const role_label = is_admin ? t('settings_dialogs.account_manage.role_admin') : t('settings_dialogs.account_manage.role_general');
+                        Message.success(t('settings_dialogs.account_manage.role_changed', {name: user.name, role: role_label}));
                         // ユーザー情報を再取得
                         fetchAllUsers();
                     } else {
@@ -143,7 +146,7 @@ function fetchAllUsers() {
             const user_account = await user_store.fetchUser(true);
             // ユーザー情報を取得した結果自分のユーザーが管理者権限でなくなった場合、メッセージを出して3秒後にリロード
             if (user_account !== null && user_account.name === user_store.user?.name && !user_account.is_admin) {
-                Message.warning('ログイン中ユーザーの管理者権限が剥奪されました。3秒後にリロードします。');
+                Message.warning(t('settings_dialogs.account_manage.admin_revoked'));
                 await Utils.sleep(3);
                 location.reload();
             }
@@ -170,7 +173,7 @@ function deleteAccount() {
         Users.deleteSpecifiedUser(user_to_delete.value).then((result) => {
             if (result) {
                 user_accounts.value = user_accounts.value.filter(user => user.name !== user_to_delete.value);
-                Message.success(`ユーザー ${user_to_delete.value} を削除しました。`);
+                Message.success(t('settings_dialogs.account_manage.user_deleted', {name: user_to_delete.value}));
                 // ユーザー情報を再取得
                 fetchAllUsers();
             }

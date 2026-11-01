@@ -40,13 +40,13 @@
                     <!-- 現在時刻に戻るボタン -->
                     <v-btn variant="flat" class="timetable-controls__now-button" icon
                         @click="goToCurrentTime"
-                        v-ftooltip.bottom="'現在時刻に移動'">
+                        v-ftooltip.bottom="$t('timetable.jump_to_now')">
                         <Icon icon="fluent:clock-20-regular" width="22px" />
                     </v-btn>
                     <!-- 設定ボタン -->
                     <v-btn variant="flat" class="timetable-controls__settings-button" icon
                         @click="isSettingsDialogOpen = true"
-                        v-ftooltip.bottom="'番組表の表示設定'">
+                        v-ftooltip.bottom="$t('timetable.display_settings')">
                         <Icon icon="fluent:settings-20-regular" width="22px" />
                     </v-btn>
                 </div>
@@ -124,6 +124,7 @@
 <script lang="ts" setup>
 
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { Dayjs } from 'dayjs';
 
@@ -139,7 +140,9 @@ import { IProgram, ITimeTableProgram } from '@/services/Programs';
 import Reservations, { IReservation, IRecordSettings, IRecordSettingsDefault } from '@/services/Reservations';
 import useServerSettingsStore from '@/stores/ServerSettingsStore';
 import useTimeTableStore, { CHANNEL_TYPE_DISPLAY_ORDER } from '@/stores/TimeTableStore';
-import Utils, { dayjs, dayjsOriginal } from '@/utils';
+import Utils, { ChannelUtils, dayjs, dayjsOriginal } from '@/utils';
+
+const { t } = useI18n();
 
 
 // ストア
@@ -245,15 +248,15 @@ const isDrawerProgramPast = ref(false);
 
 // チャンネルタイプの選択肢
 // ChannelsStore の channels_list_with_pinned に基づいて、実際に存在するチャンネルタイプのみを表示する
-// ChannelTypePretty は表示名そのもの ('ピン留め', '地デジ', 'BS' など) なので、title と value は同じ値を使用する
+// title には表示言語に合わせた表示名を、value には ChannelTypePretty ('ピン留め', '地デジ', 'BS' など) を使用する
 const channelTypeItems = computed(() => {
-    const items: { title: ChannelTypePretty; value: ChannelTypePretty }[] = [];
+    const items: { title: string; value: ChannelTypePretty }[] = [];
     const availableTypes = timetableStore.available_channel_types;
 
     // 表示順序に従って、利用可能なチャンネルタイプのみを追加
     for (const channelType of CHANNEL_TYPE_DISPLAY_ORDER) {
         if (availableTypes.has(channelType)) {
-            items.push({ title: channelType, value: channelType });
+            items.push({ title: ChannelUtils.getChannelTypeLabel(channelType), value: channelType });
         }
     }
 
@@ -278,7 +281,7 @@ const timeItems = computed(() => {
         const displayHour = hour;
         const isEarlyHour = hour <= 12;
         items.push({
-            title: `${displayHour.toString().padStart(2, '0')}時`,
+            title: t('timetable.hour_option', {hour: displayHour.toString().padStart(2, '0')}),
             value: hour,
             ...(shouldDisableEarlyHours && isEarlyHour ? { props: { disabled: true } } : {}),
         });
@@ -313,10 +316,8 @@ const selectedTimeDisplay = ref(getInitialTimeSlot());
 // これにより、28時間表記オン時は4時ライン、オフ時は0時ラインを超えたら翌日の日付が表示される
 const formattedSelectedDate = computed(() => {
     const date = timetableStore.selected_date.add(dateDisplayOffset.value, 'day');
-    const month = date.month() + 1;
-    const day = date.date();
-    const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date.day()];
-    return `${month}/${day} (${dayOfWeek})`;
+    // 曜日の表記は表示言語に合わせる (dayjs のロケールは表示言語に追従している)
+    return date.format(t('timetable.date_format'));
 });
 
 /**
@@ -675,7 +676,7 @@ async function onQuickReserve(programId: string, channel: IChannel, program: ITi
 
     // EDCB バックエンドでない場合はエラー
     if (isEDCBBackend.value === false) {
-        Message.warning('録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+        Message.warning(t('timetable.edcb_only'));
         return;
     }
 
@@ -694,8 +695,8 @@ async function onQuickReserve(programId: string, channel: IChannel, program: ITi
         const result = await Reservations.updateReservation(reservation.id, newSettings);
         if (result !== null) {
             const message = newSettings.is_enabled
-                ? '録画予約を有効にしました。\n番組開始時刻になると自動的に録画が開始されます。'
-                : '録画予約を無効にしました。\n番組開始時刻までに再度予約を有効にしない限り、この番組は録画されません。';
+                ? t('timetable.reservation_enabled')
+                : t('timetable.reservation_disabled');
             Message.success(message);
             // 番組表データを再取得して予約状態を更新
             await timetableStore.fetchTimeTableData();
@@ -707,7 +708,7 @@ async function onQuickReserve(programId: string, channel: IChannel, program: ITi
     const defaultSettings = await getDefaultRecordSettings();
     const success = await Reservations.addReservation(programId, defaultSettings);
     if (success) {
-        Message.success('録画予約を追加しました。');
+        Message.success(t('timetable.reservation_added'));
         // 番組表データを再取得して予約状態を更新
         await timetableStore.fetchTimeTableData();
     }

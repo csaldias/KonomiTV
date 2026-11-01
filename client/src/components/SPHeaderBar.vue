@@ -33,11 +33,14 @@
 <script lang="ts" setup>
 
 import { ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 
 import OfflineDownloadBadge from '@/components/OfflineDownloadBadge.vue';
 import ProgramInfoLanguageButton from '@/components/ProgramInfoLanguageButton.vue';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 // Props の定義
 const props = withDefaults(defineProps<{
@@ -89,11 +92,11 @@ const showSearchButton = computed(() => {
 // 検索プレースホルダー
 const searchPlaceholder = computed(() => {
     if (route.path.startsWith('/captures')) {
-        return 'キャプチャを検索...';
+        return t('header.search_captures');
     }
     return isVideoSection(route.path)
-        ? '録画番組やシリーズを検索...'
-        : '放送予定の番組を検索...';
+        ? t('header.search_videos_and_series')
+        : t('header.search_programs');
 });
 
 // 動画セクションかどうかを判定

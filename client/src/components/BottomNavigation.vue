@@ -3,27 +3,27 @@
         <v-btn class="bottom-navigation-button" to="/tv/"
             :class="{'v-btn--active': $route.path.startsWith('/tv')}">
             <Icon icon="fluent:tv-20-regular" width="30px" />
-            <span class="mt-1">テレビをみる</span>
+            <span class="mt-1">{{ $t('navigation.tv') }}</span>
         </v-btn>
         <v-btn class="bottom-navigation-button" to="/videos/"
             :class="{'v-btn--active': $route.path.startsWith('/videos')}">
             <Icon icon="fluent:movies-and-tv-20-regular" width="30px" />
-            <span class="mt-1">ビデオをみる</span>
+            <span class="mt-1">{{ $t('navigation.videos') }}</span>
         </v-btn>
         <v-btn class="bottom-navigation-button" to="/reservations/"
             :class="{'v-btn--active': $route.path.startsWith('/reservations')}">
             <Icon icon="fluent:timer-16-regular" width="30px" />
-            <span class="mt-1">録画予約</span>
+            <span class="mt-1">{{ $t('navigation.reservations') }}</span>
         </v-btn>
         <v-btn class="bottom-navigation-button" to="/captures/"
             :class="{'v-btn--active': $route.path.startsWith('/captures')}">
             <Icon icon="fluent:image-multiple-24-regular" width="30px" />
-            <span class="mt-1">キャプチャ</span>
+            <span class="mt-1">{{ $t('navigation.captures') }}</span>
         </v-btn>
         <v-btn class="bottom-navigation-button" to="/mypage/"
             :class="{'v-btn--active': $route.path.startsWith('/mypage')}">
             <Icon icon="fluent:person-20-regular" width="30px" />
-            <span class="mt-1">マイページ</span>
+            <span class="mt-1">{{ $t('navigation.mypage') }}</span>
         </v-btn>
     </v-bottom-navigation>
 </template>

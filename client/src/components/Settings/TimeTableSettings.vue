@@ -3,7 +3,7 @@
         <v-card class="timetable-settings-dialog">
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="fluent:settings-20-regular" height="26px" />
-                <span class="ml-3">番組表の表示設定</span>
+                <span class="ml-3">{{ $t('settings_dialogs.timetable.title') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="dialogOpen = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -14,15 +14,15 @@
                 <div class="settings__item" style="margin-top: 16px;">
                     <label class="settings__item-heading">
                         <Icon icon="fluent:arrow-autofit-width-20-regular" width="20px" />
-                        <span class="ml-2">各チャンネルの表示幅を調整</span>
+                        <span class="ml-2">{{ $t('settings_dialogs.timetable.channel_width_heading') }}</span>
                     </label>
                     <label class="settings__item-label">
-                        各チャンネルの横方向の表示を調整します。広めにすると番組名が読みやすくなります。<br>
+                        <span v-html="$t('settings_dialogs.timetable.channel_width_label')"></span>
                     </label>
                     <v-btn-toggle class="settings__item-form timetable-settings-dialog__toggle" v-model="channelWidth" mandatory density="comfortable">
-                        <v-btn value="Wide">広め</v-btn>
-                        <v-btn value="Normal">標準</v-btn>
-                        <v-btn value="Narrow">狭め</v-btn>
+                        <v-btn value="Wide">{{ $t('settings_dialogs.timetable.size_wide') }}</v-btn>
+                        <v-btn value="Normal">{{ $t('settings_dialogs.timetable.size_normal') }}</v-btn>
+                        <v-btn value="Narrow">{{ $t('settings_dialogs.timetable.size_narrow') }}</v-btn>
                     </v-btn-toggle>
                 </div>
 
@@ -30,15 +30,15 @@
                 <div class="settings__item">
                     <label class="settings__item-heading">
                         <Icon icon="fluent:arrow-autofit-height-20-regular" width="20px" />
-                        <span class="ml-2">時間軸の表示密度を調整</span>
+                        <span class="ml-2">{{ $t('settings_dialogs.timetable.hour_height_heading') }}</span>
                     </label>
                     <label class="settings__item-label">
-                        番組表の縦方向の表示密度を調整します。広めにすると番組詳細が読みやすくなります。<br>
+                        <span v-html="$t('settings_dialogs.timetable.hour_height_label')"></span>
                     </label>
                     <v-btn-toggle class="settings__item-form timetable-settings-dialog__toggle" v-model="hourHeight" mandatory density="comfortable">
-                        <v-btn value="Wide">広め</v-btn>
-                        <v-btn value="Normal">標準</v-btn>
-                        <v-btn value="Narrow">狭め</v-btn>
+                        <v-btn value="Wide">{{ $t('settings_dialogs.timetable.size_wide') }}</v-btn>
+                        <v-btn value="Normal">{{ $t('settings_dialogs.timetable.size_normal') }}</v-btn>
+                        <v-btn value="Narrow">{{ $t('settings_dialogs.timetable.size_narrow') }}</v-btn>
                     </v-btn-toggle>
                 </div>
 
@@ -46,10 +46,10 @@
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="timetable_hover_expand">
                         <Icon icon="fluent:cursor-hover-20-regular" width="20px" />
-                        <span class="ml-2">カーソルを重ねた時に番組詳細を自動表示する</span>
+                        <span class="ml-2">{{ $t('settings_dialogs.timetable.hover_expand_heading') }}</span>
                     </label>
                     <label class="settings__item-label" for="timetable_hover_expand">
-                        PC でカーソルを番組に重ねた時に、クリックせずに番組情報を展開表示します。<br>
+                        <span v-html="$t('settings_dialogs.timetable.hover_expand_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="timetable_hover_expand" hide-details
                         v-model="hoverExpand">
@@ -60,10 +60,10 @@
                 <div class="settings__item settings__item--switch">
                     <label class="settings__item-heading" for="timetable_dim_shopping_programs">
                         <Icon icon="fluent:shopping-bag-20-regular" width="20px" />
-                        <span class="ml-2">ショッピング・通販番組を控えめに表示する</span>
+                        <span class="ml-2">{{ $t('settings_dialogs.timetable.dim_shopping_heading') }}</span>
                     </label>
                     <label class="settings__item-label" for="timetable_dim_shopping_programs">
-                        「ショッピング・通販」ジャンルの番組をグレーで表示し、番組表の視認性を高めます。<br>
+                        <span v-html="$t('settings_dialogs.timetable.dim_shopping_label')"></span>
                     </label>
                     <v-switch class="settings__item-switch" color="primary" id="timetable_dim_shopping_programs" hide-details
                         v-model="dimShoppingPrograms">
@@ -74,15 +74,14 @@
                 <div class="settings__item">
                     <label class="settings__item-heading">
                         <Icon icon="fluent:color-20-regular" width="20px" />
-                        <span class="ml-2">ジャンル別のハイライト色</span>
+                        <span class="ml-2">{{ $t('settings_dialogs.timetable.genre_colors_heading') }}</span>
                     </label>
                     <label class="settings__item-label">
-                        各ジャンルの番組セルに表示するハイライト色を設定します。<br>
-                        よく見るジャンルに色を付けると、より番組を見つけやすくなります。<br>
+                        <span v-html="$t('settings_dialogs.timetable.genre_colors_label')"></span>
                     </label>
                     <div class="timetable-settings-dialog__genre-list">
                         <div class="timetable-settings-dialog__genre-item" v-for="genre in genreList" :key="genre">
-                            <span class="timetable-settings-dialog__genre-name">{{ genre }}</span>
+                            <span class="timetable-settings-dialog__genre-name">{{ ProgramUtils.getGenreLabel(genre) }}</span>
                             <v-select class="timetable-settings-dialog__genre-select" variant="outlined" density="compact" hide-details
                                 :items="colorItems" v-model="genreColors[genre]"
                                 @update:model-value="onGenreColorChange(genre, $event)">
@@ -108,9 +107,13 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import useSettingsStore, { TimeTableGenreHighlightColor, TimeTableSizeOption, ITimeTableGenreColors } from '@/stores/SettingsStore';
+import { ProgramUtils } from '@/utils';
 import { TimeTableUtils } from '@/utils/TimeTableUtils';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
@@ -183,20 +186,20 @@ const genreList: (keyof ITimeTableGenreColors)[] = [
     'その他',
 ];
 
-// 色の選択肢
-const colorItems: { title: string; value: TimeTableGenreHighlightColor }[] = [
-    { title: '白', value: 'White' },
-    { title: 'ピンク', value: 'Pink' },
-    { title: '赤', value: 'Red' },
-    { title: 'オレンジ', value: 'Orange' },
-    { title: '黄色', value: 'Yellow' },
-    { title: '黄緑', value: 'Lime' },
-    { title: '青緑', value: 'Teal' },
-    { title: '水色', value: 'Cyan' },
-    { title: '青', value: 'Blue' },
-    { title: '黄土色', value: 'Ochre' },
-    { title: '茶色', value: 'Brown' },
-];
+// 色の選択肢 (表示名は表示言語に追従させる)
+const colorItems = computed<{ title: string; value: TimeTableGenreHighlightColor }[]>(() => [
+    { title: t('settings_dialogs.timetable.color_white'), value: 'White' },
+    { title: t('settings_dialogs.timetable.color_pink'), value: 'Pink' },
+    { title: t('settings_dialogs.timetable.color_red'), value: 'Red' },
+    { title: t('settings_dialogs.timetable.color_orange'), value: 'Orange' },
+    { title: t('settings_dialogs.timetable.color_yellow'), value: 'Yellow' },
+    { title: t('settings_dialogs.timetable.color_lime'), value: 'Lime' },
+    { title: t('settings_dialogs.timetable.color_teal'), value: 'Teal' },
+    { title: t('settings_dialogs.timetable.color_cyan'), value: 'Cyan' },
+    { title: t('settings_dialogs.timetable.color_blue'), value: 'Blue' },
+    { title: t('settings_dialogs.timetable.color_ochre'), value: 'Ochre' },
+    { title: t('settings_dialogs.timetable.color_brown'), value: 'Brown' },
+]);
 
 /**
  * 色の値を取得

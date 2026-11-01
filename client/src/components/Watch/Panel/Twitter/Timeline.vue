@@ -8,7 +8,7 @@
                     class="search-input"
                     type="search"
                     enterkeyhint="search"
-                    placeholder="タイムラインを絞り込む"
+                    :placeholder="$t('watch.twitter.timeline.filter_placeholder')"
                     @focus="isFilterFormFocused = true"
                     @blur="isFilterFormFocused = false"
                 />
@@ -18,7 +18,7 @@
                     <Icon icon="fluent:settings-16-filled" width="20" />
                 </button>
                 <button v-ripple class="timeline-header__refresh" style="color: rgb(var(--v-theme-twitter-lighten-1))" @click="fetchTimelineTweets"
-                    v-ftooltip.bottom="'タイムラインを更新'">
+                    v-ftooltip.bottom="$t('watch.twitter.timeline.refresh')">
                     <Icon icon="ic:round-refresh" width="20" :class="isFetching ? 'animate-spin' : ''" />
                 </button>
             </div>
@@ -26,11 +26,11 @@
         <div v-if="showSettings" class="timeline-settings">
             <div class="timeline-settings__item">
                 <v-switch id="show_retweets" color="primary" density="compact" hide-details v-model="showRetweets" />
-                <label class="ml-4 cursor-pointer" for="show_retweets">リツイートを表示する</label>
+                <label class="ml-4 cursor-pointer" for="show_retweets">{{ $t('watch.twitter.search.show_retweets') }}</label>
             </div>
             <div class="timeline-settings__item">
                 <v-switch id="is_not_filter" color="primary" density="compact" hide-details v-model="isNotFilter" />
-                <label class="ml-4 cursor-pointer" for="is_not_filter">指定文字列を含まないツイートを表示</label>
+                <label class="ml-4 cursor-pointer" for="is_not_filter">{{ $t('watch.twitter.timeline.exclude_filter') }}</label>
             </div>
         </div>
         <VirtuaList ref="scroller" class="timeline-tweets" :data="flattenedItems" #default="{ item }"
@@ -40,19 +40,19 @@
                 <button v-else class="load-more-button" @click="handleLoadMore(item)" :disabled="isFetching">
                     <div class="load-more-button__content">
                         <Icon icon="ic:round-refresh" width="20" :class="isFetching ? 'animate-spin' : ''" class="mr-2" />
-                        ツイートをさらに表示
+                        {{ $t('watch.twitter.search.load_more') }}
                     </div>
                 </button>
             </div>
         </VirtuaList>
         <div class="timeline-announce" v-show="flattenedItems.length === 0">
-            <div class="timeline-announce__heading">{{ filterQuery ? '絞り込み条件に一致するツイートがありません。' : 'まだツイートがありません。' }}</div>
+            <div class="timeline-announce__heading">{{ filterQuery ? $t('watch.twitter.timeline.no_match') : $t('watch.twitter.search.empty') }}</div>
             <div class="timeline-announce__text">
                 <p class="mt-0 mb-0" v-if="filterQuery">
-                    絞り込み条件を変更するか、右上の更新ボタンを<br>押して、タイムラインを更新してください。
+                    <span v-html="$t('watch.twitter.timeline.no_match_hint')"></span>
                 </p>
                 <p class="mt-0 mb-0" v-else>
-                    右上の更新ボタンを押すと、最新の<br>ホームタイムラインを時系列で表示できます。
+                    <span v-html="$t('watch.twitter.timeline.empty_hint')"></span>
                 </p>
             </div>
         </div>
@@ -63,6 +63,7 @@
 import { storeToRefs } from 'pinia';
 import { VList as VirtuaList } from 'virtua/vue';
 import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Tweet from '@/components/Watch/Panel/Twitter/Tweet.vue';
 import {
@@ -87,6 +88,8 @@ import Twitter, { ITimelineLoadMoreCursor, ITimelineTweetsResult, ITweet } from 
 import useTwitterStore from '@/stores/TwitterStore';
 import useUserStore from '@/stores/UserStore';
 import Utils, { TweetUtils, dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 const twitterStore = useTwitterStore();
 const { selected_account, selected_twitter_account } = storeToRefs(twitterStore);
@@ -536,7 +539,7 @@ const fetchTimelineTweets = async () => {
     if (!selected_account.value) {
         // 初回自動取得では未連携の警告を出さず、ユーザー操作後だけ通知する
         if (isFirstFetchCompleted) {
-            Message.warning('タイムラインを更新するには、Twitter または Bluesky アカウントと連携してください。');
+            Message.warning(t('watch.twitter.timeline.account_required'));
         }
         tweetsByKey.value = new Map();
         twitterGaps.value = [];

@@ -3,23 +3,23 @@
         <v-card class="server-log-dialog">
             <v-card-title class="px-5 pt-6 pb-0 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="fluent:document-text-16-regular" height="26px" />
-                <span class="ml-3">サーバーログ</span>
+                <span class="ml-3">{{ $t('settings_dialogs.server_log.title') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="server_log_dialog_modal = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
                 </div>
             </v-card-title>
             <v-tabs class="server-log-dialog__tabs" color="primary" bg-color="transparent" align-tabs="center" v-model="active_tab">
-                <v-tab style="text-transform: none !important;" value="server">サーバーログ</v-tab>
-                <v-tab style="text-transform: none !important;" value="access">アクセスログ</v-tab>
+                <v-tab style="text-transform: none !important;" value="server">{{ $t('settings_dialogs.server_log.title') }}</v-tab>
+                <v-tab style="text-transform: none !important;" value="access">{{ $t('settings_dialogs.server_log.access_log') }}</v-tab>
             </v-tabs>
             <div class="px-5 pb-6">
                 <div class="server-log-dialog__label-container">
                     <div class="server-log-dialog__label">
-                        リアルタイムでログを表示しています。最新のログが下部に表示されます。
+                        {{ $t('settings_dialogs.server_log.realtime') }}
                     </div>
                     <div class="server-log-dialog__auto-scroll-control">
-                        <label for="auto_scroll_enabled" class="server-log-dialog__auto-scroll-label">自動スクロール</label>
+                        <label for="auto_scroll_enabled" class="server-log-dialog__auto-scroll-label">{{ $t('settings_dialogs.server_log.auto_scroll') }}</label>
                         <v-switch
                             id="auto_scroll_enabled"
                             v-model="auto_scroll_enabled"
@@ -27,7 +27,7 @@
                             color="primary"
                             density="compact"
                             hide-details
-                            aria-label="自動スクロール"
+                            :aria-label="$t('settings_dialogs.server_log.auto_scroll')"
                         ></v-switch>
                     </div>
                 </div>
@@ -60,8 +60,11 @@
 
 import { VList as VirtuaList } from 'virtua/vue';
 import { PropType, ref, watch, onMounted, onBeforeUnmount, useTemplateRef, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Maintenance from '@/services/Maintenance';
+
+const { t } = useI18n();
 
 // 親コンポーネントと子コンポーネントでモーダルの表示状態を同期する
 const props = defineProps({
@@ -185,7 +188,7 @@ function startLogStreaming(log_type: 'server' | 'access') {
 
     // 接続に失敗した場合
     if (abort_controller === null) {
-        const error_message = 'サーバーログの表示には管理者権限が必要です。\n管理者アカウントでログインし直してください。';
+        const error_message = t('settings_dialogs.server_log.admin_required');
         if (log_type === 'server') {
             server_log_lines.value = [error_message];
         } else {

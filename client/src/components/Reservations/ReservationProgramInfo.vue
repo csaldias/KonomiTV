@@ -24,7 +24,7 @@
             <div class="program-info__genre-container" v-if="displayProgram.genres && displayProgram.genres.length > 0">
                 <div class="program-info__genre" :key="genre_index"
                     v-for="(genre, genre_index) in displayProgram.genres">
-                    {{genre.major}} / {{genre.middle}}
+                    {{ProgramUtils.getGenreLabel(genre.major)}} / {{ProgramUtils.getGenreLabel(genre.major, genre.middle)}}
                 </div>
             </div>
             <div class="mt-5">

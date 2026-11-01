@@ -8,75 +8,75 @@
                             'navigation__link--active': $route.path.startsWith('/tv'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? 'テレビをみる' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.tv') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:tv-20-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">テレビをみる</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.tv') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/videos/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/videos'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? 'ビデオをみる' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.videos') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:movies-and-tv-20-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">ビデオをみる</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.videos') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/timetable/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/timetable'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? '番組表' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.timetable') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:calendar-ltr-20-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">番組表</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.timetable') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/reservations/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/reservations'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? '録画予約' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.reservations') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:timer-16-regular" width="26px" style="padding: 0.5px;" />
-                        <span v-if="!iconOnly" class="navigation__link-text">録画予約</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.reservations') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/captures/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/captures'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? 'キャプチャ' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.captures') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:image-multiple-24-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">キャプチャ</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.captures') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/offline-videos/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/offline-videos'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? 'オフライン保存' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.offline_videos') : ''">
                         <span class="navigation__link-icon-wrapper">
                             <Icon class="navigation__link-icon" icon="fluent:cloud-arrow-down-16-regular" width="26px" />
                             <OfflineDownloadBadge variant="overlay" />
                         </span>
-                        <span v-if="!iconOnly" class="navigation__link-text">オフライン保存</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.offline_videos') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/mylist/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/mylist'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? 'マイリスト' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.mylist') : ''">
                         <Icon class="navigation__link-icon" icon="ic:round-playlist-play" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">マイリスト</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.mylist') }}</span>
                     </router-link>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/watched-history/"
                         :class="{
                             'navigation__link--active': $route.path.startsWith('/watched-history'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? '視聴履歴' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.watched_history') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:history-20-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">視聴履歴</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.watched_history') }}</span>
                     </router-link>
                     <v-spacer></v-spacer>
                     <router-link v-ripple class="navigation__link" active-class="navigation__link--active" to="/settings/"
@@ -84,9 +84,9 @@
                             'navigation__link--active': $route.path.startsWith('/settings'),
                             'navigation__link--icon-only': iconOnly,
                         }"
-                        v-ftooltip.right="iconOnly ? '設定' : ''">
+                        v-ftooltip.right="iconOnly ? $t('navigation.settings') : ''">
                         <Icon class="navigation__link-icon" icon="fluent:settings-20-regular" width="26px" />
-                        <span v-if="!iconOnly" class="navigation__link-text">設定</span>
+                        <span v-if="!iconOnly" class="navigation__link-text">{{ $t('navigation.settings') }}</span>
                     </router-link>
                     <a v-ripple class="navigation__link" active-class="navigation__link--active"
                         href="https://github.com/tsukumijima/KonomiTV" target="_blank"
@@ -96,8 +96,8 @@
                             'navigation__link--icon-only': iconOnly,
                         }"
                         v-ftooltip.right="iconOnly ?
-                            (versionStore.is_update_available ? `アップデートがあります (version ${versionStore.latest_version})` : `version ${versionStore.client_version}`) :
-                            (versionStore.is_update_available ? `アップデートがあります (version ${versionStore.latest_version})` : '')">
+                            (versionStore.is_update_available ? $t('navigation.update_available', {version: versionStore.latest_version}) : `version ${versionStore.client_version}`) :
+                            (versionStore.is_update_available ? $t('navigation.update_available', {version: versionStore.latest_version}) : '')">
                         <Icon class="navigation__link-icon" icon="fluent:info-16-regular" width="26px" />
                         <span v-if="!iconOnly" class="navigation__link-text">version {{versionStore.client_version}}</span>
                     </a>

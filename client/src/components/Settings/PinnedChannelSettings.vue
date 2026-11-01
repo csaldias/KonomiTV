@@ -3,7 +3,7 @@
         <v-card class="pinned-channels-settings">
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="iconamoon:sorting-left-bold" height="26px" />
-                <span class="ml-3">ピン留め中チャンネルの並び替え</span>
+                <span class="ml-3">{{ $t('settings_dialogs.pinned_channels.title') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="pinned_channel_settings_modal = false">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -12,12 +12,14 @@
             <div class="px-5 pb-6">
                 <div class="pinned-channels-settings__label"
                     v-if="(channelsStore.channels_list_with_pinned.get('ピン留め') ?? []).length > 0">
-                    <div>各チャンネルのつまみをドラッグして並べ替えできます。</div>
+                    <div>{{ $t('settings_dialogs.pinned_channels.drag_hint') }}</div>
                 </div>
                 <div class="pinned-channels-settings__label"
                     v-if="(channelsStore.channels_list_with_pinned.get('ピン留め') ?? []).length === 0">
-                    <div><b>ピン留めされているチャンネルがありません。</b></div>
-                    <div class="mt-1">TV ホーム画面のチャンネルリストの <Icon style="position: relative; bottom: -5px;" icon="fluent:pin-20-filled" width="18.5px" /> アイコンから、よくみるチャンネルをピン留めできます。</div>
+                    <div><b>{{ $t('settings_dialogs.pinned_channels.empty') }}</b></div>
+                    <i18n-t keypath="settings_dialogs.pinned_channels.empty_hint" tag="div" class="mt-1" scope="global">
+                        <template #icon><Icon style="position: relative; bottom: -5px;" icon="fluent:pin-20-filled" width="18.5px" /></template>
+                    </i18n-t>
                 </div>
                 <draggable class="pinned-channels" handle=".pinned-channel__sort-handle" item-key="id"
                     v-model="pinned_channels" v-if="pinned_channels.length > 0">

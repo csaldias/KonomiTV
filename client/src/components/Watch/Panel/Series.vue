@@ -1,6 +1,6 @@
 <template>
     <div class="series-container">
-        鋭意実装中…
+        {{ $t('watch.series.under_development') }}
     </div>
 </template>
 <script lang="ts">

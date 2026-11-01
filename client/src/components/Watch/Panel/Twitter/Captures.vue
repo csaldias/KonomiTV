@@ -39,10 +39,10 @@
             </div>
         </div>
         <div class="capture-announce" v-show="player_store.twitter_captures.length === 0">
-            <div class="capture-announce__heading">まだキャプチャがありません。</div>
+            <div class="capture-announce__heading">{{ $t('watch.twitter.captures.empty') }}</div>
             <div class="capture-announce__text">
-                <p class="mt-0 mb-0">プレイヤーのキャプチャボタンやショートカットキーでキャプチャを撮ると、ここに表示されます。</p>
-                <p class="mt-2 mb-0">表示されたキャプチャを選択してからツイートすると、キャプチャを付けてツイートできます。</p>
+                <p class="mt-0 mb-0">{{ $t('watch.twitter.captures.empty_hint') }}</p>
+                <p class="mt-2 mb-0">{{ $t('watch.twitter.captures.empty_hint_2') }}</p>
             </div>
         </div>
     </div>

@@ -1,4 +1,5 @@
 
+import i18n from '@/plugins/i18n';
 import { ICaptureProgram } from '@/services/Captures';
 import { IProgram } from '@/services/Programs';
 import { IRecordedProgram } from '@/services/Videos';
@@ -443,9 +444,9 @@ export class ProgramUtils {
             // 日中に放送休止（停波）になることはまずあり得ないので、番組情報が取得できてないだけで視聴できるかも？というニュアンスを与える
             } else {
                 if (key === 'title') {
-                    return '番組情報がありません';  // タイトル
+                    return i18n.global.t('program.no_info_title');  // タイトル
                 } else {
-                    return 'この時間の番組情報を取得できませんでした。';  // 番組概要
+                    return i18n.global.t('program.no_info_description');  // 番組概要
                 }
             }
         }
@@ -528,7 +529,7 @@ export class ProgramUtils {
                 if (is_short === true) {  // 時刻のみ
                     return Utils.apply28HourClock(`${start_time.format('HH:mm')} ～ --:--`);
                 } else {
-                    return Utils.apply28HourClock(`${start_time.format('YYYY/MM/DD (dd) HH:mm')} ～ --:-- (放送時間未定)`);
+                    return Utils.apply28HourClock(`${start_time.format(i18n.global.t('program.datetime_format'))} ～ --:-- (${i18n.global.t('program.time_undecided')})`);
                 }
             }
 
@@ -542,7 +543,7 @@ export class ProgramUtils {
                     return Utils.apply28HourClock(`${start_time.format('HH:mm')} ～ ${end_time.format('HH:mm')}`);  // 放送中/次の番組
                 }
             } else {
-                return Utils.apply28HourClock(`${start_time.format('YYYY/MM/DD (dd) HH:mm')} ～ ${end_time.format('HH:mm')} (${duration}分)`);
+                return Utils.apply28HourClock(`${start_time.format(i18n.global.t('program.datetime_format'))} ～ ${end_time.format('HH:mm')} (${i18n.global.t('program.duration_minutes', {minutes: duration})})`);
             }
 
         // 放送休止中
@@ -554,9 +555,36 @@ export class ProgramUtils {
                     return '--:-- ～ --:--';  // 放送中/次の番組
                 }
             } else {
-                return '----/--/-- (-) --:-- ～ --:-- (--分)';
+                return i18n.global.t('program.time_placeholder');
             }
         }
+    }
+
+
+    /**
+     * ジャンル名 (API から返される日本語のジャンル名) を、表示言語に合わせた表示名に変換する
+     * CONTENT_TYPE から大分類・中分類のコードを逆引きし、コードをキーとする翻訳を参照する
+     * @param major 大分類のジャンル名
+     * @param middle 中分類のジャンル名 (省略時は大分類の表示名を返す)
+     * @returns 表示言語に合わせたジャンル名 (CONTENT_TYPE に存在しないジャンル名はそのまま返す)
+     */
+    static getGenreLabel(major: string, middle?: string): string {
+        for (const [major_code, [major_name, middles]] of Object.entries(ProgramUtils.CONTENT_TYPE)) {
+            if (major_name !== major) {
+                continue;
+            }
+            const major_key = `genre.x${Number(major_code).toString(16).toUpperCase()}`;
+            if (middle === undefined) {
+                return i18n.global.t(`${major_key}.major`);
+            }
+            for (const [middle_code, middle_name] of Object.entries(middles)) {
+                if (middle_name === middle) {
+                    return i18n.global.t(`${major_key}.middle_${Number(middle_code).toString(16).toUpperCase()}`);
+                }
+            }
+            return middle;
+        }
+        return middle ?? major;
     }
 
 
@@ -569,7 +597,7 @@ export class ProgramUtils {
 
         // 録画期間が不明な場合は代替文字列を返す
         if (recorded_program.recorded_video.recording_start_time === null || recorded_program.recorded_video.recording_end_time === null) {
-            return '----/--/-- (-) --:--:-- ～ --:--:-- (--分)';
+            return i18n.global.t('program.recording_time_placeholder');
         }
 
         const start_time = dayjs(recorded_program.recorded_video.recording_start_time);
@@ -578,7 +606,7 @@ export class ProgramUtils {
         // 分単位の番組長 (割り切れない場合は小数第2位で四捨五入)
         const duration = Math.round(recorded_program.recorded_video.duration / 60 * 100) / 100;
 
-        return Utils.apply28HourClock(`${start_time.format('YYYY/MM/DD (dd) HH:mm:ss')} ～ ${end_time.format('HH:mm:ss')} (${duration}分)`);
+        return Utils.apply28HourClock(`${start_time.format(i18n.global.t('program.datetime_seconds_format'))} ～ ${end_time.format('HH:mm:ss')} (${i18n.global.t('program.duration_minutes', {minutes: duration})})`);
     }
 
 

@@ -7,9 +7,9 @@
                 <SPHeaderBar v-model:search-query="searchCondition.keyword" @search="executeSearch" />
                 <div class="program-search-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: 'テレビをみる', path: '/tv/' },
-                        { name: '検索結果', path: `/tv/search?query=${encodeURIComponent(searchCondition.keyword)}`, disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.tv'), path: '/tv/' },
+                        { name: $t('common.search_results'), path: `/tv/search?query=${encodeURIComponent(searchCondition.keyword)}`, disabled: true },
                     ]" />
                     <div class="program-search-container__body">
                         <div class="program-search-container__filters">
@@ -27,10 +27,10 @@
                             hide-sort
                             :is-loading="isLoading"
                             :show-empty-message="hasSearched"
-                            :filter-button-label="shouldShowFilterDrawerButton ? '絞り込み' : undefined"
+                            :filter-button-label="shouldShowFilterDrawerButton ? $t('common.filter') : undefined"
                             empty-icon="fluent:search-20-regular"
                             :empty-message="emptyMessage"
-                            :empty-sub-message="'別のキーワードや絞り込み条件で検索をお試しください。'"
+                            :empty-sub-message="$t('tv.search.empty_sub_message')"
                             keep-deleted-items
                             compact-reservations-on-tablet-horizontal
                             is-program-search-result
@@ -58,6 +58,7 @@
 <script lang="ts" setup>
 
 import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -72,6 +73,8 @@ import Reservations, { IRecordSettings, IRecordSettingsDefault, IReservation } f
 import useChannelsStore from '@/stores/ChannelsStore';
 import useUserStore from '@/stores/UserStore';
 import Utils, { dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -147,17 +150,17 @@ const displayReservations = computed<IReservation[]>(() => {
 
 const resultTitle = computed(() => {
     if (Utils.isSmartphoneVertical() === true) {
-        return '検索結果';
+        return t('common.search_results');
     }
     return searchedKeyword.value.trim() !== ''
-        ? `「${searchedKeyword.value}」の検索結果`
-        : '検索結果';
+        ? t('common.search_results_for', {keyword: searchedKeyword.value})
+        : t('common.search_results');
 });
 
 const emptyMessage = computed(() => {
     return searchedKeyword.value.trim() !== ''
-        ? `「${Utils.escapeHTML(searchedKeyword.value)}」に一致する番組は<br class='d-sm-none'>見つかりませんでした。`
-        : '条件に一致する番組は<br class="d-sm-none">見つかりませんでした。';
+        ? t('tv.search.empty_message_keyword', {keyword: Utils.escapeHTML(searchedKeyword.value)})
+        : t('tv.search.empty_message');
 });
 
 const shouldShowFilterDrawerButton = computed(() => {

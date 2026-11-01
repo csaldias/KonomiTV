@@ -16,7 +16,7 @@
         <v-btn v-show="isButtonDisplay && !isTimeTablePage" variant="flat" class="pwa-install-button"
             @click="pwaInstallHandler.install()">
             <Icon icon="material-symbols:install-desktop-rounded" height="20px" class="mr-1" />
-            アプリとしてインストール
+            {{ $t('header.install_app') }}
         </v-btn>
         <div class="mr-3 mr-md-6"></div>
     </header>
@@ -25,10 +25,13 @@
 
 import { pwaInstallHandler } from 'pwa-install-handler';
 import { onMounted, ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 
 import ProgramInfoLanguageButton from '@/components/ProgramInfoLanguageButton.vue';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     searchQuery?: string;
@@ -89,11 +92,11 @@ const isVideoSection = (path: string) => {
 
 const searchPlaceholder = computed(() => {
     if (route.path.startsWith('/captures')) {
-        return 'キャプチャを検索...';
+        return t('header.search_captures');
     }
     return isVideoSection(route.path)
-        ? '録画番組を検索...'
-        : '放送予定の番組を検索...';
+        ? t('header.search_videos')
+        : t('header.search_programs');
 });
 
 const getSearchPath = () => {

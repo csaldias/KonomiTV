@@ -10,17 +10,17 @@
             <div v-ripple class="tab-button" :class="{'tab-button--active': playerStore.twitter_active_tab === 'Search'}"
                 @click="playerStore.twitter_active_tab = 'Search'">
                 <Icon icon="fluent:search-16-filled" height="18px" />
-                <span class="tab-button__text">ツイート検索</span>
+                <span class="tab-button__text">{{ $t('watch.twitter.tab_search') }}</span>
             </div>
             <div v-ripple class="tab-button" :class="{'tab-button--active': playerStore.twitter_active_tab === 'Timeline'}"
                 @click="playerStore.twitter_active_tab = 'Timeline'">
                 <Icon icon="fluent:home-16-regular" height="18px" />
-                <span class="tab-button__text">タイムライン</span>
+                <span class="tab-button__text">{{ $t('watch.twitter.tab_timeline') }}</span>
             </div>
             <div v-ripple class="tab-button" :class="{'tab-button--active': playerStore.twitter_active_tab === 'Capture'}"
                 @click="playerStore.twitter_active_tab = 'Capture'">
                 <Icon icon="fluent:image-copy-20-regular" height="18px" />
-                <span class="tab-button__text">キャプチャ</span>
+                <span class="tab-button__text">{{ $t('watch.twitter.tab_captures') }}</span>
             </div>
         </div>
         <div class="tweet-form" :class="{
@@ -31,7 +31,7 @@
         }">
             <div class="tweet-form__hashtag">
                 <!-- input[type=search] を使っているのは autocomplete 避け目的のはず -->
-                <input class="tweet-form__hashtag-form" type="search" enterkeyhint="done" placeholder="#ハッシュタグ" spellcheck="false"
+                <input class="tweet-form__hashtag-form" type="search" enterkeyhint="done" :placeholder="$t('watch.twitter.hashtag_placeholder')" spellcheck="false"
                     v-model="tweet_hashtag" @input="updateTweetLetterCount()"
                     @focus="is_tweet_hashtag_form_focused = true" @blur="is_tweet_hashtag_form_focused = false"
                     @change="tweet_hashtag = formatHashtag(tweet_hashtag); updateTweetLetterCount()">
@@ -39,7 +39,7 @@
                     <Icon icon="fluent:clipboard-text-ltr-32-regular" height="22px" />
                 </div>
             </div>
-            <textarea class="tweet-form__textarea" enterkeyhint="enter" placeholder="ツイート" spellcheck="false" v-model="tweet_text" ref="tweet_text"
+            <textarea class="tweet-form__textarea" enterkeyhint="enter" :placeholder="$t('watch.twitter.tweet_placeholder')" spellcheck="false" v-model="tweet_text" ref="tweet_text"
                 @input="updateTweetLetterCount()"
                 @paste="pasteClipboardData($event)"
                 @focus="is_tweet_text_form_focused = true"
@@ -53,7 +53,7 @@
                     <img class="account-button__icon"
                         :src="twitterStore.has_twitter_panel_account ? selectedAccountIconUrl : '/assets/images/account-icon-default.png'">
                     <span class="account-button__screen-name">
-                        {{twitterStore.has_twitter_panel_account ? selectedAccountDisplayId : '連携されていません'}}
+                        {{twitterStore.has_twitter_panel_account ? selectedAccountDisplayId : $t('watch.twitter.not_linked')}}
                     </span>
                     <Icon class="account-button__menu" icon="fluent:more-circle-20-regular" width="18px" />
                 </div>
@@ -98,12 +98,12 @@
             <div class="hashtag-heading">
                 <div class="hashtag-heading__text">
                     <Icon icon="charm:hash" width="17px" />
-                    <span class="ml-1">ハッシュタグリスト</span>
+                    <span class="ml-1">{{ $t('watch.twitter.hashtag_list') }}</span>
                 </div>
                 <button v-ripple class="hashtag-heading__add-button"
-                    @click="saved_twitter_hashtags.push({id: Utils.time(), text: '#ここにハッシュタグを入力', editing: false})">
+                    @click="saved_twitter_hashtags.push({id: Utils.time(), text: $t('watch.twitter.hashtag_placeholder_text'), editing: false})">
                     <Icon icon="fluent:add-12-filled" width="17px" />
-                    <span class="ml-1">追加</span>
+                    <span class="ml-1">{{ $t('common.add') }}</span>
                 </button>
             </div>
             <draggable class="hashtag-container" handle=".hashtag__sort-handle" item-key="id"
@@ -356,7 +356,7 @@ export default defineComponent({
             if (account?.kind === 'Twitter') return `@${account.twitter_account.screen_name}`;
             if (account?.kind === 'Bluesky') return `@${account.bluesky_account.handle}`;
             if (account?.kind === 'Linked') return `@${account.account_link.twitter_account.screen_name}`;
-            return '連携されていません';
+            return this.$t('watch.twitter.not_linked');
         },
 
         shouldPostToTwitter(): boolean {
@@ -408,9 +408,9 @@ export default defineComponent({
         tweetButtonLabel(): string {
             // Bluesky 単独投稿では「ポスト」に変え、Twitter を含む場合は抗議的に残している「ツイート」を維持する
             if (this.shouldPostToTwitter === false && this.shouldPostToBluesky === true) {
-                return 'ポスト';
+                return this.$t('watch.twitter.post');
             }
-            return 'ツイート';
+            return this.$t('watch.twitter.tweet');
         },
 
         tweetButtonClass(): Record<string, boolean> {
@@ -1125,7 +1125,7 @@ export default defineComponent({
                 console.error('Tweet sending promise rejected unexpectedly.', error);
                 return {
                     service,
-                    message: service === 'Twitter' ? 'Twitter へのツイートに失敗しました。' : 'Bluesky へのポストに失敗しました。',
+                    message: service === 'Twitter' ? this.$t('watch.twitter.tweet_failed') : this.$t('watch.twitter.bluesky_post_failed'),
                     is_error: true,
                     settled_at: performance.now(),
                 };
@@ -1208,7 +1208,7 @@ export default defineComponent({
 
             return {
                 service: result.service,
-                message: result.service === 'Twitter' ? 'Twitter にツイートしました。' : 'Bluesky にポストしました。',
+                message: result.service === 'Twitter' ? this.$t('watch.twitter.tweeted') : this.$t('watch.twitter.bluesky_posted'),
                 is_error: false,
             };
         },
@@ -1222,7 +1222,7 @@ export default defineComponent({
             if (twitter_result?.is_error === false && bluesky_result?.is_error === false) {
                 return {
                     service: 'Twitter',
-                    message: 'Twitter と Bluesky に同時ツイートしました。',
+                    message: this.$t('watch.twitter.both_posted'),
                     is_error: false,
                 };
             }
@@ -1232,7 +1232,7 @@ export default defineComponent({
             if (twitter_result?.is_error === true && bluesky_result?.is_error === false) {
                 return {
                     service: 'Twitter',
-                    message: `Bluesky にポストしました。Twitter へのツイートは失敗しました。(${twitter_result.message})`,
+                    message: this.$t('watch.twitter.only_bluesky_posted', {error: twitter_result.message}),
                     is_error: true,
                 };
             }
@@ -1242,7 +1242,7 @@ export default defineComponent({
             if (twitter_result?.is_error === false && bluesky_result?.is_error === true) {
                 return {
                     service: 'Bluesky',
-                    message: `Twitter にツイートしました。Bluesky へのポストは失敗しました。(${bluesky_result.message})`,
+                    message: this.$t('watch.twitter.only_twitter_posted', {error: bluesky_result.message}),
                     is_error: true,
                 };
             }
@@ -1251,7 +1251,7 @@ export default defineComponent({
             // どちらか一方だけ失敗したように見えないよう、サービス横断の失敗として扱う
             return {
                 service: 'Twitter',
-                message: `Twitter と Bluesky へのツイートに失敗しました。(${results.map(result => result.message).join(' / ')})`,
+                message: this.$t('watch.twitter.both_failed', {error: results.map(result => result.message).join(' / ')}),
                 is_error: true,
             };
         },

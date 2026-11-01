@@ -88,6 +88,10 @@ export function setLanguage(language: Language): void {
     i18n.global.locale.value = locale;
     // dayjs はシングルトンのため、ここで切り替えると Utils 側の dayjs にも反映される
     dayjs.locale(locale);
+    // Web Worker (ProgramUtils などを経由して読み込まれる) には document が存在しないため、DOM の更新は行わない
+    if (typeof document === 'undefined') {
+        return;
+    }
     // スクリーンリーダーや :lang() セレクタのために <html lang> 属性も更新する
     document.documentElement.setAttribute('lang', locale);
     // CSS の content 擬似要素で表示している「デバイス間同期無効」バッジ (Base.vue) の文言を、

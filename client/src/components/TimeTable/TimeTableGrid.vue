@@ -126,7 +126,7 @@
                 v-if="showNextDayButton"
                 @click="$emit('go-to-next-day')">
                 <Icon icon="fluent:chevron-down-20-regular" width="20px" />
-                <span>次の日を見る</span>
+                <span>{{ $t('timetable.next_day') }}</span>
             </v-btn>
         </Transition>
         <!-- 日付遷移フロートボタン (前の日へ) -->
@@ -135,7 +135,7 @@
                 v-if="showPrevDayButton"
                 @click="$emit('go-to-previous-day')">
                 <Icon icon="fluent:chevron-up-20-regular" width="20px" />
-                <span>前の日を見る</span>
+                <span>{{ $t('timetable.previous_day') }}</span>
             </v-btn>
         </Transition>
     </div>

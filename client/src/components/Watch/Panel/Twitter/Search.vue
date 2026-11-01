@@ -8,7 +8,7 @@
                     class="search-input"
                     type="search"
                     enterkeyhint="search"
-                    placeholder="検索キーワードを入力"
+                    :placeholder="$t('watch.twitter.search.keyword_placeholder')"
                     @keydown="onKeyDown($event)"
                     @focus="isSearchFormFocused = true"
                     @blur="isSearchFormFocused = false"
@@ -19,14 +19,14 @@
                     <Icon icon="fluent:settings-16-filled" width="20" />
                 </button>
                 <button v-ripple class="search-header__refresh" style="color: rgb(var(--v-theme-twitter-lighten-1))"
-                    @click="performSearchTweets" v-ftooltip.bottom="'検索結果を更新'">
+                    @click="performSearchTweets" v-ftooltip.bottom="$t('watch.twitter.search.refresh')">
                     <Icon icon="ic:round-refresh" width="20" :class="isFetching ? 'animate-spin' : ''" />
                 </button>
             </div>
         </div>
         <div v-if="showSettings" class="search-settings">
             <v-switch id="show_retweets" color="primary" density="compact" hide-details v-model="showRetweets" />
-            <label class="ml-4 cursor-pointer" for="show_retweets">リツイートを表示する</label>
+            <label class="ml-4 cursor-pointer" for="show_retweets">{{ $t('watch.twitter.search.show_retweets') }}</label>
         </div>
         <VirtuaList ref="scroller" class="search-tweets" :data="flattenedItems" #default="{ item }"
             v-show="flattenedItems.length > 0">
@@ -35,15 +35,15 @@
                 <button v-else class="load-more-button" @click="handleLoadMore(item)" :disabled="isFetching">
                     <div class="load-more-button__content">
                         <Icon icon="ic:round-refresh" width="20" :class="isFetching ? 'animate-spin' : ''" class="mr-2" />
-                        ツイートをさらに表示
+                        {{ $t('watch.twitter.search.load_more') }}
                     </div>
                 </button>
             </div>
         </VirtuaList>
         <div class="search-announce" v-show="flattenedItems.length === 0">
-            <div class="search-announce__heading">まだツイートがありません。</div>
+            <div class="search-announce__heading">{{ $t('watch.twitter.search.empty') }}</div>
             <div class="search-announce__text">
-                <p class="mt-0 mb-0">右上の更新ボタンを押すと、最新の<br>ツイート検索結果を時系列で表示できます。</p>
+                <p class="mt-0 mb-0">{{ $t('watch.twitter.search.empty_hint') }}</p>
             </div>
         </div>
     </div>
@@ -53,6 +53,7 @@
 import { storeToRefs } from 'pinia';
 import { VList as VirtuaList } from 'virtua/vue';
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Tweet from '@/components/Watch/Panel/Twitter/Tweet.vue';
 import {
@@ -76,6 +77,8 @@ import Twitter, { ITimelineLoadMoreCursor, ITimelineTweetsResult, ITweet } from 
 import useTwitterStore from '@/stores/TwitterStore';
 import useUserStore from '@/stores/UserStore';
 import Utils, { TweetUtils } from '@/utils';
+
+const { t } = useI18n();
 
 const twitterStore = useTwitterStore();
 const { selected_account } = storeToRefs(twitterStore);
@@ -328,13 +331,13 @@ const performSearchTweets = async () => {
     }
     // 空検索はサーバーに投げず、既存の Twitter 検索 UI と同じくユーザー操作で解決させる
     if (!searchQuery.value.trim()) {
-        Message.warning('検索キーワードを入力してください。');
+        Message.warning(t('watch.twitter.search.keyword_required'));
         return;
     }
     isFetching.value = true;
     await useUserStore().fetchUser();
     if (!selected_account.value) {
-        Message.warning('ツイートを検索するには、Twitter または Bluesky アカウントと連携してください。');
+        Message.warning(t('watch.twitter.search.account_required'));
         // 未連携状態に変わった場合は古い検索結果を残さず、現在のアカウント状態と画面表示を一致させる
         resetSearchState();
         isFetching.value = false;

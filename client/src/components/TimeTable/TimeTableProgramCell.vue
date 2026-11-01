@@ -41,7 +41,7 @@
                 <v-btn variant="flat" size="small" class="timetable-program-cell__action-button"
                     @click.stop="$emit('show-detail')">
                     <Icon icon="fluent:info-12-regular" width="16px" />
-                    <span>番組詳細</span>
+                    <span>{{ $t('timetable.program_details') }}</span>
                 </v-btn>
                 <!-- 録画予約ボタン: 予約なしの場合は追加、予約ありの場合は有効/無効切替 -->
                 <v-btn variant="flat" size="small"
@@ -62,6 +62,7 @@
 <script lang="ts" setup>
 
 import { computed, nextTick, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { IProgramTranslation, ITimeTableChannel, ITimeTableProgram } from '@/services/Programs';
 import useProgramTranslationsStore from '@/stores/ProgramTranslationsStore';
@@ -71,6 +72,8 @@ import { dayjs } from '@/utils';
 import { ProgramUtils } from '@/utils/ProgramUtils';
 import { TimeTableUtils } from '@/utils/TimeTableUtils';
 import Utils from '@/utils/Utils';
+
+const { t } = useI18n();
 
 type DecoratedProgramInfoCache = {
     raw_title: string;
@@ -279,7 +282,7 @@ const reservationButtonLabel = computed(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _trigger = props.resizeTrigger;
     if (!hasReservation.value) {
-        return '録画予約';
+        return t('timetable.reserve');
     }
     // チャンネル幅が狭い画面では短縮表示
     // - スマホ縦画面: 「標準」または「狭め」の場合
@@ -290,9 +293,9 @@ const reservationButtonLabel = computed(() => {
         (Utils.isSmartphoneVertical() && isNotWide) ||
         ((Utils.isSmartphoneHorizontal() || Utils.isTabletVertical()) && isNarrow);
     if (isReservationDisabled.value) {
-        return shouldShorten ? '有効化' : '予約を有効化';
+        return shouldShorten ? t('timetable.enable_reservation_short') : t('timetable.enable_reservation');
     }
-    return shouldShorten ? '無効化' : '予約を無効化';
+    return shouldShorten ? t('timetable.disable_reservation_short') : t('timetable.disable_reservation');
 });
 
 /**

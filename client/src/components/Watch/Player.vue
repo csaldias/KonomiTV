@@ -26,7 +26,7 @@
                 @touchmove="playerStore.event_emitter.emit('SetControlDisplayTimer', {event: $event})"
                 @click="playerStore.event_emitter.emit('SetControlDisplayTimer', {event: $event})">
             <div v-ripple class="switch-button switch-button-up"
-                v-ftooltip.top="settingsStore.settings.tv_channel_up_down_buttons_reverse ? '次のチャンネル' : '前のチャンネル'" v-if="playback_mode === 'Live'"
+                v-ftooltip.top="settingsStore.settings.tv_channel_up_down_buttons_reverse ? $t('watch.player.next_channel') : $t('watch.player.previous_channel')" v-if="playback_mode === 'Live'"
                 @click="playerStore.is_zapping = true; $router.push({path: `/tv/watch/${settingsStore.settings.tv_channel_up_down_buttons_reverse ? channelsStore.channel.next.display_channel_id : channelsStore.channel.previous.display_channel_id}`})">
                 <Icon class="switch-button-icon" icon="fluent:ios-arrow-left-24-filled" width="32px" style="transform: rotate(90deg)" />
             </div>
@@ -36,7 +36,7 @@
                 <Icon class="switch-button-icon" icon="fluent:navigation-16-filled" width="32px" />
             </div>
             <div v-ripple class="switch-button switch-button-down"
-                    v-ftooltip.bottom="settingsStore.settings.tv_channel_up_down_buttons_reverse ? '前のチャンネル' : '次のチャンネル'" v-if="playback_mode === 'Live'"
+                    v-ftooltip.bottom="settingsStore.settings.tv_channel_up_down_buttons_reverse ? $t('watch.player.previous_channel') : $t('watch.player.next_channel')" v-if="playback_mode === 'Live'"
                     @click="playerStore.is_zapping = true; $router.push({path: `/tv/watch/${settingsStore.settings.tv_channel_up_down_buttons_reverse ? channelsStore.channel.previous.display_channel_id : channelsStore.channel.next.display_channel_id}`})">
                 <Icon class="switch-button-icon" icon="fluent:ios-arrow-right-24-filled" width="33px" style="transform: rotate(90deg)" />
             </div>
