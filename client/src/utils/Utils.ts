@@ -26,7 +26,8 @@ export default class Utils {
     })();
 
     // パフォーマンス最適化のため、apply28HourClock() で利用する正規表現を事前コンパイル
-    private static readonly date_week_time_pattern = /(\d{4})\/(\d{2})\/(\d{2})\s+\((.)\)\s+([0-2]\d):(\d{2})(?::(\d{2}))?/g;
+    // 曜日は日本語の1文字 (日) と英語の略称 (Sun) の両方に対応する
+    private static readonly date_week_time_pattern = /(\d{4})\/(\d{2})\/(\d{2})\s+\(([^)\s]{1,3})\)\s+([0-2]\d):(\d{2})(?::(\d{2}))?/g;
     private static readonly date_time_pattern = /(\d{4})\/(\d{2})\/(\d{2})\s+([0-2]\d):(\d{2})(?::(\d{2}))?/g;
     private static readonly month_day_time_pattern = /(\d{2})\/(\d{2})\s+([0-2]\d):(\d{2})(?::(\d{2}))?/g;
     private static readonly standalone_time_pattern = /(^|[^0-9])([0-2]\d):(\d{2})(?::(\d{2}))?/g;
@@ -121,15 +122,15 @@ export default class Utils {
         }
 
         // ユーティリティ: 日付文字列 YYYY/MM/DD を 1 日戻す
-        const prevDateStr = (y: number, m: number, d: number, withWeek: boolean): string => {
+        // week_label には元の文字列の曜日を渡し、1日戻した日付の曜日も同じ表記 (日本語の1文字 / 英語の略称) にする
+        const prevDateStr = (y: number, m: number, d: number, week_label: string | null): string => {
             const date = new Date(y, m - 1, d);
             date.setDate(date.getDate() - 1);
             const yy = date.getFullYear();
             const mm = String(date.getMonth() + 1).padStart(2, '0');
             const dd = String(date.getDate()).padStart(2, '0');
-            if (withWeek) {
-                const weeks = '日月火水木金土';
-                const w = weeks[date.getDay()];
+            if (week_label !== null) {
+                const w = week_label.length === 1 ? '日月火水木金土'[date.getDay()] : date.toLocaleDateString('en-US', {weekday: 'short'});
                 return `${yy}/${mm}/${dd} (${w})`;
             }
             return `${yy}/${mm}/${dd}`;
@@ -140,7 +141,7 @@ export default class Utils {
             (_m, y, m, d, _w, hh, mm, ss) => {
                 const hour = parseInt(hh, 10);
                 if (hour >= 0 && hour <= 3) {
-                    const newDate = prevDateStr(parseInt(y, 10), parseInt(m, 10), parseInt(d, 10), true);
+                    const newDate = prevDateStr(parseInt(y, 10), parseInt(m, 10), parseInt(d, 10), _w);
                     const newH = String(hour + 24).padStart(2, '0');
                     return `${newDate} ${newH}:${mm}${ss ? `:${ss}` : ''}`;
                 }
@@ -153,7 +154,7 @@ export default class Utils {
             (_m, y, m, d, hh, mm, ss) => {
                 const hour = parseInt(hh, 10);
                 if (hour >= 0 && hour <= 3) {
-                    const newDate = prevDateStr(parseInt(y, 10), parseInt(m, 10), parseInt(d, 10), false);
+                    const newDate = prevDateStr(parseInt(y, 10), parseInt(m, 10), parseInt(d, 10), null);
                     const newH = String(hour + 24).padStart(2, '0');
                     return `${newDate} ${newH}:${mm}${ss ? `:${ss}` : ''}`;
                 }
