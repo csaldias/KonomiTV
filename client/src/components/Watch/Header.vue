@@ -12,6 +12,8 @@
             {{ProgramUtils.getProgramTime(playback_mode === 'Live' ? channelsStore.channel.current.program_present : playerStore.recorded_program, true)}}
         </span>
         <v-spacer></v-spacer>
+        <!-- 番組情報の表示言語 (日本語・英語) の切り替えボタン (英訳があるのはテレビの番組情報だけなので、ライブ視聴時のみ表示する) -->
+        <ProgramInfoLanguageButton class="watch-header__language-button" v-if="playback_mode === 'Live'" />
         <span class="watch-header__now">
             <Icon v-if="is_showing_original_broadcast_time" class="watch-header__timeshift-icon" icon="fluent:history-16-regular" width="16px" />
             {{time}}
@@ -25,6 +27,7 @@ import { defineComponent, PropType } from 'vue';
 
 import type { Dayjs } from 'dayjs';
 
+import ProgramInfoLanguageButton from '@/components/ProgramInfoLanguageButton.vue';
 import useChannelsStore from '@/stores/ChannelsStore';
 import usePlayerStore from '@/stores/PlayerStore';
 import useSettingsStore from '@/stores/SettingsStore';
@@ -32,6 +35,9 @@ import Utils, { dayjs, ProgramUtils } from '@/utils';
 
 export default defineComponent({
     name: 'Watch-Header',
+    components: {
+        ProgramInfoLanguageButton,
+    },
     props: {
         playback_mode: {
             type: String as PropType<'Live' | 'Video'>,
@@ -280,6 +286,17 @@ export default defineComponent({
         @include smartphone-vertical {
             margin-left: 8px;
             font-size: 13px;
+        }
+    }
+
+    .watch-header__language-button {
+        margin-left: 16px;
+
+        @include smartphone-horizontal {
+            margin-left: 8px;
+        }
+        @include smartphone-vertical {
+            margin-left: 8px;
         }
     }
 

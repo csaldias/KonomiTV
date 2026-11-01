@@ -6,6 +6,8 @@
         <v-spacer></v-spacer>
         <!-- 番組表コントロール用スロット -->
         <slot name="timetable-controls"></slot>
+        <!-- 番組情報の表示言語 (日本語・英語) の切り替えボタン -->
+        <ProgramInfoLanguageButton class="ml-3" />
         <div v-if="showSearchInput" class="search-box">
             <input class="search-input" type="search" name="header-search" enterkeyhint="search" :placeholder="searchPlaceholder"
                 v-model="searchQuery" @keydown="handleKeyDown">
@@ -25,6 +27,7 @@ import { pwaInstallHandler } from 'pwa-install-handler';
 import { onMounted, ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
+import ProgramInfoLanguageButton from '@/components/ProgramInfoLanguageButton.vue';
 import Utils from '@/utils';
 
 const props = defineProps<{

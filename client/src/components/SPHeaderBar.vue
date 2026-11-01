@@ -10,6 +10,8 @@
             <!-- スマホ縦画面では Navigation が非表示のため、ヘッダー側にバッジを残す -->
             <!-- スマホ横画面では左側の Navigation にオフライン保存の項目と件数が表示されるため、ヘッダーではバッジを非表示にする -->
             <OfflineDownloadBadge class="offline-download-badge mr-4" />
+            <!-- 番組情報の表示言語 (日本語・英語) の切り替えボタン -->
+            <ProgramInfoLanguageButton class="mr-3" />
             <div v-if="showSearchButton" v-ripple class="search-button" @click="activateSearch">
                 <Icon icon="fluent:search-20-filled" height="24px" />
             </div>
@@ -34,6 +36,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 import OfflineDownloadBadge from '@/components/OfflineDownloadBadge.vue';
+import ProgramInfoLanguageButton from '@/components/ProgramInfoLanguageButton.vue';
 import Utils from '@/utils';
 
 // Props の定義
