@@ -31,15 +31,15 @@
                 <!-- 映像・音声情報 -->
                 <div class="program-info__status" v-if="displayProgram.video_codec && displayProgram.video_resolution">
                     <Icon icon="fluent:video-16-filled" height="17px" style="margin-left: -2px; margin-right: -1.7px; margin-bottom: -3px;" />
-                    <span class="ml-2">映像: {{displayProgram.video_codec}} / {{displayProgram.video_resolution}}</span>
+                    <span class="ml-2">{{ $t('reservations.program_info.video') }} {{displayProgram.video_codec}} / {{displayProgram.video_resolution}}</span>
                 </div>
                 <div class="program-info__status">
                     <Icon icon="fluent:headphones-sound-wave-20-filled" height="17px" style="margin-left: -2px; margin-right: -1.7px; margin-bottom: -3px;" />
-                    <span class="ml-2">主音声: {{displayProgram.primary_audio_type}} {{displayProgram.primary_audio_sampling_rate || 'Unknown'}} / {{displayProgram.primary_audio_language}}</span>
+                    <span class="ml-2">{{ $t('reservations.program_info.primary_audio') }} {{displayProgram.primary_audio_type}} {{displayProgram.primary_audio_sampling_rate || 'Unknown'}} / {{displayProgram.primary_audio_language}}</span>
                 </div>
                 <div v-if="displayProgram.secondary_audio_type" class="program-info__status">
                     <Icon icon="fluent:headphones-sound-wave-20-filled" height="17px" style="margin-left: -2px; margin-right: -1.7px; margin-bottom: -3px;" />
-                    <span class="ml-2">副音声: {{displayProgram.secondary_audio_type}} {{displayProgram.secondary_audio_sampling_rate || 'Unknown'}} / {{displayProgram.secondary_audio_language}}</span>
+                    <span class="ml-2">{{ $t('reservations.program_info.secondary_audio') }} {{displayProgram.secondary_audio_type}} {{displayProgram.secondary_audio_sampling_rate || 'Unknown'}} / {{displayProgram.secondary_audio_language}}</span>
                 </div>
             </div>
         </section>

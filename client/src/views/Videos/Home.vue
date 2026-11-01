@@ -7,13 +7,13 @@
                 <SPHeaderBar />
                 <div class="videos-home-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: 'ビデオをみる', path: '/videos/', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.videos'), path: '/videos/', disabled: true },
                     ]" />
                     <RecordedProgramList
                         class="videos-home-container__recent-programs"
                         :class="{'videos-home-container__recent-programs--loading': recent_programs.length === 0 && is_loading}"
-                        title="新着の録画番組"
+                        :title="$t('videos.list.recent')"
                         :programs="recent_programs"
                         :total="total_programs"
                         :hideSort="true"
@@ -24,7 +24,7 @@
                         :showEmptyMessage="!is_loading"
                         @more="$router.push('/videos/programs')" />
                     <RecordedProgramList
-                        title="マイリスト"
+                        :title="$t('navigation.mylist')"
                         :programs="mylist_programs"
                         :total="total_mylist_programs"
                         :hideSort="true"
@@ -32,13 +32,13 @@
                         :showMoreButton="true"
                         :showEmptyMessage="!is_loading"
                         :emptyIcon="'ic:round-playlist-play'"
-                        :emptyMessage="'あとで観たい番組を<br class=\'d-sm-none\'>マイリストに保存できます。'"
-                        :emptySubMessage="'録画番組の右上にある ＋ ボタンから、<br class=\'d-sm-none\'>番組をマイリストに追加できます。'"
+                        :emptyMessage="$t('videos.list.mylist_empty')"
+                        :emptySubMessage="$t('videos.list.mylist_empty_sub')"
                         :isLoading="is_loading"
                         :forMylist="true"
                         @more="$router.push('/mylist/')" />
                     <RecordedProgramList
-                        title="視聴履歴"
+                        :title="$t('navigation.watched_history')"
                         :programs="watched_programs"
                         :total="total_watched_programs"
                         :hideSort="true"
@@ -46,8 +46,8 @@
                         :showMoreButton="true"
                         :showEmptyMessage="!is_loading"
                         :emptyIcon="'fluent:history-20-regular'"
-                        :emptyMessage="'まだ視聴履歴がありません。'"
-                        :emptySubMessage="'録画番組を30秒以上みると、<br class=\'d-sm-none\'>視聴履歴に追加されます。'"
+                        :emptyMessage="$t('videos.list.history_empty')"
+                        :emptySubMessage="$t('videos.list.history_empty_sub')"
                         :isLoading="is_loading"
                         :forWatchedHistory="true"
                         @more="$router.push('/watched-history/')" />

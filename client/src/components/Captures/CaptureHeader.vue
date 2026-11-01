@@ -6,7 +6,7 @@
                 <Icon icon="fluent:search-20-filled" height="20px" />
             </div>
             <input ref="searchInputRef" v-model="searchText" type="search" name="capture-search" enterkeyhint="search"
-                placeholder="キャプチャを検索..." @keydown.enter="submitSearch" @keydown.esc="closeSearch">
+                :placeholder="$t('header.search_captures')" @keydown.enter="submitSearch" @keydown.esc="closeSearch">
             <div v-ripple class="capture-header__search-close" @click="closeSearch">
                 <Icon icon="fluent:dismiss-20-filled" height="24px" />
             </div>
@@ -18,19 +18,19 @@
             </div>
             <h2 class="capture-header__title">
                 <span class="capture-header__title-text">{{ title }}</span>
-                <span v-if="total !== null" class="capture-header__title-count">{{ total.toLocaleString() }}枚</span>
+                <span v-if="total !== null" class="capture-header__title-count">{{ $t('captures.common.count', {count: total.toLocaleString()}) }}</span>
             </h2>
             <!-- 登録済みのキャプチャがあるときは、初回のスキャンではなく、追加・変更されたキャプチャを探していることを表示する -->
             <div v-if="scanStatus !== null && scanStatus.is_running && scanStatus.has_registered_files" class="capture-header__scan"
-                v-ftooltip.bottom="'保存先フォルダに追加・変更されたキャプチャを探しています。登録済みのキャプチャは、スキャン中もそのまま表示されます。'">
+                v-ftooltip.bottom="$t('captures.header.scanning_new_tooltip')">
                 <Icon icon="line-md:loading-twotone-loop" width="16px" />
-                <span>新しいキャプチャを探しています... ({{ scanStatus.processed_count.toLocaleString() }} / {{ scanStatus.total_count.toLocaleString() }} 枚)</span>
+                <span>{{ $t('captures.header.scanning_new', {processed: scanStatus.processed_count.toLocaleString(), total: scanStatus.total_count.toLocaleString()}) }}</span>
             </div>
             <div v-else-if="scanStatus !== null && scanStatus.is_running" class="capture-header__scan"
-                v-ftooltip.bottom="'保存先フォルダのキャプチャをスキャンしています。解析が完了した画像から順次表示されます。'">
+                v-ftooltip.bottom="$t('captures.header.scanning_tooltip')">
                 <Icon icon="line-md:loading-twotone-loop" width="16px" />
-                <span v-if="scanStatus.total_count === 0">保存先フォルダを確認しています...</span>
-                <span v-else>キャプチャをスキャンしています... ({{ scanStatus.processed_count.toLocaleString() }} / {{ scanStatus.total_count.toLocaleString() }} 枚)</span>
+                <span v-if="scanStatus.total_count === 0">{{ $t('captures.header.checking_folders') }}</span>
+                <span v-else>{{ $t('captures.header.scanning', {processed: scanStatus.processed_count.toLocaleString(), total: scanStatus.total_count.toLocaleString()}) }}</span>
             </div>
             <v-spacer></v-spacer>
             <!-- スマホの縦画面では、上部のヘッダーを隠しているので、ここに検索の入口を置く -->
@@ -43,51 +43,51 @@
                     <v-btn class="capture-header__view-button" variant="flat" color="background-lighten-1" height="34"
                         :class="{'capture-header__view-button--active': activeFilterCount > 0}" v-bind="menuProps">
                         <Icon icon="fluent:filter-20-regular" width="18px" height="18px" />
-                        <span class="capture-header__view-button-text">並べ替えと絞り込み</span>
+                        <span class="capture-header__view-button-text">{{ $t('captures.header.sort_and_filter') }}</span>
                         <span v-if="activeFilterCount > 0" class="capture-header__view-button-count">{{ activeFilterCount }}</span>
                     </v-btn>
                 </template>
                 <v-card class="capture-header__filter" color="background-lighten-1">
                     <div class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">並べ替えの基準</span>
+                        <span class="capture-header__filter-label">{{ $t('captures.header.sort_axis') }}</span>
                         <div class="capture-header__filter-choices">
                             <div v-for="choice in axisChoices" :key="choice.value" v-ripple
                                 class="capture-header__filter-choice"
                                 :class="{'capture-header__filter-choice--active': axis === choice.value}"
                                 @click="$emit('update:axis', choice.value)">
-                                {{ choice.label }}
+                                {{ $t(choice.labelKey) }}
                             </div>
                         </div>
                     </div>
                     <div class="capture-header__filter-divider"></div>
                     <!-- タグ・お気に入りはアカウントごとのものなので、ログインしていないときは選ぼうとした時点でログインを案内する -->
                     <div class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">タグ (すべて付いているもの)</span>
+                        <span class="capture-header__filter-label">{{ $t('captures.header.filter_tags') }}</span>
                         <v-autocomplete :model-value="filter.tag_ids ?? []" :items="tagChoices" item-title="name" item-value="id"
                             color="primary" variant="outlined" density="compact" multiple chips closable-chips hide-details
-                            placeholder="タグを選択" :no-data-text="tags === null ? 'タグの一覧を読み込めませんでした' : 'タグがありません'" :readonly="!isLoggedIn"
+                            :placeholder="$t('captures.header.select_tags')" :no-data-text="tags === null ? $t('captures.header.tags_load_failed') : $t('captures.header.no_tags')" :readonly="!isLoggedIn"
                             @click="warnIfLoggedOut" @update:model-value="updateFilterValue('tag_ids', $event)" />
                     </div>
                     <div v-if="!lockFavorite" class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">お気に入り</span>
+                        <span class="capture-header__filter-label">{{ $t('captures.header.filter_favorites') }}</span>
                         <div class="capture-header__filter-choices">
                             <div v-for="choice in favoriteChoices" :key="String(choice.value)" v-ripple
                                 class="capture-header__filter-choice"
                                 :class="{'capture-header__filter-choice--active': (filter.is_favorite ?? null) === choice.value}"
                                 @click="updateFavorite(choice.value)">
-                                {{ choice.label }}
+                                {{ $t(choice.labelKey) }}
                             </div>
                         </div>
                     </div>
                     <div class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">チャンネル</span>
+                        <span class="capture-header__filter-label">{{ $t('captures.header.filter_channels') }}</span>
                         <v-autocomplete :model-value="filter.channel_ids ?? []" :items="channelChoices" item-title="label" item-value="id"
                             color="primary" variant="outlined" density="compact" multiple chips closable-chips hide-details
-                            placeholder="チャンネルを選択" :no-data-text="channels === null ? 'チャンネルの一覧を読み込めませんでした' : 'チャンネルがありません'"
+                            :placeholder="$t('captures.header.select_channels')" :no-data-text="channels === null ? $t('captures.header.channels_load_failed') : $t('captures.header.no_channels')"
                             @update:model-value="updateFilterValue('channel_ids', $event)" />
                     </div>
                     <div class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">期間 ({{ axis === 'BroadcastAt' ? '放送日' : '撮影日' }})</span>
+                        <span class="capture-header__filter-label">{{ $t('captures.header.period', {axis: axis === 'BroadcastAt' ? $t('captures.header.broadcast_date') : $t('captures.header.captured_date')}) }}</span>
                         <div class="capture-header__filter-period">
                             <v-text-field :model-value="filter.start_date ?? ''" type="date" color="primary" variant="outlined"
                                 density="compact" hide-details :max="filter.end_date ?? undefined"
@@ -100,20 +100,20 @@
                     </div>
                     <div class="capture-header__filter-divider"></div>
                     <div v-for="option in filterOptions" :key="option.key" class="capture-header__filter-row">
-                        <span class="capture-header__filter-label">{{ option.label }}</span>
+                        <span class="capture-header__filter-label">{{ $t(option.labelKey) }}</span>
                         <div class="capture-header__filter-choices">
                             <div v-for="choice in option.choices" :key="String(choice.value)" v-ripple
                                 class="capture-header__filter-choice"
                                 :class="{'capture-header__filter-choice--active': filter[option.key] === choice.value}"
                                 @click="updateFilter(option.key, choice.value)">
-                                {{ choice.label }}
+                                {{ $t(choice.labelKey) }}
                             </div>
                         </div>
                     </div>
                     <div class="capture-header__filter-footer">
                         <v-btn variant="text" color="text" height="36" :disabled="activeFilterCount === 0" @click="clearFilters">
                             <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                            <span class="ml-1">絞り込みをすべて解除</span>
+                            <span class="ml-1">{{ $t('captures.common.clear_filters') }}</span>
                         </v-btn>
                     </div>
                 </v-card>
@@ -129,13 +129,13 @@
                         <template #prepend>
                             <Icon icon="fluent:arrow-upload-20-regular" width="20px" />
                         </template>
-                        <v-list-item-title class="ml-3">画像をアップロード</v-list-item-title>
+                        <v-list-item-title class="ml-3">{{ $t('captures.header.upload_images') }}</v-list-item-title>
                     </v-list-item>
                     <v-list-item @click="isShortcutDialogOpen = true">
                         <template #prepend>
                             <Icon icon="fluent:keyboard-20-regular" width="20px" />
                         </template>
-                        <v-list-item-title class="ml-3">キーボードショートカット</v-list-item-title>
+                        <v-list-item-title class="ml-3">{{ $t('captures.header.keyboard_shortcuts') }}</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -150,7 +150,7 @@
                 :class="{'capture-header__target--active': queryTargets.includes(choice.value)}"
                 @click="toggleQueryTarget(choice.value)">
                 <Icon :icon="queryTargets.includes(choice.value) ? 'fluent:checkmark-16-filled' : choice.icon" width="18px" />
-                <span>{{ choice.label }}</span>
+                <span>{{ $t(choice.labelKey) }}</span>
             </div>
         </div>
         <!-- タイムライン・番組別・タグ別・お気に入りの画面を切り替えるタブ -->
@@ -158,7 +158,7 @@
             <router-link v-for="tab in tabs" :key="tab.value" v-ripple class="capture-header__tab"
                 :class="{'capture-header__tab--active': tab.value === activeTab}" :to="tab.to">
                 <Icon :icon="tab.icon" width="18px" />
-                <span>{{ tab.label }}</span>
+                <span>{{ $t(tab.labelKey) }}</span>
             </router-link>
         </div>
 
@@ -176,8 +176,8 @@
                 <div v-if="isDraggingFiles" class="capture-drop-overlay">
                     <div class="capture-drop-overlay__frame">
                         <Icon icon="fluent:arrow-upload-24-regular" width="56px" height="56px" />
-                        <div class="capture-drop-overlay__message">ドロップして画像をアップロード</div>
-                        <div class="capture-drop-overlay__sub">JPEG・PNG の画像を、複数まとめてアップロードできます。</div>
+                        <div class="capture-drop-overlay__message">{{ $t('captures.header.drop_to_upload') }}</div>
+                        <div class="capture-drop-overlay__sub">{{ $t('captures.header.drop_hint') }}</div>
                     </div>
                 </div>
             </transition>
@@ -187,6 +187,7 @@
 <script lang="ts" setup>
 
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import CaptureShortcutDialog from '@/components/Captures/CaptureShortcutDialog.vue';
@@ -195,6 +196,8 @@ import Captures, { CaptureQueryTarget, CaptureTimelineAxis, ICapture, ICaptureCh
 import Maintenance, { IMaintenanceTaskStatus } from '@/services/Maintenance';
 import useUserStore from '@/stores/UserStore';
 import Utils, { dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 
 /** 絞り込みのうち、ヘッダーで切り替えるもの (キャプチャの種類と番組情報の有無) */
@@ -235,11 +238,12 @@ const emit = defineEmits<{
 }>();
 
 // 番組別とタグ別はどちらもキャプチャをまとめたアルバムの一覧なので、隣に並べる
+// 以下の選択肢の labelKey は、表示言語に合わせてテンプレートで翻訳する文言のキー
 const tabs = [
-    { value: 'Timeline', label: 'タイムライン', icon: 'fluent:image-multiple-20-regular', to: '/captures/' },
-    { value: 'Programs', label: '番組別', icon: 'fluent:video-clip-multiple-20-regular', to: '/captures/programs/' },
-    { value: 'Tags', label: 'タグ別', icon: 'fluent:tag-multiple-20-regular', to: '/captures/tags/' },
-    { value: 'Favorites', label: 'お気に入り', icon: 'fluent:heart-20-regular', to: '/captures/favorites/' },
+    { value: 'Timeline', labelKey: 'captures.common.timeline', icon: 'fluent:image-multiple-20-regular', to: '/captures/' },
+    { value: 'Programs', labelKey: 'captures.common.by_program', icon: 'fluent:video-clip-multiple-20-regular', to: '/captures/programs/' },
+    { value: 'Tags', labelKey: 'captures.common.by_tag', icon: 'fluent:tag-multiple-20-regular', to: '/captures/tags/' },
+    { value: 'Favorites', labelKey: 'captures.common.favorites', icon: 'fluent:heart-20-regular', to: '/captures/favorites/' },
 ];
 
 // スマホの縦画面の検索欄 (検索結果の画面では、今の検索語を入れた状態で開く)
@@ -271,10 +275,10 @@ const submitSearch = (event: KeyboardEvent) => {
 };
 
 // 検索語を探す範囲 (何も選ばないときは、字幕・番組名・番組概要に加えて、チャンネル名とファイル名からも探す)
-const queryTargetChoices: { label: string; value: CaptureQueryTarget; icon: string }[] = [
-    { label: '字幕テキスト', value: 'CaptionText', icon: 'fluent:closed-caption-20-regular' },
-    { label: '番組名', value: 'ProgramTitle', icon: 'fluent:video-clip-20-regular' },
-    { label: '番組概要', value: 'ProgramDescription', icon: 'fluent:text-description-20-regular' },
+const queryTargetChoices: { labelKey: string; value: CaptureQueryTarget; icon: string }[] = [
+    { labelKey: 'captures.header.target_caption_text', value: 'CaptionText', icon: 'fluent:closed-caption-20-regular' },
+    { labelKey: 'captures.header.target_program_title', value: 'ProgramTitle', icon: 'fluent:video-clip-20-regular' },
+    { labelKey: 'captures.header.target_program_description', value: 'ProgramDescription', icon: 'fluent:text-description-20-regular' },
 ];
 const toggleQueryTarget = (value: CaptureQueryTarget) => {
     // 範囲は選択肢の並びの順に保ち、同じ組み合わせが同じ URL になるようにする
@@ -285,17 +289,22 @@ const toggleQueryTarget = (value: CaptureQueryTarget) => {
 };
 
 // 並べ替えの基準 (撮影日時か、その場面が放送された日時か)
-const axisChoices: { label: string; value: CaptureTimelineAxis }[] = [
-    { label: '撮影日時', value: 'CapturedAt' },
-    { label: '放送日時', value: 'BroadcastAt' },
+const axisChoices: { labelKey: string; value: CaptureTimelineAxis }[] = [
+    { labelKey: 'captures.header.axis_captured_at', value: 'CapturedAt' },
+    { labelKey: 'captures.header.axis_broadcast_at', value: 'BroadcastAt' },
 ];
 
 // キャプチャの種類の絞り込み (どれも「指定なし」「あり」「なし」の3択)
-const filterOptions: { key: CaptureTypeFilterKey; label: string; choices: { label: string; value: boolean | null }[] }[] = [
-    { key: 'is_caption_composited', label: '字幕の合成', choices: [{ label: 'すべて', value: null }, { label: 'あり', value: true }, { label: 'なし', value: false }] },
-    { key: 'is_comment_composited', label: 'コメントの合成', choices: [{ label: 'すべて', value: null }, { label: 'あり', value: true }, { label: 'なし', value: false }] },
-    { key: 'has_caption_text', label: '字幕テキスト', choices: [{ label: 'すべて', value: null }, { label: 'あり', value: true }, { label: 'なし', value: false }] },
-    { key: 'has_metadata', label: '番組情報', choices: [{ label: 'すべて', value: null }, { label: 'あり', value: true }, { label: 'なし', value: false }] },
+const filterChoices: { labelKey: string; value: boolean | null }[] = [
+    { labelKey: 'captures.header.choice_all', value: null },
+    { labelKey: 'captures.header.choice_yes', value: true },
+    { labelKey: 'captures.header.choice_no', value: false },
+];
+const filterOptions: { key: CaptureTypeFilterKey; labelKey: string; choices: { labelKey: string; value: boolean | null }[] }[] = [
+    { key: 'is_caption_composited', labelKey: 'captures.header.filter_caption_composited', choices: filterChoices },
+    { key: 'is_comment_composited', labelKey: 'captures.header.filter_comment_composited', choices: filterChoices },
+    { key: 'has_caption_text', labelKey: 'captures.header.target_caption_text', choices: filterChoices },
+    { key: 'has_metadata', labelKey: 'captures.header.filter_metadata', choices: filterChoices },
 ];
 const updateFilter = (key: CaptureTypeFilterKey, value: boolean | null) => {
     emit('update:filter', { ...props.filter, [key]: value });
@@ -305,15 +314,15 @@ const updateFilterValue = <K extends 'tag_ids' | 'channel_ids' | 'start_date' | 
 };
 
 // お気に入りの絞り込み (お気に入りに追加したものだけに絞るか、絞らないかの2択)
-const favoriteChoices: { label: string; value: boolean | null }[] = [
-    { label: 'すべて', value: null },
-    { label: 'お気に入りのみ', value: true },
+const favoriteChoices: { labelKey: string; value: boolean | null }[] = [
+    { labelKey: 'captures.header.choice_all', value: null },
+    { labelKey: 'captures.header.favorites_only', value: true },
 ];
 const userStore = useUserStore();
 const isLoggedIn = computed(() => userStore.is_logged_in);
 const warnIfLoggedOut = () => {
     if (isLoggedIn.value === false) {
-        Message.warning('お気に入りやタグで絞り込むには、ログインが必要です。\nアカウントにログインしてから、もう一度お試しください。');
+        Message.warning(t('captures.header.filter_login_required'));
     }
 };
 const updateFavorite = (value: boolean | null) => {
@@ -365,21 +374,21 @@ const formatDate = (value: string) => dayjs(value).format('YYYY/MM/DD');
 const activeFilterChips = computed(() => {
     const chips: { key: string; label: string; clear: () => void }[] = [];
     for (const tagId of props.filter.tag_ids ?? []) {
-        const name = tags.value?.find(tag => tag.id === tagId)?.name ?? 'タグ';
+        const name = tags.value?.find(tag => tag.id === tagId)?.name ?? t('captures.common.tag');
         chips.push({
             key: `tag-${tagId}`,
-            label: `タグ: ${name}`,
+            label: t('captures.header.chip_tag', {name}),
             clear: () => updateFilterValue('tag_ids', (props.filter.tag_ids ?? []).filter(id => id !== tagId)),
         });
     }
     if (props.lockFavorite === false && props.filter.is_favorite === true) {
-        chips.push({ key: 'favorite', label: 'お気に入りのみ', clear: () => updateFavorite(null) });
+        chips.push({ key: 'favorite', label: t('captures.header.favorites_only'), clear: () => updateFavorite(null) });
     }
     for (const channelId of props.filter.channel_ids ?? []) {
         const name = channelChoices.value.find(channel => channel.id === channelId)?.label ?? channelId;
         chips.push({
             key: `channel-${channelId}`,
-            label: `チャンネル: ${name}`,
+            label: t('captures.header.chip_channel', {name}),
             clear: () => updateFilterValue('channel_ids', (props.filter.channel_ids ?? []).filter(id => id !== channelId)),
         });
     }
@@ -388,7 +397,7 @@ const activeFilterChips = computed(() => {
         const end = props.filter.end_date ? formatDate(props.filter.end_date) : '';
         chips.push({
             key: 'period',
-            label: `期間: ${start} 〜 ${end}`,
+            label: t('captures.header.chip_period', {start, end}),
             clear: () => emit('update:filter', { ...props.filter, start_date: null, end_date: null }),
         });
     }
@@ -398,7 +407,7 @@ const activeFilterChips = computed(() => {
             continue;
         }
         const choice = option.choices.find(item => item.value === value);
-        chips.push({ key: option.key, label: `${option.label}: ${choice?.label ?? ''}`, clear: () => updateFilter(option.key, null) });
+        chips.push({ key: option.key, label: `${t(option.labelKey)}: ${choice !== undefined ? t(choice.labelKey) : ''}`, clear: () => updateFilter(option.key, null) });
     }
     return chips;
 });
@@ -437,11 +446,11 @@ const uploadFiles = async (files: File[]) => {
     if (files.length === 0) {
         return;
     }
-    Message.info(`${files.length}枚の画像をアップロードしています...`);
+    Message.info(t('captures.header.uploading', {count: files.length}));
     const results = await Promise.all(files.map(file => Captures.uploadLocalFile(file)));
     const uploaded = results.filter((capture): capture is ICapture => capture !== null);
     if (uploaded.length > 0) {
-        Message.success(`${uploaded.length}枚の画像をアップロードしました。`);
+        Message.success(t('captures.header.uploaded', {count: uploaded.length}));
         emit('uploaded', uploaded);
     }
 };
@@ -499,7 +508,7 @@ const onDrop = async (event: DragEvent) => {
     const files = [...(event.dataTransfer?.files ?? [])];
     const images = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/png');
     if (images.length < files.length) {
-        Message.warning(`JPEG・PNG 以外の${files.length - images.length}個のファイルは、アップロードしませんでした。`);
+        Message.warning(t('captures.header.skipped_files', {count: files.length - images.length}));
     }
     await uploadFiles(images);
 };

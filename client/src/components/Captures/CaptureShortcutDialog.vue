@@ -4,7 +4,7 @@
         <v-card>
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold">
                 <Icon icon="fluent:keyboard-20-filled" height="28px" />
-                <span class="ml-3">キーボードショートカット</span>
+                <span class="ml-3">{{ $t('captures.header.keyboard_shortcuts') }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="emit('update:show', false)">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -14,11 +14,11 @@
                 <div class="mt-3" v-for="group in shortcutGroups" :key="group.name">
                     <div class="text-subtitle-1 d-flex align-center font-weight-bold">
                         <Icon :icon="group.icon" height="22px" />
-                        <span class="ml-2">{{ group.name }}</span>
+                        <span class="ml-2">{{ $t(group.name) }}</span>
                     </div>
                     <div class="mt-3" v-for="shortcut in group.shortcuts" :key="shortcut.name">
                         <div class="text-subtitle-2 mt-2 d-flex align-center font-weight-medium">
-                            <span class="mr-2">{{ shortcut.name }}</span>
+                            <span class="mr-2">{{ $t(shortcut.name) }}</span>
                             <div class="ml-auto d-flex align-center flex-shrink-0">
                                 <template v-for="(keys, alternativeIndex) in shortcut.alternatives" :key="alternativeIndex">
                                     <span v-if="alternativeIndex > 0" class="shortcut-key-or">/</span>
@@ -69,39 +69,40 @@ const RIGHT_KEY: IShortcutKey = {name: 'fluent:arrow-right-12-filled', icon: tru
 // Mac のキーボードには Delete キーがないため、Finder と同じく Command+Backspace でも削除できる
 const DELETE_KEYS: IShortcutKey[][] = [[{name: 'Delete', icon: false}], [{name: 'Cmd', icon: false}, {name: 'Backspace', icon: false}]];
 
+// グループとショートカットの name は、表示言語に合わせてテンプレートで翻訳する文言のキー
 const shortcutGroups: { name: string; icon: string; shortcuts: IShortcut[] }[] = [
     {
-        name: 'キャプチャを選択しているとき',
+        name: 'captures.shortcuts.group_selecting',
         icon: 'fluent:checkmark-circle-20-filled',
         shortcuts: [
-            { name: '選択を移動する', alternatives: [[ARROW_KEYS]] },
-            { name: '選択する範囲を広げる', alternatives: [[{name: 'Shift', icon: false}, ARROW_KEYS]] },
-            { name: '選択しているキャプチャを拡大表示する', alternatives: [[{name: 'Space', icon: false}], [{name: 'Enter', icon: false}]] },
-            { name: '同じ日付のキャプチャをすべて選択する', alternatives: [[{name: Utils.CtrlOrCmd(), icon: false}, {name: 'A', icon: false}]] },
-            { name: '選択しているキャプチャをお気に入りに追加する / 外す', alternatives: [[{name: 'F', icon: false}]] },
-            { name: '選択しているキャプチャにタグを付ける', alternatives: [[{name: 'T', icon: false}]] },
-            { name: '選択しているキャプチャを削除する', alternatives: DELETE_KEYS },
-            { name: '選択を解除する', alternatives: [[{name: 'Esc', icon: false}]] },
+            { name: 'captures.shortcuts.move_selection', alternatives: [[ARROW_KEYS]] },
+            { name: 'captures.shortcuts.extend_selection', alternatives: [[{name: 'Shift', icon: false}, ARROW_KEYS]] },
+            { name: 'captures.shortcuts.open_selected', alternatives: [[{name: 'Space', icon: false}], [{name: 'Enter', icon: false}]] },
+            { name: 'captures.shortcuts.select_same_date', alternatives: [[{name: Utils.CtrlOrCmd(), icon: false}, {name: 'A', icon: false}]] },
+            { name: 'captures.shortcuts.toggle_favorite_selected', alternatives: [[{name: 'F', icon: false}]] },
+            { name: 'captures.shortcuts.tag_selected', alternatives: [[{name: 'T', icon: false}]] },
+            { name: 'captures.shortcuts.delete_selected', alternatives: DELETE_KEYS },
+            { name: 'captures.shortcuts.clear_selection', alternatives: [[{name: 'Esc', icon: false}]] },
         ],
     },
     {
-        name: 'キャプチャを拡大表示しているとき',
+        name: 'captures.shortcuts.group_viewing',
         icon: 'fluent:image-20-filled',
         shortcuts: [
-            { name: '前のキャプチャを表示する', alternatives: [[LEFT_KEY]] },
-            { name: '次のキャプチャを表示する', alternatives: [[RIGHT_KEY]] },
-            { name: 'お気に入りに追加する / 外す', alternatives: [[{name: 'F', icon: false}]] },
-            { name: 'タグを付ける', alternatives: [[{name: 'T', icon: false}]] },
-            { name: '情報の表示を切り替える', alternatives: [[{name: 'I', icon: false}]] },
-            { name: 'キャプチャを削除する', alternatives: DELETE_KEYS },
-            { name: '拡大表示を閉じる', alternatives: [[{name: 'Space', icon: false}], [{name: 'Esc', icon: false}]] },
+            { name: 'captures.shortcuts.previous', alternatives: [[LEFT_KEY]] },
+            { name: 'captures.shortcuts.next', alternatives: [[RIGHT_KEY]] },
+            { name: 'captures.shortcuts.toggle_favorite', alternatives: [[{name: 'F', icon: false}]] },
+            { name: 'captures.shortcuts.tag', alternatives: [[{name: 'T', icon: false}]] },
+            { name: 'captures.shortcuts.toggle_info', alternatives: [[{name: 'I', icon: false}]] },
+            { name: 'captures.shortcuts.delete', alternatives: DELETE_KEYS },
+            { name: 'captures.shortcuts.close_viewer', alternatives: [[{name: 'Space', icon: false}], [{name: 'Esc', icon: false}]] },
         ],
     },
     {
-        name: '全般',
+        name: 'captures.shortcuts.group_general',
         icon: 'fluent:home-20-filled',
         shortcuts: [
-            { name: 'キーボードショートカットの一覧を表示する', alternatives: [[{name: '／(？)', icon: false}]] },
+            { name: 'captures.shortcuts.show_shortcuts', alternatives: [[{name: '／(？)', icon: false}]] },
         ],
     },
 ];

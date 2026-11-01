@@ -4,15 +4,15 @@
         <div v-if="reservation.is_recording_in_progress" class="recording-warning-banner">
             <Icon icon="fluent:warning-16-filled" class="recording-warning-banner__icon" />
             <span class="recording-warning-banner__text">
-                録画中の録画設定の変更はできません。
+                {{ $t('reservations.settings.recording_locked') }}
             </span>
         </div>
 
         <!-- 録画設定プリセット選択（プリセットが2つ以上ある場合のみ表示） -->
         <div v-if="presets !== null && presets.presets.length >= 2" class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画設定プリセット</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.preset') }}</div>
             <div class="reservation-recording-settings__description">
-                EDCB の録画設定プリセットから設定値を読み込みます。プリセットの追加・変更・削除は EpgTimer から行ってください。
+                {{ $t('reservations.settings.preset_label') }}
             </div>
             <v-select
                 :disabled="reservation.is_recording_in_progress"
@@ -31,7 +31,7 @@
         <!-- 録画予約の有効/無効 -->
         <div class="reservation-recording-settings__section">
             <div class="reservation-recording-settings__header">
-                <div class="reservation-recording-settings__label">録画予約の有効/無効</div>
+                <div class="reservation-recording-settings__label">{{ $t('reservations.settings.enabled') }}</div>
                 <v-switch
                     :disabled="reservation.is_recording_in_progress"
                     style="height: 0; margin-top: -40px; margin-right: 6px;"
@@ -43,16 +43,15 @@
                 </v-switch>
             </div>
             <div class="reservation-recording-settings__description mb-0">
-                予約が無効なときは、この番組の録画動作を行いません。<br>
-                キーワード自動予約条件により不必要な番組が予約されてしまっているときは、予約を無効にしてみてください。(予約削除ではすぐ再追加されてしまい意味がありません。)
+                <span v-html="$t('reservations.settings.enabled_label')"></span>
             </div>
         </div>
 
         <!-- 録画予約の優先度 -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画予約の優先度</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.priority') }}</div>
             <div class="reservation-recording-settings__description mb-0">
-                放送時間が重なりチューナーが足りないときは、より優先度が高い予約から優先的に録画します。
+                {{ $t('reservations.settings.priority_label') }}
             </div>
             <div class="reservation-recording-settings__slider">
                 <v-slider
@@ -73,9 +72,9 @@
 
         <!-- 録画フォルダのパス -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画フォルダのパス</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.folder') }}</div>
             <div class="reservation-recording-settings__description">
-                空欄にすると、デフォルトの録画フォルダに保存されます。
+                {{ $t('reservations.settings.folder_label') }}
             </div>
             <v-text-field
                 :disabled="reservation.is_recording_in_progress"
@@ -84,18 +83,18 @@
                 variant="outlined"
                 density="compact"
                 hide-details
-                :placeholder="versionStore.is_linux_environment ? '/mnt/hdd/Records/2025年春アニメ' : 'E:\\Records\\2025年春アニメ'"
+                :placeholder="versionStore.is_linux_environment ? $t('reservations.settings.folder_placeholder_linux') : $t('reservations.settings.folder_placeholder_windows')"
                 @update:model-value="handleChange">
             </v-text-field>
         </div>
 
         <!-- 録画ファイル名テンプレート -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画ファイル名テンプレート (マクロ)</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.file_name') }}</div>
             <div class="reservation-recording-settings__description">
-                空欄にすると、デフォルトの録画ファイル名テンプレート (マクロ) が録画ファイル名の変更に利用されます。<br>
+                <span v-html="$t('reservations.settings.file_name_label')"></span>
                 <div class="mt-1">
-                    <a class="link" href="https://github.com/xtne6f/EDCB/blob/work-plus-s/Document/Readme_EpgTimer.txt#L929-L1008" target="_blank">テンプレート構文の一覧</a> / <a class="link" href="https://github.com/xtne6f/EDCB/blob/work-plus-s/Document/Readme_Mod.txt#%E3%83%9E%E3%82%AF%E3%83%AD" target="_blank">xtne6f 版での追加差分</a>
+                    <a class="link" href="https://github.com/xtne6f/EDCB/blob/work-plus-s/Document/Readme_EpgTimer.txt#L929-L1008" target="_blank">{{ $t('reservations.settings.template_syntax') }}</a> / <a class="link" href="https://github.com/xtne6f/EDCB/blob/work-plus-s/Document/Readme_Mod.txt#%E3%83%9E%E3%82%AF%E3%83%AD" target="_blank">{{ $t('reservations.settings.xtne6f_diff') }}</a>
                 </div>
             </div>
             <v-text-field
@@ -112,9 +111,9 @@
 
         <!-- 録画マージン -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画マージン (秒)</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.margin') }}</div>
             <div class="reservation-recording-settings__description">
-                番組開始時刻の何秒前から録画を開始し、番組終了時刻の何秒後に録画を終了するかの設定です。最低でも5秒以上をおすすめします。(0秒だと番組の冒頭/末尾が欠けてしまいます。)
+                {{ $t('reservations.settings.margin_label') }}
             </div>
             <div class="reservation-recording-settings__margin-default">
                 <v-checkbox
@@ -140,8 +139,8 @@
                     density="compact"
                     type="number"
                     hide-details
-                    prefix="番組開始"
-                    suffix="秒前"
+                    :prefix="$t('reservations.settings.margin_start_prefix')"
+                    :suffix="$t('reservations.settings.margin_start_suffix')"
                     style="width: 160px;"
                     @update:model-value="handleChange">
                 </v-text-field>
@@ -153,8 +152,8 @@
                     density="compact"
                     type="number"
                     hide-details
-                    prefix="番組終了"
-                    suffix="秒後"
+                    :prefix="$t('reservations.settings.margin_end_prefix')"
+                    :suffix="$t('reservations.settings.margin_end_suffix')"
                     style="width: 166px;"
                     @update:model-value="handleChange">
                 </v-text-field>
@@ -163,10 +162,9 @@
 
         <!-- 字幕データ録画設定 -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">字幕データ録画設定</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.caption') }}</div>
             <div class="reservation-recording-settings__description">
-                字幕データはほとんど録画容量を消費しません。<br>
-                [録画する] に設定しておくことを強くおすすめします。
+                <span v-html="$t('reservations.settings.caption_label')"></span>
             </div>
             <v-select
                 :disabled="reservation.is_recording_in_progress"
@@ -182,10 +180,9 @@
 
         <!-- データ放送録画設定 -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">データ放送録画設定</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.data_broadcasting') }}</div>
             <div class="reservation-recording-settings__description">
-                データ放送は30分で 500MB 以上録画容量を消費する上、KonomiTV は録画再生時のデータ放送表示に非対応です。<br>
-                [録画しない] に設定しておくことを強くおすすめします。
+                <span v-html="$t('reservations.settings.data_broadcasting_label')"></span>
             </div>
             <v-select
                 :disabled="reservation.is_recording_in_progress"
@@ -201,9 +198,9 @@
 
         <!-- 録画後動作設定 -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画後動作設定</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.post_recording') }}</div>
             <div class="reservation-recording-settings__description">
-                通常は [何もしない] のままで大丈夫です。録画後に録画 PC をスリープさせておきたい方のみ設定してください。環境によっては復帰できず以降の録画に失敗することがあります。
+                {{ $t('reservations.settings.post_recording_label') }}
             </div>
             <v-select
                 :disabled="reservation.is_recording_in_progress"
@@ -219,9 +216,9 @@
 
         <!-- 録画後実行スクリプトのパス -->
         <div class="reservation-recording-settings__section">
-            <div class="reservation-recording-settings__label">録画後実行スクリプトのパス</div>
+            <div class="reservation-recording-settings__label">{{ $t('reservations.settings.script') }}</div>
             <div class="reservation-recording-settings__description">
-                通常は空欄のままで大丈夫です。録画後に指定の {{ versionStore.is_linux_environment ? '.sh / .lua' : '.bat / .ps1 / .lua' }} スクリプトを実行させたい方のみ設定してください。
+                {{ $t('reservations.settings.script_label', {extensions: versionStore.is_linux_environment ? '.sh / .lua' : '.bat / .ps1 / .lua'}) }}
             </div>
             <v-text-field
                 :disabled="reservation.is_recording_in_progress"
@@ -240,9 +237,12 @@
 
 import { objectHash } from 'ohash';
 import { ref, computed, watch, onMounted, toRaw } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { type IReservation, type IRecordSettings, type IRecordSettingsPresets } from '@/services/Reservations';
 import useVersionStore from '@/stores/VersionStore';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
@@ -345,27 +345,27 @@ const handlePresetChange = (presetId: number) => {
     handleChange();
 };
 
-// 録画後動作モードの日本語ラベルマッピング
-const postRecordingModeLabels: Record<string, string> = {
-    'Nothing': '何もしない',
-    'Standby': 'スタンバイ',
-    'StandbyAndReboot': 'スタンバイ(復帰後再起動)',
-    'Suspend': 'サスペンド',
-    'SuspendAndReboot': 'サスペンド(復帰後再起動)',
-    'Shutdown': 'シャットダウン',
-};
+// 録画後動作モードの表示名 (表示言語に追従させる)
+const postRecordingModeLabels = computed<Record<string, string>>(() => ({
+    'Nothing': t('reservations.settings.post_nothing'),
+    'Standby': t('reservations.settings.post_standby'),
+    'StandbyAndReboot': t('reservations.settings.post_standby_reboot'),
+    'Suspend': t('reservations.settings.post_suspend'),
+    'SuspendAndReboot': t('reservations.settings.post_suspend_reboot'),
+    'Shutdown': t('reservations.settings.post_shutdown'),
+}));
 
 // 字幕録画のオプション
 // グローバルデフォルト値が取得できている場合は括弧書きで実際の値を表示
 const captionRecordingOptions = computed(() => {
     const globalDefaults = props.presets?.global_defaults;
     const defaultLabel = globalDefaults
-        ? `デフォルト設定を使う (${globalDefaults.caption_recording_mode === 'Enable' ? '録画する' : '録画しない'})`
-        : 'デフォルト設定を使う';
+        ? t('reservations.settings.use_default_with', {value: globalDefaults.caption_recording_mode === 'Enable' ? t('reservations.settings.record') : t('reservations.settings.do_not_record')})
+        : t('reservations.settings.use_default');
     return [
         { title: defaultLabel, value: 'Default' },
-        { title: '録画する', value: 'Enable' },
-        { title: '録画しない', value: 'Disable' },
+        { title: t('reservations.settings.record'), value: 'Enable' },
+        { title: t('reservations.settings.do_not_record'), value: 'Disable' },
     ];
 });
 
@@ -374,12 +374,12 @@ const captionRecordingOptions = computed(() => {
 const dataBroadcastingRecordingOptions = computed(() => {
     const globalDefaults = props.presets?.global_defaults;
     const defaultLabel = globalDefaults
-        ? `デフォルト設定を使う (${globalDefaults.data_broadcasting_recording_mode === 'Enable' ? '録画する' : '録画しない'})`
-        : 'デフォルト設定を使う';
+        ? t('reservations.settings.use_default_with', {value: globalDefaults.data_broadcasting_recording_mode === 'Enable' ? t('reservations.settings.record') : t('reservations.settings.do_not_record')})
+        : t('reservations.settings.use_default');
     return [
         { title: defaultLabel, value: 'Default' },
-        { title: '録画する', value: 'Enable' },
-        { title: '録画しない', value: 'Disable' },
+        { title: t('reservations.settings.record'), value: 'Enable' },
+        { title: t('reservations.settings.do_not_record'), value: 'Disable' },
     ];
 });
 
@@ -388,16 +388,16 @@ const dataBroadcastingRecordingOptions = computed(() => {
 const postRecordingOptions = computed(() => {
     const globalDefaults = props.presets?.global_defaults;
     const defaultLabel = globalDefaults
-        ? `デフォルト設定を使う (${postRecordingModeLabels[globalDefaults.post_recording_mode] ?? globalDefaults.post_recording_mode})`
-        : 'デフォルト設定を使う';
+        ? t('reservations.settings.use_default_with', {value: postRecordingModeLabels.value[globalDefaults.post_recording_mode] ?? globalDefaults.post_recording_mode})
+        : t('reservations.settings.use_default');
     return [
         { title: defaultLabel, value: 'Default' },
-        { title: '何もしない', value: 'Nothing' },
-        { title: 'スタンバイ', value: 'Standby' },
-        { title: 'スタンバイ(復帰後再起動)', value: 'StandbyAndReboot' },
-        { title: 'サスペンド', value: 'Suspend' },
-        { title: 'サスペンド(復帰後再起動)', value: 'SuspendAndReboot' },
-        { title: 'シャットダウン', value: 'Shutdown' },
+        { title: postRecordingModeLabels.value['Nothing'], value: 'Nothing' },
+        { title: postRecordingModeLabels.value['Standby'], value: 'Standby' },
+        { title: postRecordingModeLabels.value['StandbyAndReboot'], value: 'StandbyAndReboot' },
+        { title: postRecordingModeLabels.value['Suspend'], value: 'Suspend' },
+        { title: postRecordingModeLabels.value['SuspendAndReboot'], value: 'SuspendAndReboot' },
+        { title: postRecordingModeLabels.value['Shutdown'], value: 'Shutdown' },
     ];
 });
 
@@ -432,9 +432,9 @@ const handleChange = () => {
 const marginDefaultLabel = computed(() => {
     const globalDefaults = props.presets?.global_defaults;
     if (globalDefaults) {
-        return `デフォルト設定を使う (開始 ${globalDefaults.recording_start_margin} 秒前 / 終了 ${globalDefaults.recording_end_margin} 秒後)`;
+        return t('reservations.settings.use_default_margin', {start: globalDefaults.recording_start_margin, end: globalDefaults.recording_end_margin});
     }
-    return 'デフォルト設定を使う';
+    return t('reservations.settings.use_default');
 });
 
 // マージンデフォルト設定の変更

@@ -15,7 +15,7 @@
                 <div class="recorded-program__thumbnail-duration">{{ProgramUtils.getProgramDuration(program)}}</div>
                 <div v-if="program.recorded_video.status === 'Recording'" class="recorded-program__thumbnail-status recorded-program__thumbnail-status--recording">
                     <div class="recorded-program__thumbnail-status-dot"></div>
-                    録画中
+                    {{ $t('videos.program.recording') }}
                 </div>
                 <div v-else-if="isOfflineJobActive" class="recorded-program__thumbnail-status recorded-program__thumbnail-status--downloading">
                     <Icon icon="fluent:arrow-download-16-filled" width="13px" height="13px" />
@@ -23,14 +23,14 @@
                 </div>
                 <div v-else-if="isOfflineJobFailed" class="recorded-program__thumbnail-status recorded-program__thumbnail-status--failed">
                     <Icon icon="fluent:error-circle-12-regular" width="15px" height="15px" />
-                    保存失敗
+                    {{ $t('videos.program.save_failed') }}
                 </div>
                 <div v-else-if="program.recorded_video.status === 'AnalysisFailed'" class="recorded-program__thumbnail-status recorded-program__thumbnail-status--failed">
                     <Icon icon="fluent:error-circle-12-regular" width="15px" height="15px" />
-                    メタデータ解析失敗
+                    {{ $t('videos.program.analysis_failed') }}
                 </div>
                 <div v-else-if="program.is_partially_recorded" class="recorded-program__thumbnail-status recorded-program__thumbnail-status--partial">
-                    ⚠️ 一部のみ録画
+                    {{ $t('videos.program.partially_recorded') }}
                 </div>
                 <div v-if="watchHistory" class="recorded-program__thumbnail-progress">
                     <div class="recorded-program__thumbnail-progress-bar"
@@ -63,7 +63,7 @@
                         <span class="recorded-program__content-meta-broadcaster-name">Ch: {{program.channel.channel_number}} {{program.channel.name}}</span>
                     </div>
                     <div class="recorded-program__content-meta-broadcaster" v-else>
-                        <span class="recorded-program__content-meta-broadcaster-name">チャンネル情報なし</span>
+                        <span class="recorded-program__content-meta-broadcaster-name">{{ $t('videos.program.no_channel_info') }}</span>
                     </div>
                     <div class="recorded-program__content-meta-time">{{ProgramUtils.getProgramTime(program)}}</div>
                 </div>
@@ -75,7 +75,7 @@
             </div>
             <div v-if="!forWatchedHistory && !forOffline" v-ripple class="recorded-program__mylist"
                 :class="{'recorded-program__mylist--highlight': isInMylist && !forMylist}"
-                v-ftooltip="isInMylist ? 'マイリストから削除する' : 'マイリストに追加する'"
+                v-ftooltip="isInMylist ? $t('videos.program.mylist_remove') : $t('videos.program.mylist_add')"
                 @click.prevent.stop="toggleMylist"
                 @mousedown.prevent.stop="">
                 <template v-if="forMylist">
@@ -93,8 +93,8 @@
                 </template>
             </div>
             <div v-if="forOffline && isOfflineJobActive" v-ripple class="recorded-program__mylist"
-                role="button" tabindex="0" aria-label="オフライン保存をキャンセルする"
-                v-ftooltip="'キャンセル'"
+                role="button" tabindex="0" :aria-label="$t('videos.program.cancel_offline_aria')"
+                v-ftooltip="$t('common.cancel')"
                 @click.prevent.stop="cancelOfflineDownload"
                 @keydown.enter.prevent.stop="cancelOfflineDownload"
                 @keydown.space.prevent.stop="cancelOfflineDownload"
@@ -102,8 +102,8 @@
                 <Icon icon="fluent:dismiss-16-regular" width="22px" height="22px" />
             </div>
             <div v-else-if="forOffline && isOfflineJobFailed" v-ripple class="recorded-program__mylist"
-                role="button" tabindex="0" aria-label="失敗した保存ジョブを閉じる"
-                v-ftooltip="'閉じる'"
+                role="button" tabindex="0" :aria-label="$t('videos.program.dismiss_failed_aria')"
+                v-ftooltip="$t('common.close')"
                 @click.prevent.stop="dismissOfflineDownload"
                 @keydown.enter.prevent.stop="dismissOfflineDownload"
                 @keydown.space.prevent.stop="dismissOfflineDownload"
@@ -111,7 +111,7 @@
                 <Icon icon="fluent:dismiss-16-regular" width="22px" height="22px" />
             </div>
             <div v-if="forWatchedHistory" v-ripple class="recorded-program__mylist"
-                v-ftooltip="'視聴履歴から削除する'"
+                v-ftooltip="$t('videos.program.remove_from_history')"
                 @click.prevent.stop="removeFromWatchedHistory"
                 @mousedown.prevent.stop="">
                 <svg width="22px" height="22px" viewBox="0 0 16 16">
@@ -119,7 +119,7 @@
                 </svg>
             </div>
             <div v-if="forOffline && offlineVideo !== null && isOfflineJobActive === false && isOfflineJobFailed === false" v-ripple class="recorded-program__mylist"
-                v-ftooltip="'オフライン保存を削除する'"
+                v-ftooltip="$t('videos.program.delete_offline')"
                 @click.prevent.stop="deleteOfflineVideo"
                 @mousedown.prevent.stop="">
                 <svg width="22px" height="22px" viewBox="0 0 16 16">
@@ -143,13 +143,13 @@
                             <template v-slot:prepend>
                                 <Icon icon="fluent:cloud-arrow-down-20-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">オフライン再生用に保存 ({{offlineMenuSizeLabel}})</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_save_offline', {size: offlineMenuSizeLabel}) }}</v-list-item-title>
                         </v-list-item>
                         <v-list-item :to="`/captures/recorded/${program.id}`">
                             <template v-slot:prepend>
                                 <Icon icon="fluent:image-multiple-20-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">この番組のキャプチャを見る</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_captures') }}</v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="show_video_info = true">
                             <template v-slot:prepend>
@@ -157,32 +157,32 @@
                                     <path fill="currentColor" d="M8.499 7.5a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm.25-2a.749.749 0 1 1-1.499 0a.749.749 0 0 1 1.498 0M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1M2 8a6 6 0 1 1 12 0A6 6 0 0 1 2 8"></path>
                                 </svg>
                             </template>
-                            <v-list-item-title class="ml-3">録画ファイル情報を表示</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_file_info') }}</v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="downloadVideo" :disabled="program.recorded_video.status === 'Recording'">
                             <template v-slot:prepend>
                                 <Icon icon="fluent:arrow-download-24-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">録画ファイル本体をダウンロード ({{ Utils.formatBytes(program.recorded_video.file_size) }})</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_download', {size: Utils.formatBytes(program.recorded_video.file_size)}) }}</v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="reanalyzeVideo" v-ftooltip="'再生時に必要な録画ファイル情報・番組情報・サムネイルなどをすべて再解析・再生成します（数分かかります）'">
+                        <v-list-item @click="reanalyzeVideo" v-ftooltip="$t('videos.program.menu_reanalyze_tooltip')">
                             <template v-slot:prepend>
                                 <Icon icon="fluent:book-arrow-clockwise-20-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">メタデータを再解析</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_reanalyze') }}</v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="regenerateThumbnail()" v-ftooltip="'サムネイルのみを再生成します（数分かかります） 変更はページを再読み込みすると反映されます'">
+                        <v-list-item @click="regenerateThumbnail()" v-ftooltip="$t('videos.program.menu_regenerate_thumbnail_tooltip')">
                             <template v-slot:prepend>
                                 <Icon icon="fluent:image-arrow-counterclockwise-24-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">サムネイルを再生成</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_regenerate_thumbnail') }}</v-list-item-title>
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item @click="showDeleteConfirmation" :disabled="program.recorded_video.status === 'Recording'" class="recorded-program__menu-list-item--danger">
                             <template v-slot:prepend>
                                 <Icon icon="fluent:delete-20-regular" width="20px" height="20px" />
                             </template>
-                            <v-list-item-title class="ml-3">録画ファイルを削除</v-list-item-title>
+                            <v-list-item-title class="ml-3">{{ $t('videos.program.menu_delete_file') }}</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -201,7 +201,7 @@
     <v-dialog v-model="showOfflineDeleteConfirmation" max-width="715">
         <v-card>
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                オフライン保存を削除しますか？
+                {{ $t('videos.program.delete_offline_title') }}
             </v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <div class="mb-4">
@@ -212,19 +212,18 @@
                     </div>
                 </div>
                 <v-alert color="info" variant="tonal">
-                    端末に保存したオフライン再生用データだけを削除します。<br>
-                    サーバー上の録画ファイルは削除されません。
+                    <span v-html="$t('videos.program.delete_offline_text')"></span>
                 </v-alert>
             </v-card-text>
             <v-card-actions class="pt-4 px-6 pb-6">
                 <v-spacer />
                 <v-btn color="text" variant="text" @click="showOfflineDeleteConfirmation = false">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="error" variant="flat" :loading="isDeletingOfflineVideo" @click="confirmDeleteOfflineVideo">
                     <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">オフライン保存を削除</span>
+                    <span class="ml-1">{{ $t('videos.program.delete_offline_button') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -233,23 +232,22 @@
     <!-- 録画ファイル削除確認ダイアログ -->
     <v-dialog max-width="750" v-model="show_delete_confirmation">
         <v-card>
-            <v-card-title class="d-flex justify-center pt-6 font-weight-bold">本当に録画ファイルを削除しますか？</v-card-title>
+            <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('videos.program.delete_file_title') }}</v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <div class="delete-confirmation__file-path mb-4">{{ program.recorded_video.file_path }}</div>
                 <div class="text-error-lighten-1 font-weight-bold">
-                    この録画ファイルに関連するすべてのデータ (サムネイル / .ts.program.txt / .ts.err を含む) が削除されます。<br>
-                    元に戻すことはできません。本当に録画ファイルを削除しますか？
+                    <span v-html="$t('videos.program.delete_file_text')"></span>
                 </div>
             </v-card-text>
             <v-card-actions class="pt-4 px-6 pb-6">
                 <v-spacer></v-spacer>
                 <v-btn color="text" variant="text" @click="show_delete_confirmation = false">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="error" variant="flat" @click="deleteVideo">
                     <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">録画ファイルを削除</span>
+                    <span class="ml-1">{{ $t('videos.program.menu_delete_file') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -258,6 +256,7 @@
 <script lang="ts" setup>
 
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import OfflineVideoDownloadDialog from '@/components/Videos/Dialogs/OfflineVideoDownloadDialog.vue';
 import RecordedFileInfoDialog from '@/components/Videos/Dialogs/RecordedFileInfoDialog.vue';
@@ -267,6 +266,8 @@ import Videos, { type IRecordedProgram } from '@/services/Videos';
 import useSettingsStore from '@/stores/SettingsStore';
 import useUserStore from '@/stores/UserStore';
 import Utils, { PlayerUtils, ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 // Props
 const props = withDefaults(defineProps<{
@@ -309,19 +310,19 @@ const downloadVideo = () => {
 
 // メタデータ再解析
 const reanalyzeVideo = async () => {
-    Message.success('メタデータの再解析を開始します。完了までしばらくお待ちください。');
+    Message.success(t('videos.program.reanalyze_started'));
     const result = await Videos.reanalyzeVideo(props.program.id);
     if (result === true) {
-        Message.success('メタデータの再解析が完了しました。');
+        Message.success(t('videos.program.reanalyze_done'));
     }
 };
 
 // サムネイル再生成
 const regenerateThumbnail = async () => {
-    Message.success('サムネイルの再生成を開始しました。完了までしばらくお待ちください。');
+    Message.success(t('videos.program.regenerate_started'));
     const result = await Videos.regenerateThumbnail(props.program.id);
     if (result === true) {
-        Message.success('サムネイルの再生成が完了しました。');
+        Message.success(t('videos.program.regenerate_done'));
     }
 };
 
@@ -338,7 +339,7 @@ const toggleMylist = () => {
         settingsStore.settings.mylist = settingsStore.settings.mylist.filter(item => {
             return !(item.type === 'RecordedProgram' && item.id === props.program.id);
         });
-        Message.show('マイリストから削除しました。');
+        Message.show(t('videos.program.mylist_removed'));
     } else {
         // マイリストに追加
         settingsStore.settings.mylist.push({
@@ -346,7 +347,7 @@ const toggleMylist = () => {
             id: props.program.id,
             created_at: Utils.time(),  // 秒単位
         });
-        Message.success('マイリストに追加しました。');
+        Message.success(t('videos.program.mylist_added'));
     }
 };
 
@@ -365,7 +366,7 @@ const removeFromWatchedHistory = () => {
     settingsStore.settings.watched_history = settingsStore.settings.watched_history.filter(history => {
         return history.video_id !== props.program.id;
     });
-    Message.show('視聴履歴から削除しました。');
+    Message.show(t('videos.program.history_removed'));
 };
 
 // オフライン保存サムネイルの読み込み失敗時はサーバー側サムネイルへ切り替える
@@ -418,12 +419,12 @@ const rootBindings = computed(() => {
 const offlineDownloadStateLabel = computed(() => {
     if (props.offlineDownloadJob === null) return '';
     return {
-        Waiting: '待機中',
-        Downloading: 'ダウンロード中',
-        Finalizing: '保存処理中',
-        Completed: '完了',
-        Failed: '失敗',
-        Cancelled: 'キャンセル済み',
+        Waiting: t('videos.program.job_waiting'),
+        Downloading: t('videos.program.job_downloading'),
+        Finalizing: t('videos.program.job_finalizing'),
+        Completed: t('videos.program.job_completed'),
+        Failed: t('videos.program.job_failed'),
+        Cancelled: t('videos.program.job_cancelled'),
     }[props.offlineDownloadJob.state];
 });
 
@@ -525,21 +526,21 @@ const confirmDeleteOfflineVideo = async (): Promise<void> => {
     try {
         await OfflineVideos.deleteVideo(props.program.id);
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : 'オフライン保存を削除できませんでした。');
+        Message.error(error instanceof Error ? error.message : t('videos.program.delete_offline_failed'));
         return;
     } finally {
         isDeletingOfflineVideo.value = false;
     }
     showOfflineDeleteConfirmation.value = false;
     emit('deleted', props.program.id);
-    Message.success('オフライン保存を削除しました。');
+    Message.success(t('videos.program.offline_deleted'));
 };
 
 // 録画ファイル削除確認ダイアログを表示
 const showDeleteConfirmation = () => {
     const userStore = useUserStore();
     if (userStore.user === null || userStore.user.is_admin === false) {
-        Message.warning('録画ファイルを削除するには管理者権限が必要です。\n管理者アカウントでログインし直してください。');
+        Message.warning(t('videos.program.delete_admin_required'));
         return;
     }
     show_delete_confirmation.value = true;
@@ -548,11 +549,11 @@ const showDeleteConfirmation = () => {
 // 録画ファイル削除
 const deleteVideo = async () => {
     show_delete_confirmation.value = false;
-    Message.info('録画ファイルの削除を開始します。完了までしばらくお待ちください。');
+    Message.info(t('videos.program.delete_started'));
 
     const result = await Videos.deleteVideo(props.program.id);
     if (result === true) {
-        Message.success('録画ファイルを削除しました。');
+        Message.success(t('videos.program.file_deleted'));
         // 親コンポーネントに削除イベントを発行
         emit('deleted', props.program.id);
     }

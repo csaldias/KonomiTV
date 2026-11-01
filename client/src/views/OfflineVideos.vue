@@ -7,15 +7,15 @@
             <div class="offline-videos-container-wrapper">
                 <div class="offline-videos-container">
                     <Breadcrumbs :crumbs="[
-                        {name: 'ホーム', path: '/'},
-                        {name: 'オフライン保存', path: '/offline-videos/', disabled: true},
+                        {name: $t('common.home'), path: '/'},
+                        {name: $t('navigation.offline_videos'), path: '/offline-videos/', disabled: true},
                     ]" />
-                    <RecordedProgramList title="オフライン保存" :programs="displayPrograms"
+                    <RecordedProgramList :title="$t('navigation.offline_videos')" :programs="displayPrograms"
                         :total="displayTotal" :hideSort="true" :hidePagination="true" :showBackButton="true"
                         :showEmptyMessage="isLoading === false" :isLoading="isLoading" :forOffline="true"
                         :offlineVideos="videos" :offlineJobs="visibleOfflineJobs"
-                        emptyIcon="fluent:cloud-off-24-regular" emptyMessage="オフライン保存した番組はありません。"
-                        emptySubMessage="録画番組のメニューまたは視聴画面から保存できます。"
+                        emptyIcon="fluent:cloud-off-24-regular" :emptyMessage="$t('videos.offline.empty')"
+                        :emptySubMessage="$t('videos.offline.empty_sub')"
                         @cancelOfflineJob="cancelJob" @dismissOfflineJob="dismissJob">
                         <template #after-header>
                             <section class="offline-videos-storage">
@@ -24,9 +24,9 @@
                                         <Icon icon="fluent:cloud-arrow-down-20-filled" width="24px" height="24px" />
                                     </div>
                                     <div class="offline-videos-storage__content">
-                                        <div class="offline-videos-storage__label">オフライン保存済み</div>
+                                        <div class="offline-videos-storage__label">{{ $t('videos.offline.saved') }}</div>
                                         <div class="offline-videos-storage__value">
-                                            {{isLoading === true ? '読み込み中...' : Utils.formatBytes(savedSizeBytes, 2, true)}}
+                                            {{isLoading === true ? $t('common.loading') : Utils.formatBytes(savedSizeBytes, 2, true)}}
                                         </div>
                                     </div>
                                 </div>
@@ -35,9 +35,9 @@
                                         <Icon icon="material-symbols:storage-rounded" width="24px" height="24px" />
                                     </div>
                                     <div class="offline-videos-storage__content">
-                                        <div class="offline-videos-storage__label">ストレージクオータ</div>
+                                        <div class="offline-videos-storage__label">{{ $t('videos.offline.storage_quota') }}</div>
                                         <div class="offline-videos-storage__value">
-                                            <template v-if="isLoading === true">読み込み中...</template>
+                                            <template v-if="isLoading === true">{{ $t('common.loading') }}</template>
                                             <template v-else>
                                                 {{Utils.formatBytes(storageUsageBytes, 2, true)}} / {{Utils.formatBytes(storageQuotaBytes, 2, true)}}
                                             </template>
@@ -55,6 +55,7 @@
 <script lang="ts" setup>
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import HeaderBar from '@/components/HeaderBar.vue';
@@ -65,6 +66,8 @@ import Message from '@/message';
 import OfflineVideos, { type IOfflineDownloadJob, type IOfflineVideo } from '@/services/OfflineVideos';
 import { type IRecordedProgram } from '@/services/Videos';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 const videos = ref<IOfflineVideo[]>([]);
 const jobs = ref<IOfflineDownloadJob[]>([]);
@@ -199,7 +202,7 @@ const cancelJob = async (jobID: string): Promise<void> => {
     try {
         await OfflineVideos.cancel(jobID);
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : 'オフライン保存をキャンセルできませんでした。');
+        Message.error(error instanceof Error ? error.message : t('videos.offline.cancel_failed'));
     } finally {
         await refresh();
     }
@@ -210,7 +213,7 @@ const dismissJob = async (jobID: string): Promise<void> => {
     try {
         await OfflineVideos.dismissJob(jobID);
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : '失敗した保存ジョブを削除できませんでした。');
+        Message.error(error instanceof Error ? error.message : t('videos.offline.dismiss_failed'));
     } finally {
         await refresh();
     }

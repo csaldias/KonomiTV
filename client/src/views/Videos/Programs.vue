@@ -7,12 +7,12 @@
                 <SPHeaderBar />
                 <div class="recorded-programs-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: 'ビデオをみる', path: '/videos/' },
-                        { name: '録画番組一覧', path: '/videos/programs', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.videos'), path: '/videos/' },
+                        { name: $t('videos.list.all_programs'), path: '/videos/programs', disabled: true },
                     ]" />
                     <RecordedProgramList
-                        title="録画番組一覧"
+                        :title="$t('videos.list.all_programs')"
                         :programs="programs"
                         :total="total_programs"
                         :page="current_page"

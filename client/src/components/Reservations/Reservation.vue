@@ -22,7 +22,7 @@
                 </div>
                 <div v-else class="reservation__priority">
                     <div class="reservation__priority-badge">{{ reservation.record_settings.priority }}</div>
-                    <div class="reservation__priority-label">優先度</div>
+                    <div class="reservation__priority-label">{{ $t('reservations.card.priority') }}</div>
                 </div>
                 <div v-if="!shouldShowProgramSearchAddButton && !reservation.is_recording_in_progress" class="reservation__toggle" @click="handleSwitchClick">
                     <v-switch
@@ -33,7 +33,7 @@
                         @update:model-value="handleToggleEnabled"
                         @click="handleSwitchClick"
                     ></v-switch>
-                    <div class="reservation__toggle-label">{{ isEnabled ? '有効' : '無効' }}</div>
+                    <div class="reservation__toggle-label">{{ isEnabled ? $t('reservations.card.enabled') : $t('reservations.card.disabled') }}</div>
                 </div>
                 <div v-else-if="!shouldShowProgramSearchAddButton" class="reservation__recording">
                     <div class="reservation__recording-icon"></div>
@@ -92,7 +92,7 @@
                         </div>
                         <div class="reservation__content-meta-size">
                             <Icon icon="fluent:hard-drive-20-filled" width="14px" height="14px" class="reservation__content-meta-size-icon" />
-                            約 {{ Utils.formatBytes(reservation.estimated_recording_file_size, 1, true) }}
+                            {{ $t('reservations.card.estimated_size', {size: Utils.formatBytes(reservation.estimated_recording_file_size, 1, true)}) }}
                         </div>
                     </div>
                     <!-- PC版のみ：上段右側の時刻表示 -->
@@ -118,13 +118,13 @@
                         </div>
                         <div class="reservation__content-description-size">
                             <Icon icon="fluent:hard-drive-20-filled" width="14px" height="14px" class="reservation__content-description-size-icon" />
-                            約 {{ Utils.formatBytes(reservation.estimated_recording_file_size, 1, true) }}
+                            {{ $t('reservations.card.estimated_size', {size: Utils.formatBytes(reservation.estimated_recording_file_size, 1, true)}) }}
                         </div>
                     </div>
                     <!-- PC・タブレット横版：概要行の右側に推定録画容量を表示 -->
                     <div v-if="!shouldShowProgramSearchAddButton" class="reservation__content-description-size-pc">
                         <Icon icon="fluent:hard-drive-20-filled" width="14px" height="14px" class="reservation__content-description-size-icon" />
-                        約 {{ Utils.formatBytes(reservation.estimated_recording_file_size, 1, true) }}
+                        {{ $t('reservations.card.estimated_size', {size: Utils.formatBytes(reservation.estimated_recording_file_size, 1, true)}) }}
                     </div>
                 </div>
             </div>
@@ -134,10 +134,13 @@
 <script lang="ts" setup>
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Message from '@/message';
 import Reservations, { IReservation } from '@/services/Reservations';
 import Utils, { ProgramUtils, dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
@@ -183,9 +186,9 @@ const isDisplayDisabled = computed(() => {
 
 const programSearchActionLabel = computed(() => {
     if (isPastProgram.value === true) {
-        return '終了済み';
+        return t('reservations.card.ended');
     }
-    return '録画追加';
+    return t('reservations.card.add_recording');
 });
 
 const programSearchActionIcon = computed(() => {
@@ -205,7 +208,7 @@ const programSearchActionColor = computed(() => {
 const displayStatusLabel = computed(() => {
     // 番組検索を開いたまま放送終了を跨いだ場合は、録画可否ではなく現在の番組状態を優先する
     if (props.isProgramSearchResult === true && isPastProgram.value === true) {
-        return '放送終了';
+        return t('reservations.card.broadcast_ended');
     }
     return getReservationStatusLabel(props.reservation);
 });
@@ -221,7 +224,7 @@ const countdownStatusLabel = computed(() => {
     if (shouldShowProgramSearchAddButton.value === true && now.isSameOrAfter(startTime) && now.isBefore(endTime)) {
         // 検索結果画面かつ予約が入っていない番組では、「録画中」ツールチップが表示されないため、
         // 代わりに放送中である旨をツールチップに表示する
-        return '放送中';
+        return t('reservations.card.on_air');
     }
 
     if (props.reservation.is_recording_in_progress === true || now.isSameOrAfter(startTime)) {
@@ -236,12 +239,12 @@ const countdownStatusLabel = computed(() => {
     const hours = Math.floor(diffMinutes / 60);
     const minutes = diffMinutes % 60;
     if (hours === 0) {
-        return `${minutes}分後`;
+        return t('reservations.card.in_minutes', {minutes});
     }
     if (minutes === 0) {
-        return `${hours}時間後`;
+        return t('reservations.card.in_hours', {hours});
     }
-    return `${hours}時間${minutes}分後`;
+    return t('reservations.card.in_hours_minutes', {hours, minutes});
 });
 
 const displayStatusIcon = computed(() => {
@@ -299,18 +302,18 @@ const onLogoError = (event: Event) => {
 // 予約状態のラベルを取得
 const getReservationStatusLabel = (reservation: IReservation): string => {
     if (reservation.is_recording_in_progress) {
-        return '録画中';
+        return t('reservations.card.recording');
     }
 
     switch (reservation.recording_availability) {
         case 'Full':
-            return '録画可能';
+            return t('reservations.card.recordable');
         case 'Partial':
-            return '一部のみ録画可能';
+            return t('reservations.card.partially_recordable');
         case 'Unavailable':
-            return 'チューナー不足';
+            return t('reservations.card.tuner_shortage');
         default:
-            return '不明';
+            return t('common.unknown');
     }
 };
 
@@ -370,8 +373,8 @@ const handleToggleEnabled = async () => {
         const result = await Reservations.updateReservation(props.reservation.id, updatedSettings);
         if (result) {
             const message = isEnabled.value
-                ? '録画予約を有効にしました。\n番組開始時刻になると自動的に録画が開始されます。'
-                : '録画予約を無効にしました。\n番組開始時刻までに再度予約を有効にしない限り、この番組は録画されません。';
+                ? t('timetable.reservation_enabled')
+                : t('timetable.reservation_disabled');
             Message.success(message);
         } else {
             // 失敗時は元の状態に戻す
@@ -398,12 +401,12 @@ const handleAddButtonClick = async (event: Event) => {
     try {
         const isSuccess = await Reservations.addReservation(props.reservation.program.id, props.reservation.record_settings);
         if (isSuccess === true) {
-            Message.success('録画予約を追加しました。');
+            Message.success(t('timetable.reservation_added'));
             emit('added', props.reservation);
         }
     } catch (error) {
         console.error('Failed to add reservation:', error);
-        Message.error('録画予約の追加に失敗しました。');
+        Message.error(t('reservations.card.add_failed'));
     } finally {
         isAddingReservation.value = false;
     }

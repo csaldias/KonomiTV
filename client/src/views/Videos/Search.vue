@@ -7,12 +7,12 @@
                 <SPHeaderBar />
                 <div class="videos-search-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: 'ビデオをみる', path: '/videos/' },
-                        { name: '検索結果', path: `/videos/search?query=${encodeURIComponent(query)}`, disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.videos'), path: '/videos/' },
+                        { name: $t('common.search_results'), path: `/videos/search?query=${encodeURIComponent(query)}`, disabled: true },
                     ]" />
                     <RecordedProgramList
-                        :title="Utils.isSmartphoneVertical() ? '検索結果' : `「${query}」の検索結果`"
+                        :title="Utils.isSmartphoneVertical() ? $t('common.search_results') : $t('common.search_results_for', {keyword: query})"
                         :programs="programs"
                         :total="total_programs"
                         :page="current_page"
@@ -21,13 +21,13 @@
                         :isSearching="is_searching"
                         :showBackButton="true"
                         :breadcrumbs="[
-                            { name: 'ビデオをみる', path: '/videos/' },
-                            { name: '検索結果', path: `/videos/search?query=${encodeURIComponent(query)}` },
+                            { name: $t('navigation.videos'), path: '/videos/' },
+                            { name: $t('common.search_results'), path: `/videos/search?query=${encodeURIComponent(query)}` },
                         ]"
                         @update:page="updatePage"
                         @update:sortOrder="updateSortOrder($event as SortOrder)"
-                        :emptyMessage="`「${query}」に一致する録画番組は<br class='d-sm-none'>見つかりませんでした。`"
-                        :emptySubMessage="'別のキーワードで検索をお試しください。'"
+                        :emptyMessage="$t('videos.list.search_empty', {keyword: Utils.escapeHTML(query)})"
+                        :emptySubMessage="$t('videos.list.search_empty_sub')"
                         :showEmptyMessage="!is_loading" />
                 </div>
             </div>

@@ -7,11 +7,11 @@
             <div class="watched-history-container-wrapper">
                 <div class="watched-history-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: '視聴履歴', path: '/watched-history/', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.watched_history'), path: '/watched-history/', disabled: true },
                     ]" />
                     <RecordedProgramList
-                        title="視聴履歴"
+                        :title="$t('navigation.watched_history')"
                         :programs="programs"
                         :total="total_programs"
                         :page="current_page"
@@ -20,8 +20,8 @@
                         :showBackButton="true"
                         :showEmptyMessage="!is_loading"
                         :emptyIcon="'fluent:history-20-regular'"
-                        :emptyMessage="'まだ視聴履歴がありません。'"
-                        :emptySubMessage="'録画番組を30秒以上みると、<br class=\'d-sm-none\'>視聴履歴に追加されます。'"
+                        :emptyMessage="$t('videos.list.history_empty')"
+                        :emptySubMessage="$t('videos.list.history_empty_sub')"
                         :forWatchedHistory="true"
                         @update:page="updatePage" />
                 </div>

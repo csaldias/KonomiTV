@@ -1,9 +1,9 @@
 <template>
     <CapturePage :crumbs="[
-        { name: 'ホーム', path: '/' },
-        { name: 'キャプチャ', path: '/captures/' },
-        { name: '番組別', path: '/captures/programs/' },
-        { name: program ? program.title : '番組', path: route.fullPath, disabled: true },
+        { name: $t('common.home'), path: '/' },
+        { name: $t('navigation.captures'), path: '/captures/' },
+        { name: $t('captures.common.by_program'), path: '/captures/programs/' },
+        { name: program ? program.title : $t('captures.program.program'), path: route.fullPath, disabled: true },
     ]">
         <div class="capture-program">
             <!-- 番組名から並べ替えまでの見出しの部分 (スマホの縦画面ではマイリストの見出しと同じく左右に 8px を加える) -->
@@ -14,7 +14,7 @@
                         <Icon icon="fluent:chevron-left-12-filled" width="27px" />
                     </div>
                     <h2 class="capture-program__title" v-if="program" v-html="ProgramUtils.decorateProgramInfo(program, 'title')"></h2>
-                    <h2 class="capture-program__title" v-else>{{ isLoading ? '読み込み中...' : 'この番組のキャプチャ' }}</h2>
+                    <h2 class="capture-program__title" v-else>{{ isLoading ? $t('common.loading') : $t('captures.common.captures_of_program') }}</h2>
                 </div>
                 <!-- PC では番組の情報の右に並べ替えを置き、並べ替えのためだけの段を作らない (スマホの縦画面では一覧の直前に置く) -->
                 <div class="capture-program__body">
@@ -25,16 +25,16 @@
                             <v-btn color="primary" variant="flat" height="38" class="capture-program__action"
                                 :to="`/videos/watch/${program.recorded_program_ids[0]}`">
                                 <Icon icon="fluent:play-20-filled" width="18px" />
-                                <span class="ml-2">録画を再生</span>
+                                <span class="ml-2">{{ $t('captures.common.play_recording') }}</span>
                             </v-btn>
                         </div>
                     </div>
                     <div v-if="captures.length > 0" class="capture-program__toolbar">
                     <v-select v-model="order" class="capture-program__order"
                         :items="[
-                            { title: '再生位置順', value: 'PlaybackPosition' },
-                            { title: '撮影日時が新しい順', value: 'CapturedAtDesc' },
-                            { title: '撮影日時が古い順', value: 'CapturedAtAsc' },
+                            { title: $t('captures.program.sort_position'), value: 'PlaybackPosition' },
+                            { title: $t('captures.program.sort_captured_desc'), value: 'CapturedAtDesc' },
+                            { title: $t('captures.program.sort_captured_asc'), value: 'CapturedAtAsc' },
                         ]"
                         color="primary" bg-color="background-lighten-1" variant="solo" density="comfortable" hide-details flat />
                     </div>
@@ -43,13 +43,13 @@
 
             <div v-if="isLoadFailed" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:cloud-error-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">キャプチャを読み込めませんでした。</div>
-                <div class="capture-empty__sub">KonomiTV サーバーが起動しているか確認してから、ページを再読み込みしてください。</div>
+                <div class="capture-empty__message">{{ $t('captures.timeline.load_failed') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.common.load_failed_sub') }}</div>
             </div>
             <div v-else-if="!isLoading && captures.length === 0" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:image-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">この番組のキャプチャはまだありません。</div>
-                <div class="capture-empty__sub">この番組の視聴中にキャプチャを撮影すると、<br class="d-sm-none">ここに表示されます。</div>
+                <div class="capture-empty__message">{{ $t('captures.program.empty') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.program.empty_sub') }}</div>
             </div>
 
             <div class="capture-program__grid" :class="{'capture-program__grid--captions': hasCaptions}">

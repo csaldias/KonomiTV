@@ -8,10 +8,10 @@
         <!-- お気に入りとタグはログインが必要 -->
         <div v-if="needsLogin" class="capture-empty">
             <Icon class="capture-empty__icon" icon="fluent:person-20-regular" width="54px" height="54px" />
-            <div class="capture-empty__message">お気に入りとタグを使うには、ログインが必要です。</div>
-            <div class="capture-empty__sub">お気に入りやタグは、アカウントごとに分けて保存されます。</div>
+            <div class="capture-empty__message">{{ $t('captures.timeline.login_required') }}</div>
+            <div class="capture-empty__sub">{{ $t('captures.common.login_required_sub') }}</div>
             <v-btn class="mt-6 px-4" color="secondary" variant="flat" height="40" to="/login/">
-                <Icon icon="fa:sign-in" class="mr-2" />ログイン
+                <Icon icon="fa:sign-in" class="mr-2" />{{ $t('account.login') }}
             </v-btn>
         </div>
         <template v-else>
@@ -21,8 +21,8 @@
             </div>
             <div v-else-if="isLoadFailed" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:cloud-error-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">キャプチャを読み込めませんでした。</div>
-                <div class="capture-empty__sub">KonomiTV サーバーが起動しているか確認してから、ページを再読み込みしてください。</div>
+                <div class="capture-empty__message">{{ $t('captures.timeline.load_failed') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.common.load_failed_sub') }}</div>
             </div>
             <div v-else-if="isLoaded && total === 0" class="capture-empty">
                 <Icon class="capture-empty__icon" :icon="emptyIcon" width="54px" height="54px" />
@@ -31,11 +31,11 @@
                 <!-- 条件で0件になったときは、その場で条件を外せるようにする -->
                 <v-btn v-if="hasViewFilter" class="mt-6 px-4" color="secondary" variant="flat" height="40" @click="clearViewFilter">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">絞り込みをすべて解除</span>
+                    <span class="ml-1">{{ $t('captures.common.clear_filters') }}</span>
                 </v-btn>
                 <v-btn v-else-if="queryTargets.length > 0" class="mt-6 px-4" color="secondary" variant="flat" height="40" @click="updateQueryTargets([])">
                     <Icon icon="fluent:search-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">すべての範囲から検索</span>
+                    <span class="ml-1">{{ $t('captures.timeline.search_all_scopes') }}</span>
                 </v-btn>
             </div>
             <CaptureTimeline ref="timelineRef" :filter="filter" :axis="axis" :day-start-hour="dayStartHour"
@@ -50,6 +50,7 @@
 <script lang="ts" setup>
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import CaptureHeader from '@/components/Captures/CaptureHeader.vue';
@@ -63,6 +64,8 @@ import Captures, { CaptureQueryTarget, CaptureTimelineAxis, ICapture, ICaptureFi
 import useSettingsStore from '@/stores/SettingsStore';
 import useUserStore from '@/stores/UserStore';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 
 /** このページで出すタイムラインの種類 (ルートの meta で決まる) */
@@ -171,20 +174,20 @@ const activeTab = computed(() => {
 });
 const title = computed(() => {
     switch (mode.value) {
-        case 'Favorites': return 'お気に入り';
-        case 'Tag': return tagName.value ?? 'タグ';
+        case 'Favorites': return t('captures.common.favorites');
+        case 'Tag': return tagName.value ?? t('captures.common.tag');
         // スマホの縦画面では、録画番組の検索結果と同じく「検索結果」に短くする (検索語は検索欄に残っている)
-        case 'Search': return Utils.isSmartphoneVertical() ? '検索結果' : `「${searchQuery.value}」の検索結果`;
-        default: return 'キャプチャ';
+        case 'Search': return Utils.isSmartphoneVertical() ? t('common.search_results') : t('common.search_results_for', {keyword: searchQuery.value});
+        default: return t('navigation.captures');
     }
 });
 const crumbs = computed(() => {
-    const base = [{ name: 'ホーム', path: '/' }, { name: 'キャプチャ', path: '/captures/' }];
+    const base = [{ name: t('common.home'), path: '/' }, { name: t('navigation.captures'), path: '/captures/' }];
     switch (mode.value) {
-        case 'Favorites': return [...base, { name: 'お気に入り', path: '/captures/favorites/', disabled: true }];
-        case 'Tag': return [...base, { name: 'タグ別', path: '/captures/tags/' }, { name: tagName.value ?? 'タグ', path: route.path, disabled: true }];
-        case 'Search': return [...base, { name: '検索結果', path: route.fullPath, disabled: true }];
-        default: return [{ name: 'ホーム', path: '/' }, { name: 'キャプチャ', path: '/captures/', disabled: true }];
+        case 'Favorites': return [...base, { name: t('captures.common.favorites'), path: '/captures/favorites/', disabled: true }];
+        case 'Tag': return [...base, { name: t('captures.common.by_tag'), path: '/captures/tags/' }, { name: tagName.value ?? t('captures.common.tag'), path: route.path, disabled: true }];
+        case 'Search': return [...base, { name: t('common.search_results'), path: route.fullPath, disabled: true }];
+        default: return [{ name: t('common.home'), path: '/' }, { name: t('navigation.captures'), path: '/captures/', disabled: true }];
     }
 });
 const emptyIcon = computed(() => mode.value === 'Favorites' ? 'fluent:heart-20-regular' : mode.value === 'Search' ? 'fluent:search-20-regular' : 'fluent:image-20-regular');
@@ -200,34 +203,34 @@ const hasViewFilter = computed(() => {
 
 const emptyMessage = computed(() => {
     if (hasViewFilter.value) {
-        return '条件に一致するキャプチャはありません。';
+        return t('captures.timeline.empty_filtered');
     }
     if (mode.value === 'Favorites') {
-        return 'お気に入りに追加したキャプチャはまだありません。';
+        return t('captures.timeline.empty_favorites');
     }
     if (mode.value === 'Tag') {
-        return 'このタグが付与されたキャプチャはまだありません。';
+        return t('captures.timeline.empty_tag');
     }
     if (mode.value === 'Search') {
-        return '条件に一致するキャプチャは見つかりませんでした。';
+        return t('captures.timeline.empty_search');
     }
-    return 'キャプチャはまだありません。';
+    return t('captures.timeline.empty');
 });
 const emptySubMessage = computed(() => {
     if (hasViewFilter.value) {
-        return '絞り込み条件を解除すると、<br class="d-sm-none">他のキャプチャも表示されます。';
+        return t('captures.timeline.empty_filtered_sub');
     }
     if (mode.value === 'Favorites') {
-        return 'キャプチャをお気に入りに追加すると、<br class="d-sm-none">ここに表示されます。';
+        return t('captures.timeline.empty_favorites_sub');
     }
     if (mode.value === 'Search' && queryTargets.value.length > 0) {
-        return '検索する範囲の選択をすべて外すと、<br class="d-sm-none">チャンネル名やファイル名も含めて検索します。';
+        return t('captures.timeline.empty_search_scoped_sub');
     }
     if (mode.value === 'Search') {
-        return '字幕テキスト・番組名・番組概要・チャンネル名・ファイル名から検索できます。<br>空白で区切ると、すべてを含むキャプチャを検索します。';
+        return t('captures.timeline.empty_search_sub');
     }
     if (mode.value === 'Timeline') {
-        return '視聴画面でキャプチャを撮影するか、保存先フォルダに画像が追加されると、<br class="d-none d-sm-inline">ここに表示されます。';
+        return t('captures.timeline.empty_sub');
     }
     return '';
 });

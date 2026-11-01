@@ -1,17 +1,17 @@
 <template>
     <CapturePage :crumbs="[
-        { name: 'ホーム', path: '/' },
-        { name: 'キャプチャ', path: '/captures/' },
-        { name: 'タグ別', path: '/captures/tags/', disabled: true },
+        { name: $t('common.home'), path: '/' },
+        { name: $t('navigation.captures'), path: '/captures/' },
+        { name: $t('captures.common.by_tag'), path: '/captures/tags/', disabled: true },
     ]">
-        <CaptureHeader title="タグ別" :total="null" active-tab="Tags" />
+        <CaptureHeader :title="$t('captures.common.by_tag')" :total="null" active-tab="Tags" />
 
         <div v-if="!isLoggedIn && !isLoading" class="capture-empty">
             <Icon class="capture-empty__icon" icon="fluent:person-20-regular" width="54px" height="54px" />
-            <div class="capture-empty__message">タグを使うには、ログインが必要です。</div>
-            <div class="capture-empty__sub">お気に入りやタグは、アカウントごとに分けて保存されます。</div>
+            <div class="capture-empty__message">{{ $t('captures.tags.login_required') }}</div>
+            <div class="capture-empty__sub">{{ $t('captures.common.login_required_sub') }}</div>
             <v-btn class="mt-6 px-4" color="secondary" variant="flat" height="40" to="/login/">
-                <Icon icon="fa:sign-in" class="mr-2" />ログイン
+                <Icon icon="fa:sign-in" class="mr-2" />{{ $t('account.login') }}
             </v-btn>
         </div>
         <!-- ログイン状態の確認中も、ほかのキャプチャの画面と同じく中央にスピナーを表示する -->
@@ -23,14 +23,14 @@
             <!-- タグの作成は、絞り込みの入力と取り違えないよう、右のボタンからダイアログで行う -->
             <div class="capture-tags__toolbar">
                 <v-text-field v-model="queryInput" class="capture-tags__search" color="primary" bg-color="background-lighten-1"
-                    variant="solo" density="comfortable" hide-details flat clearable placeholder="タグの名前で絞り込む">
+                    variant="solo" density="comfortable" hide-details flat clearable :placeholder="$t('captures.tags.filter_placeholder')">
                     <template #prepend-inner>
                         <Icon icon="fluent:search-20-regular" width="18px" class="text-text-darken-1" />
                     </template>
                 </v-text-field>
                 <v-btn color="primary" variant="flat" height="48" class="capture-tags__create-button" @click="startCreate">
                     <Icon icon="fluent:add-12-filled" width="18px" />
-                    <span class="ml-1">タグを作成</span>
+                    <span class="ml-1">{{ $t('captures.tags.create') }}</span>
                 </v-btn>
             </div>
 
@@ -40,25 +40,25 @@
             </div>
             <div v-else-if="isLoadFailed" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:cloud-error-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">タグの一覧を読み込めませんでした。</div>
-                <div class="capture-empty__sub">KonomiTV サーバーが起動しているか確認してから、ページを再読み込みしてください。</div>
+                <div class="capture-empty__message">{{ $t('captures.tags.load_failed') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.common.load_failed_sub') }}</div>
             </div>
             <div v-else-if="tags.length === 0" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:tag-multiple-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">タグはまだありません。</div>
-                <div class="capture-empty__sub">キャプチャの詳細や「タグを作成」ボタンから、タグを作成して付与できます。<br>1枚のキャプチャに複数のタグを付与することもできます。</div>
+                <div class="capture-empty__message">{{ $t('captures.tags.empty') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.tags.empty_sub') }}</div>
             </div>
             <div v-else-if="filteredTags.length === 0" class="capture-empty">
                 <Icon class="capture-empty__icon" icon="fluent:search-20-regular" width="54px" height="54px" />
-                <div class="capture-empty__message">条件に一致するタグはありません。</div>
-                <div class="capture-empty__sub">検索キーワードを消去すると、他のタグも表示されます。</div>
+                <div class="capture-empty__message">{{ $t('captures.tags.empty_filtered') }}</div>
+                <div class="capture-empty__sub">{{ $t('captures.tags.empty_filtered_sub') }}</div>
             </div>
             <div class="capture-tags__list">
                 <router-link v-for="tag in filteredTags" :key="tag.id" v-ripple class="capture-tag-card" :to="`/captures/tags/${tag.id}`">
                     <Icon class="capture-tag-card__icon" icon="fluent:tag-20-filled" width="22px" />
                     <div class="capture-tag-card__body">
                         <div class="capture-tag-card__name">{{ tag.name }}</div>
-                        <div class="capture-tag-card__count">{{ tag.capture_count.toLocaleString() }}枚</div>
+                        <div class="capture-tag-card__count">{{ $t('captures.common.count_unit', {count: tag.capture_count.toLocaleString()}) }}</div>
                     </div>
                     <v-menu location="bottom end">
                         <template #activator="{ props: menuProps }">
@@ -69,12 +69,12 @@
                         <v-list density="compact" bg-color="background-lighten-1">
                             <v-list-item @click="startRename(tag)">
                                 <template #prepend><Icon icon="fluent:rename-20-regular" width="20px" /></template>
-                                <v-list-item-title class="ml-3">名前を変更</v-list-item-title>
+                                <v-list-item-title class="ml-3">{{ $t('captures.tags.rename') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider></v-divider>
                             <v-list-item class="text-error" @click="deletingTag = tag">
                                 <template #prepend><Icon icon="fluent:delete-20-regular" width="20px" /></template>
-                                <v-list-item-title class="ml-3">タグを削除</v-list-item-title>
+                                <v-list-item-title class="ml-3">{{ $t('captures.tags.delete') }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -85,61 +85,60 @@
         <!-- 見出し・余白・ボタンの並びは、ほかの画面の入力欄のあるダイアログ (Twitter.vue のアカウント連携など) と同じ作りにする -->
         <v-dialog max-width="480" :model-value="isCreateOpen" @update:model-value="isCreateOpen = false">
             <v-card>
-                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">タグを作成</v-card-title>
+                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('captures.tags.create') }}</v-card-title>
                 <v-card-text class="pt-2 pb-0">
                     <v-text-field v-model="newTagName" class="mt-4" color="primary" variant="outlined" hide-details
-                        label="タグの名前" placeholder="作品名、キャラクター名、名シーンなど" maxlength="100" autofocus
+                        :label="$t('captures.tags.tag_name')" :placeholder="$t('captures.tags.name_placeholder')" maxlength="100" autofocus
                         @keydown.enter="createTag" />
                 </v-card-text>
                 <v-card-actions class="pt-6 px-6 pb-6">
                     <v-spacer></v-spacer>
                     <v-btn color="text" variant="text" height="40" @click="isCreateOpen = false">
                         <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                        <span class="ml-1">キャンセル</span>
+                        <span class="ml-1">{{ $t('common.cancel') }}</span>
                     </v-btn>
                     <v-btn color="secondary" variant="flat" height="40" class="px-3" :disabled="newTagName.trim() === ''" @click="createTag()">
                         <Icon icon="fluent:add-16-filled" width="18px" height="18px" />
-                        <span class="ml-1">タグを作成</span>
+                        <span class="ml-1">{{ $t('captures.tags.create') }}</span>
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
         <v-dialog max-width="480" :model-value="renamingTag !== null" @update:model-value="renamingTag = null">
             <v-card>
-                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">タグの名前を変更</v-card-title>
+                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('captures.tags.rename_title') }}</v-card-title>
                 <v-card-text class="pt-2 pb-0">
                     <v-text-field v-model="renameInput" class="mt-4" color="primary" variant="outlined" hide-details
-                        label="タグの名前" maxlength="100" autofocus @keydown.enter="renameTag" />
+                        :label="$t('captures.tags.tag_name')" maxlength="100" autofocus @keydown.enter="renameTag" />
                 </v-card-text>
                 <v-card-actions class="pt-6 px-6 pb-6">
                     <v-spacer></v-spacer>
                     <v-btn color="text" variant="text" height="40" @click="renamingTag = null">
                         <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                        <span class="ml-1">キャンセル</span>
+                        <span class="ml-1">{{ $t('common.cancel') }}</span>
                     </v-btn>
                     <v-btn color="secondary" variant="flat" height="40" class="px-3" :disabled="renameInput.trim() === ''" @click="renameTag()">
                         <Icon icon="fluent:rename-16-regular" width="18px" height="18px" />
-                        <span class="ml-1">名前を変更</span>
+                        <span class="ml-1">{{ $t('captures.tags.rename') }}</span>
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
         <v-dialog max-width="480" :model-value="deletingTag !== null" @update:model-value="deletingTag = null">
             <v-card>
-                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">タグ「{{ deletingTag?.name }}」を削除しますか？</v-card-title>
+                <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('captures.tags.delete_title', {name: deletingTag?.name ?? ''}) }}</v-card-title>
                 <v-card-text class="pt-2 pb-0">
-                    このタグは、付与されているすべてのキャプチャから解除されます。<br>
-                    キャプチャ画像自体は削除されません。
+                    <span v-html="$t('captures.tags.delete_text')"></span>
                 </v-card-text>
                 <v-card-actions class="pt-4 px-6 pb-6">
                     <v-spacer></v-spacer>
                     <v-btn color="text" variant="text" height="40" @click="deletingTag = null">
                         <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                        <span class="ml-1">キャンセル</span>
+                        <span class="ml-1">{{ $t('common.cancel') }}</span>
                     </v-btn>
                     <v-btn color="error" variant="flat" height="40" class="px-3" @click="deleteTag">
                         <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                        <span class="ml-1">タグを削除</span>
+                        <span class="ml-1">{{ $t('captures.tags.delete') }}</span>
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -149,6 +148,7 @@
 <script lang="ts" setup>
 
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import CaptureHeader from '@/components/Captures/CaptureHeader.vue';
 import CapturePage from '@/components/Captures/CapturePage.vue';
@@ -156,6 +156,8 @@ import Message from '@/message';
 import Captures, { ICaptureTag } from '@/services/Captures';
 import useUserStore from '@/stores/UserStore';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 
 const userStore = useUserStore();
@@ -205,7 +207,7 @@ const createTag = async (event?: KeyboardEvent) => {
     if (tag !== null) {
         isCreateOpen.value = false;
         newTagName.value = '';
-        Message.success(`タグ「${tag.name}」を作成しました。`);
+        Message.success(t('captures.tags.created', {name: tag.name}));
         await load();
     }
 };
@@ -242,7 +244,7 @@ const deleteTag = async () => {
     const success = await Captures.deleteTag(deletingTag.value.id);
     deletingTag.value = null;
     if (success) {
-        Message.success(`タグ「${name}」を削除しました。`);
+        Message.success(t('captures.tags.deleted', {name}));
         await load();
     }
 };

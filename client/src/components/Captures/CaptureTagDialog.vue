@@ -4,8 +4,8 @@
         <v-card class="capture-tag-dialog">
             <v-card-title class="px-5 pt-6 pb-3 d-flex align-center font-weight-bold" style="height: 60px;">
                 <Icon icon="fluent:tag-20-filled" height="26px" />
-                <span class="ml-3">タグを付ける</span>
-                <span class="capture-tag-dialog__target">{{ captures.length.toLocaleString() }}枚</span>
+                <span class="ml-3">{{ $t('captures.common.add_tags') }}</span>
+                <span class="capture-tag-dialog__target">{{ $t('captures.common.count_unit', {count: captures.length.toLocaleString()}) }}</span>
                 <v-spacer></v-spacer>
                 <div v-ripple class="d-flex align-center rounded-circle cursor-pointer px-2 py-2" @click="$emit('update:show', false)">
                     <Icon icon="fluent:dismiss-12-filled" width="23px" height="23px" />
@@ -14,12 +14,12 @@
             <div class="capture-tag-dialog__body px-5 pb-6">
                 <!-- 付けられるタグの一覧 (押すたびに付け外しする) -->
                 <div class="capture-tag-dialog__list">
-                    <div v-if="isLoading" class="capture-tag-dialog__empty">タグを読み込んでいます...</div>
+                    <div v-if="isLoading" class="capture-tag-dialog__empty">{{ $t('captures.tag_dialog.loading') }}</div>
                     <div v-else-if="isLoadFailed" class="capture-tag-dialog__empty">
-                        タグの一覧を読み込めませんでした。<br>KonomiTV サーバーが起動しているか確認してから、もう一度お試しください。
+                        <span v-html="$t('captures.tag_dialog.load_failed')"></span>
                     </div>
                     <div v-else-if="tags.length === 0" class="capture-tag-dialog__empty">
-                        タグはまだありません。<br>下の入力欄から、新しいタグを追加できます。
+                        <span v-html="$t('captures.tag_dialog.empty')"></span>
                     </div>
                     <div v-for="tag in tags" :key="tag.id" v-ripple class="capture-tag-dialog__item" @click="toggleTag(tag)">
                         <Icon class="capture-tag-dialog__item-check"
@@ -27,7 +27,7 @@
                             :class="{'capture-tag-dialog__item-check--on': stateOf(tag) !== 'None'}"
                             width="22px" height="22px" />
                         <span class="capture-tag-dialog__item-name">{{ tag.name }}</span>
-                        <span class="capture-tag-dialog__item-count">{{ tag.capture_count.toLocaleString() }}枚</span>
+                        <span class="capture-tag-dialog__item-count">{{ $t('captures.common.count_unit', {count: tag.capture_count.toLocaleString()}) }}</span>
                     </div>
                 </div>
 
@@ -35,11 +35,11 @@
                 <div class="capture-tag-dialog__create">
                     <v-text-field v-model="newTagName" class="capture-tag-dialog__create-field"
                         color="primary" variant="outlined" density="compact" hide-details
-                        placeholder="新しいタグの名前" maxlength="100" @keydown.enter="createTag" />
+                        :placeholder="$t('captures.tag_dialog.new_tag_placeholder')" maxlength="100" @keydown.enter="createTag" />
                     <v-btn class="capture-tag-dialog__create-button px-3" color="secondary" variant="flat" height="40"
                         :disabled="newTagName.trim() === '' || isBusy" @click="createTag()">
                         <Icon icon="fluent:add-12-filled" width="18px" height="18px" />
-                        <span class="ml-1">追加</span>
+                        <span class="ml-1">{{ $t('common.add') }}</span>
                     </v-btn>
                 </div>
             </div>

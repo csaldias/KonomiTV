@@ -13,7 +13,7 @@
                     <template v-if="isLoading">
                         <Icon icon="line-md:loading-twotone-loop" class="mr-1 spin" width="20px" height="20px" />
                     </template>
-                    <template v-else>{{ displayTotal }}件</template>
+                    <template v-else>{{ $t('common.count', {count: displayTotal}) }}</template>
                 </div>
             </h2>
             <div class="reservation-list__actions">
@@ -27,8 +27,8 @@
                 <v-select v-if="!hideSort"
                     v-model="sortOrder"
                     :items="[
-                        { title: '放送が近い順', value: 'asc' },
-                        { title: '放送が遠い順', value: 'desc' },
+                        { title: $t('reservations.list.sort_asc'), value: 'asc' },
+                        { title: $t('reservations.list.sort_desc'), value: 'desc' },
                     ]"
                     item-title="title"
                     item-value="value"
@@ -44,7 +44,7 @@
                     variant="text"
                     class="reservation-list__more"
                     @click="$emit('more')">
-                    <span class="text-primary">もっと見る</span>
+                    <span class="text-primary">{{ $t('common.show_more') }}</span>
                     <Icon icon="fluent:chevron-right-12-regular" width="18px" class="ml-1 text-text-darken-1" style="margin: 0px -4px;" />
                 </v-btn>
             </div>
@@ -60,9 +60,9 @@
                 }">
                 <div class="reservation-list__empty-content">
                     <Icon class="reservation-list__empty-icon" :icon="emptyIcon" width="54px" height="54px" />
-                    <h2 v-html="emptyMessage"></h2>
+                    <h2 v-html="emptyMessage ?? $t('reservations.list.empty_message')"></h2>
                     <div class="reservation-list__empty-submessage"
-                        v-if="emptySubMessage" v-html="emptySubMessage"></div>
+                        v-if="emptySubMessage !== ''" v-html="emptySubMessage ?? $t('reservations.list.empty_sub_message')"></div>
                 </div>
             </div>
             <div class="reservation-list__grid-content">
@@ -137,8 +137,9 @@ const props = withDefaults(defineProps<{
     showBackButton: false,
     showEmptyMessage: true,
     emptyIcon: 'fluent:timer-20-regular',
-    emptyMessage: 'まだ録画予約がありません。',
-    emptySubMessage: '番組表から録画予約を追加できます。',
+    // emptyMessage / emptySubMessage を省略したときは、表示言語に合わせた既定の文言を表示する
+    emptyMessage: undefined,
+    emptySubMessage: undefined,
     isLoading: false,
     keepDeletedItems: false,
     filterButtonLabel: undefined,

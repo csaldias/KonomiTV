@@ -7,14 +7,14 @@
                 <SPHeaderBar />
                 <div class="reservations-home-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: '録画予約', path: '/reservations/', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.reservations'), path: '/reservations/', disabled: true },
                     ]" />
                     <!-- 放送が近い録画予約セクション -->
                     <ReservationList
                         class="reservations-home-container__upcoming-reservations"
                         :class="{'reservations-home-container__upcoming-reservations--loading': upcomingReservations.length === 0 && isLoading}"
-                        title="放送が近い録画予約"
+                        :title="$t('reservations.list.upcoming')"
                         :reservations="upcomingReservations"
                         :total="totalUpcomingReservations"
                         :hideSort="true"
@@ -23,8 +23,8 @@
                         :isLoading="isLoading"
                         :showEmptyMessage="!isLoading"
                         :emptyIcon="'fluent:timer-20-regular'"
-                        :emptyMessage="'まだ録画予約がありません。'"
-                        :emptySubMessage="'番組表から録画予約を追加できます。'"
+                        :emptyMessage="$t('reservations.list.empty_message')"
+                        :emptySubMessage="$t('reservations.list.empty_sub_message')"
                         @more="$router.push('/reservations/all')"
                         @delete="handleReservationDeleted" />
                 </div>

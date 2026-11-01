@@ -2,7 +2,7 @@
     <v-dialog max-width="650" v-model="isShown">
         <v-card class="offline-download-dialog__card">
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                オフライン再生用に保存
+                {{ $t('videos.offline_dialog.title') }}
             </v-card-title>
             <v-card-text class="pt-4 px-6 pb-0">
                 <div class="offline-download-dialog__title mb-4">
@@ -15,67 +15,58 @@
                 <div v-if="activeDownloadJob !== null" class="warning-banner warning-banner--normal mt-4">
                     <Icon icon="fluent:info-16-regular" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        現在オフライン保存中です ({{OfflineVideos.formatQualityLabel(activeDownloadJob.quality)}}) 。<br>
-                        完了するまで新しい保存は開始できません。
+                        <span v-html="$t('videos.offline_dialog.active_job', {quality: OfflineVideos.formatQualityLabel(activeDownloadJob.quality)})"></span>
                     </span>
                 </div>
                 <div v-if="savedVideo !== null" class="warning-banner warning-banner--keyword mt-4">
                     <Icon icon="fluent:warning-16-filled" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        現在は {{OfflineVideos.formatQualityLabel(savedVideo.quality)}} / {{OfflineVideos.formatOfflineSize(savedVideo.size_bytes, false)}} で保存されています。<br>
-                        新しい保存が完了するまで、現在のデータは削除されません。
+                        <span v-html="$t('videos.offline_dialog.already_saved', {quality: OfflineVideos.formatQualityLabel(savedVideo.quality), size: OfflineVideos.formatOfflineSize(savedVideo.size_bytes, false)})"></span>
                     </span>
                 </div>
                 <v-select class="offline-download-dialog__select settings__item-form mt-7" v-model="selectedQuality" :items="qualityItems"
-                    label="保存画質" color="primary" variant="outlined" hide-details :density="selectDensity" />
+                    :label="$t('videos.offline_dialog.quality')" color="primary" variant="outlined" hide-details :density="selectDensity" />
                 <div class="offline-download-dialog__switch mt-6" :class="{'offline-download-dialog__switch--disabled': isHEVCSupported === false}">
                     <div>
-                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_data_saver_mode">通信節約モード (H.265 / HEVC)</label>
-                        <label class="text-text-darken-1" for="offline_download_data_saver_mode">画質はほぼそのまま、保存容量を 50% ~ 70% 抑えて保存できます。</label>
+                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_data_saver_mode">{{ $t('videos.offline_dialog.data_saver') }}</label>
+                        <label class="text-text-darken-1" for="offline_download_data_saver_mode">{{ $t('videos.offline_dialog.data_saver_label') }}</label>
                     </div>
                     <v-switch id="offline_download_data_saver_mode" v-model="isDataSaverMode" color="primary" hide-details
                         :disabled="isHEVCSupported === false" />
                 </div>
                 <div class="offline-download-dialog__switch mt-3">
                     <div>
-                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_24fps_mode">24fps モード</label>
-                        <label class="text-text-darken-1" for="offline_download_24fps_mode">映画やアニメなど 24fps で制作された映像を検出し、本来の動きに近づけます。</label>
+                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_24fps_mode">{{ $t('videos.offline_dialog.mode_24fps') }}</label>
+                        <label class="text-text-darken-1" for="offline_download_24fps_mode">{{ $t('videos.offline_dialog.mode_24fps_label') }}</label>
                     </div>
                     <v-switch id="offline_download_24fps_mode" v-model="is24fpsMode" color="primary" hide-details />
                 </div>
                 <div class="offline-download-dialog__switch mt-3"
                     :class="{'offline-download-dialog__switch--disabled': isBackgroundFetchSupported !== true}">
                     <div>
-                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_background">バックグラウンドでダウンロードする</label>
-                        <label class="text-text-darken-1" for="offline_download_background">
-                            <b>オンにすると、ブラウザのタブやアプリを閉じてもダウンロードを続行できます。</b><br>
-                            <div class="mt-1"></div>
-                            その代わり、<b>仕様上並列ダウンロードができません。</b><br>
-                            2本目以降は前のダウンロードが終わるまで順番待ちになります。また、Android では一向にダウンロードが開始されないなど、挙動が不安定になりがちです。<br>
-                            <div class="mt-1"></div>
-                            急いで保存したいときや、複数番組を一度に保存したいケースでは、<b>オフのまま使うことをおすすめします。</b>
-                        </label>
+                        <label class="font-weight-bold mb-1" style="font-size: 15px;" for="offline_download_background">{{ $t('videos.offline_dialog.background') }}</label>
+                        <label class="text-text-darken-1" for="offline_download_background" v-html="$t('videos.offline_dialog.background_label')"></label>
                         <p class="mt-1 mb-0 text-error-lighten-1" v-if="isBackgroundFetchSupported === false">
-                            このブラウザではバックグラウンドダウンロードに対応していません。
+                            {{ $t('videos.offline_dialog.background_unsupported') }}
                         </p>
                     </div>
                     <v-switch id="offline_download_background" v-model="isBackgroundDownload" color="primary" hide-details
                         :disabled="isBackgroundFetchSupported !== true" />
                 </div>
                 <v-alert v-if="isMeteredConnection" class="mt-4" color="warning" variant="tonal">
-                    従量制通信の可能性があります。通信量に注意してください。
+                    {{ $t('videos.offline_dialog.metered') }}
                 </v-alert>
             </v-card-text>
             <v-card-actions class="pt-7 px-6 pb-6">
                 <v-spacer />
                 <v-btn color="text" variant="text" @click="isShown = false">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="secondary" variant="flat"
                     :disabled="isPreparing || activeDownloadJob !== null" :loading="isStarting" @click="startDownload">
                     <Icon icon="fluent:cloud-arrow-down-20-filled" width="18px" height="18px" />
-                    <span class="ml-1">{{savedVideo === null ? 'ダウンロード開始' : '保存し直す'}}</span>
+                    <span class="ml-1">{{savedVideo === null ? $t('videos.offline_dialog.start') : $t('videos.offline_dialog.save_again')}}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -85,22 +76,22 @@
     <v-dialog v-model="showPersistenceWarning" max-width="620" persistent>
         <v-card class="offline-download-dialog__card">
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                保存データが自動削除される可能性があります
+                {{ $t('videos.offline_dialog.persistence_title') }}
             </v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <v-alert color="warning" variant="tonal">
-                    ブラウザから永続ストレージの利用を許可されませんでした。空き容量が減った場合、ブラウザの判断でオフライン保存が削除されることがあります。
+                    {{ $t('videos.offline_dialog.persistence_text') }}
                 </v-alert>
             </v-card-text>
             <v-card-actions class="pt-4 px-6 pb-6">
                 <v-spacer />
                 <v-btn color="text" variant="text" @click="cancelPersistenceWarning">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="secondary" variant="flat" :loading="isStarting" @click="continueAfterPersistenceWarning">
                     <Icon icon="fluent:arrow-download-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">そのまま保存</span>
+                    <span class="ml-1">{{ $t('videos.offline_dialog.save_anyway') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -109,12 +100,15 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { IRecordedProgram } from '@/services/Videos';
 
 import Message from '@/message';
 import OfflineVideos, { type IOfflineDownloadJob, type IOfflineVideo } from '@/services/OfflineVideos';
 import Utils, { PlayerUtils, ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     program: IRecordedProgram;
@@ -191,10 +185,10 @@ const startDownload = async (): Promise<void> => {
             return;
         }
         await OfflineVideos.start(props.program, apiQuality, isBackgroundDownload.value);
-        Message.success('オフライン保存を開始しました。');
+        Message.success(t('videos.offline_dialog.started'));
         isShown.value = false;
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : 'オフライン保存を開始できませんでした。');
+        Message.error(error instanceof Error ? error.message : t('videos.offline_dialog.start_failed'));
     } finally {
         isStarting.value = false;
     }
@@ -206,13 +200,13 @@ const continueAfterPersistenceWarning = async (): Promise<void> => {
     isStarting.value = true;
     try {
         await OfflineVideos.start(props.program, pendingAPIQuality.value, pendingUseBackgroundFetch.value);
-        Message.success('オフライン保存を開始しました。');
+        Message.success(t('videos.offline_dialog.started'));
         showPersistenceWarning.value = false;
         pendingAPIQuality.value = null;
         pendingUseBackgroundFetch.value = false;
         isShown.value = false;
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : 'オフライン保存を開始できませんでした。');
+        Message.error(error instanceof Error ? error.message : t('videos.offline_dialog.start_failed'));
     } finally {
         isStarting.value = false;
     }
@@ -243,7 +237,7 @@ watch(() => props.show, async (show) => {
         isBackgroundFetchSupported.value = isBackgroundFetchSupportedResult;
         isHEVC10bitSupported.value = isHEVCSupported.value === true && await PlayerUtils.isHEVC10bitVideoSupported();
     } catch (error) {
-        Message.error(error instanceof Error ? error.message : 'オフライン保存の準備に失敗しました。');
+        Message.error(error instanceof Error ? error.message : t('videos.offline_dialog.prepare_failed'));
         isShown.value = false;
     } finally {
         isPreparing.value = false;

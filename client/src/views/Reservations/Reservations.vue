@@ -7,12 +7,12 @@
                 <SPHeaderBar />
                 <div class="reservations-all-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: '録画予約', path: '/reservations/' },
-                        { name: '録画予約一覧', path: '/reservations/all', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.reservations'), path: '/reservations/' },
+                        { name: $t('reservations.list.all'), path: '/reservations/all', disabled: true },
                     ]" />
                     <ReservationList ref="reservationList"
-                        title="録画予約一覧"
+                        :title="$t('reservations.list.all')"
                         :reservations="reservations"
                         :total="total"
                         :page="page"

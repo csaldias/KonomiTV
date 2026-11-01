@@ -12,7 +12,7 @@
                 <!-- 日付と枚数は文字の大きさが違うので、中央ではなく文字のベースラインでそろえる -->
                 <span class="capture-timeline__header-label">
                     <span class="capture-timeline__header-date">{{ formatDate(section.date) }}</span>
-                    <span class="capture-timeline__header-count">{{ section.count.toLocaleString() }}枚</span>
+                    <span class="capture-timeline__header-count">{{ $t('captures.common.count_unit', {count: section.count.toLocaleString()}) }}</span>
                 </span>
             </div>
             <template v-for="tile in visibleTiles(section)" :key="tile.key">
@@ -39,12 +39,15 @@
 <script lang="ts" setup>
 
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import CaptureScrubber, { IScrubberMark } from '@/components/Captures/CaptureScrubber.vue';
 import { CaptureSelection } from '@/components/Captures/CaptureSelection';
 import CaptureTile from '@/components/Captures/CaptureTile.vue';
 import Captures, { CaptureTimelineAxis, ICapture, ICaptureFilter, ICaptureProgram } from '@/services/Captures';
 import { dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 
 /** 日付ごとのまとまり (見出しとタイルの位置を含む) */
@@ -427,7 +430,7 @@ const labelAt = (y: number) => {
     }
     // 日付だけの文字列はブラウザのタイムゾーンの0時として解釈されるので、日本時間の0時として解釈させる
     const date = dayjs(`${sections.value[findSectionIndex(y)].date}T00:00:00+09:00`);
-    return date.format('YYYY年M月');
+    return date.format(t('captures.timeline.month_format'));
 };
 const scrollToContentY = (y: number) => {
     if (rootRef.value === null) {
@@ -472,7 +475,7 @@ const onToggle = (capture: ICapture, shiftKey: boolean) => {
 const formatDate = (date: string) => {
     // 日付だけの文字列はブラウザのタイムゾーンの0時として解釈されるので、日本時間の0時として解釈させる
     const value = dayjs(`${date}T00:00:00+09:00`);
-    return value.year() === dayjs().year() ? value.format('M月D日 (dd)') : value.format('YYYY年M月D日 (dd)');
+    return value.year() === dayjs().year() ? value.format(t('captures.timeline.date_format')) : value.format(t('captures.timeline.date_with_year_format'));
 };
 
 /**

@@ -1,21 +1,21 @@
 <template>
     <transition name="capture-selection-bar-slide">
         <div v-if="selection.isSelecting.value" class="capture-selection-bar">
-            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="'選択を解除'" @click="selection.clear()">
+            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="$t('captures.selection.clear')" @click="selection.clear()">
                 <Icon icon="fluent:dismiss-24-regular" width="22px" />
             </div>
-            <span class="capture-selection-bar__count">{{ selection.count.value.toLocaleString() }}枚を選択中</span>
+            <span class="capture-selection-bar__count">{{ $t('captures.selection.selected', {count: selection.count.value.toLocaleString()}) }}</span>
             <v-spacer></v-spacer>
-            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="allFavorite ? 'お気に入りから外す' : 'お気に入りに追加'"
+            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="allFavorite ? $t('captures.common.remove_favorite') : $t('captures.common.add_favorite')"
                 @click="toggleFavorite">
                 <Icon :icon="allFavorite ? 'fluent:heart-24-filled' : 'fluent:heart-24-regular'" width="22px"
                     :class="{'text-primary': allFavorite}" />
             </div>
-            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="'タグを付ける'" @click="openTagDialog">
+            <div v-ripple class="capture-selection-bar__button" v-ftooltip.top="$t('captures.common.add_tags')" @click="openTagDialog">
                 <Icon icon="fluent:tag-24-regular" width="22px" />
             </div>
             <!-- 削除は右端に置き、誤って押したときは確認のダイアログでキャンセルできるようにする -->
-            <div v-ripple class="capture-selection-bar__button capture-selection-bar__button--danger" v-ftooltip.top="'キャプチャを削除'"
+            <div v-ripple class="capture-selection-bar__button capture-selection-bar__button--danger" v-ftooltip.top="$t('captures.common.delete')"
                 @click="requestDelete">
                 <Icon icon="fluent:delete-24-regular" width="22px" />
             </div>
@@ -28,23 +28,22 @@
         @after-enter="deleteButtonRef?.$el.focus()">
         <v-card>
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                {{ selection.count.value.toLocaleString() }}枚のキャプチャを削除しますか？
+                {{ $t('captures.selection.delete_title', {count: selection.count.value.toLocaleString()}) }}
             </v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <div class="text-error-lighten-1 font-weight-bold">
-                    保存先にある画像ファイルも削除され、元に戻すことはできません。<br>
-                    同じ画像が他のフォルダにもある場合は、それらも一緒に削除されます。
+                    <span v-html="$t('captures.common.delete_warning')"></span>
                 </div>
             </v-card-text>
             <v-card-actions class="pt-4 px-6 pb-6">
                 <v-spacer></v-spacer>
                 <v-btn color="text" variant="text" height="40" @click="isDeleteConfirmOpen = false">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn ref="deleteButtonRef" color="error" variant="flat" height="40" class="px-3" :loading="isDeleting" @click="deleteSelected">
                     <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">キャプチャを削除</span>
+                    <span class="ml-1">{{ $t('captures.common.delete') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -53,12 +52,15 @@
 <script lang="ts" setup>
 
 import { ComponentPublicInstance, computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { CaptureSelection } from '@/components/Captures/CaptureSelection';
 import CaptureTagDialog from '@/components/Captures/CaptureTagDialog.vue';
 import Message from '@/message';
 import Captures, { ICapture } from '@/services/Captures';
 import useUserStore from '@/stores/UserStore';
+
+const { t } = useI18n();
 
 
 const props = defineProps<{
@@ -83,7 +85,7 @@ const allFavorite = computed(() => selectedList.value.length > 0 && selectedList
 
 const requireLogin = () => {
     if (!userStore.is_logged_in) {
-        Message.warning('お気に入りとタグを使うには、KonomiTV アカウントにログインしてください。');
+        Message.warning(t('captures.common.login_required_message'));
         return false;
     }
     return true;
@@ -103,7 +105,7 @@ const toggleFavorite = async () => {
         // 選択に持っている内容は、まだ選ばれているキャプチャの分だけ新しい状態に差し替える
         props.selection.setMany(updated.filter(capture => props.selection.isSelected(capture)), true);
         emit('updated', updated);
-        Message.success(next ? `${ids.length}枚のキャプチャをお気に入りに追加しました。` : `${ids.length}枚のキャプチャをお気に入りから外しました。`);
+        Message.success(next ? t('captures.selection.favorited', {count: ids.length}) : t('captures.selection.unfavorited', {count: ids.length}));
     }
 };
 
@@ -124,7 +126,7 @@ const requestDelete = () => {
         return;
     }
     if (!isAdmin.value) {
-        Message.warning('キャプチャを削除するには管理者権限が必要です。\n管理者アカウントでログインし直してください。');
+        Message.warning(t('captures.common.delete_admin_required'));
         return;
     }
     isDeleteConfirmOpen.value = true;
@@ -144,9 +146,9 @@ const deleteSelected = async () => {
         return;
     }
     if (result.failed_capture_ids.length > 0) {
-        Message.error(`${result.failed_capture_ids.length}枚のキャプチャを削除できませんでした。もう一度お試しください。`);
+        Message.error(t('captures.selection.delete_failed', {count: result.failed_capture_ids.length}));
     } else {
-        Message.success(`${result.deleted_capture_ids.length}枚のキャプチャを削除しました。`);
+        Message.success(t('captures.selection.deleted', {count: result.deleted_capture_ids.length}));
     }
     // 削除できたキャプチャだけを選択から外し、削除できなかったキャプチャは選んだまま残して、もう一度押せるようにする
     const deletedIds = new Set(result.deleted_capture_ids);

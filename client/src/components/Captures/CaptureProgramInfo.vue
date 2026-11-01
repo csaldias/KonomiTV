@@ -7,7 +7,7 @@
             <div class="capture-program-info__broadcaster-container">
                 <div v-if="program.channel !== null" class="capture-program-info__broadcaster-name">{{ program.channel.name }}</div>
                 <div class="capture-program-info__broadcaster-time">
-                    {{ formatBroadcast(program) }}<template v-if="captureCount !== null"> / {{ captureCount.toLocaleString() }}枚</template>
+                    {{ formatBroadcast(program) }}<template v-if="captureCount !== null"> / {{ $t('captures.common.count_unit', {count: captureCount.toLocaleString()}) }}</template>
                 </div>
             </div>
         </div>
@@ -17,8 +17,12 @@
 </template>
 <script lang="ts" setup>
 
+import { useI18n } from 'vue-i18n';
+
 import { ICaptureProgram } from '@/services/Captures';
 import Utils, { dayjs, ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 
 withDefaults(defineProps<{
@@ -42,13 +46,13 @@ const onLogoError = (event: Event) => {
 // 放送時間は、ほかの画面の番組情報 (ProgramUtils.getProgramTime()) と同じく、番組の長さを分で添える
 // 終了時刻が不明な放送回は、同じく放送時間未定と表示する
 const formatBroadcast = (program: ICaptureProgram) => {
-    const start = dayjs(program.start_time).format('YYYY/MM/DD (dd) HH:mm');
+    const start = dayjs(program.start_time).format(t('program.datetime_format'));
     if (program.end_time === null || program.duration === null) {
-        return Utils.apply28HourClock(`${start} ～ --:-- (放送時間未定)`);
+        return Utils.apply28HourClock(`${start} ～ --:-- (${t('program.time_undecided')})`);
     }
     // 分単位の番組長 (割り切れない場合は小数第2位で四捨五入)
     const duration = Math.round(program.duration / 60 * 100) / 100;
-    return Utils.apply28HourClock(`${start} ～ ${dayjs(program.end_time).format('HH:mm')} (${duration}分)`);
+    return Utils.apply28HourClock(`${start} ～ ${dayjs(program.end_time).format('HH:mm')} (${t('program.duration_minutes', {minutes: duration})})`);
 };
 
 </script>

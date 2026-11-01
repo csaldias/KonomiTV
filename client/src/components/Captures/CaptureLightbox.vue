@@ -12,24 +12,24 @@
                 <div class="capture-lightbox__main">
                     <!-- 上のバー: 閉じる・お気に入り・タグ・ダウンロード・情報・削除 -->
                     <div class="capture-lightbox__bar" :style="{ opacity: backdropOpacity }">
-                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="'閉じる (Esc)'" @click="close">
+                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="$t('captures.lightbox.close')" @click="close">
                             <Icon icon="fluent:arrow-left-24-regular" width="24px" />
                         </div>
                         <v-spacer></v-spacer>
-                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="capture.is_favorite ? 'お気に入りから外す (F)' : 'お気に入りに追加 (F)'"
+                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="capture.is_favorite ? $t('captures.lightbox.remove_favorite') : $t('captures.lightbox.add_favorite')"
                             @click="toggleFavorite">
                             <Icon :icon="capture.is_favorite ? 'fluent:heart-24-filled' : 'fluent:heart-24-regular'" width="24px"
                                 :class="{'text-primary': capture.is_favorite}" />
                         </div>
-                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="'タグを付ける (T)'" @click="openTagDialog">
+                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="$t('captures.lightbox.add_tags')" @click="openTagDialog">
                             <Icon icon="fluent:tag-24-regular" width="24px" />
                         </div>
-                        <a v-ripple class="capture-lightbox__button" v-ftooltip.bottom="'ダウンロード'"
+                        <a v-ripple class="capture-lightbox__button" v-ftooltip.bottom="$t('captures.lightbox.download')"
                             :href="Captures.getImageURL(capture)" :download="downloadName" @click.stop>
                             <Icon icon="fluent:arrow-download-24-regular" width="24px" />
                         </a>
                         <!-- 情報 (横画面では右のパネル、縦画面では下のシート) の開閉 (開いている間はアイコンを塗りつぶしにする) -->
-                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="isInfoOpen ? '情報を閉じる (I)' : '情報を開く (I)'"
+                        <div v-ripple class="capture-lightbox__button" v-ftooltip.bottom="isInfoOpen ? $t('captures.lightbox.close_info') : $t('captures.lightbox.open_info')"
                             @click="setInfoOpen(!isInfoOpen)">
                             <Icon :icon="isInfoOpen ? 'fluent:info-24-filled' : 'fluent:info-24-regular'" width="24px" />
                         </div>
@@ -45,14 +45,14 @@
                                     <template #prepend>
                                         <Icon icon="fluent:image-20-regular" width="20px" height="20px" />
                                     </template>
-                                    <v-list-item-title class="ml-3">録画番組のサムネイルにする</v-list-item-title>
+                                    <v-list-item-title class="ml-3">{{ $t('captures.lightbox.set_thumbnail') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-divider v-if="canSetThumbnail"></v-divider>
                                 <v-list-item class="capture-lightbox__menu-item--danger" @click="requestDelete">
                                     <template #prepend>
                                         <Icon icon="fluent:delete-20-regular" width="20px" height="20px" />
                                     </template>
-                                    <v-list-item-title class="ml-3">キャプチャを削除</v-list-item-title>
+                                    <v-list-item-title class="ml-3">{{ $t('captures.common.delete') }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -92,7 +92,7 @@
                     <div v-else class="capture-lightbox__info-header">
                         <div v-ripple class="capture-lightbox__info-close" @click="setInfoOpen(false)">
                             <Icon icon="akar-icons:chevron-right" width="25px" />
-                            <span>閉じる</span>
+                            <span>{{ $t('common.close') }}</span>
                         </div>
                     </div>
                     <div ref="infoScrollRef" class="capture-lightbox__info-scroll">
@@ -107,22 +107,21 @@
                 <v-dialog max-width="520" :model-value="isDeleteConfirmOpen" @update:model-value="isDeleteConfirmOpen = $event"
                     @after-enter="deleteButtonRef?.$el.focus()">
                     <v-card>
-                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">このキャプチャを削除しますか？</v-card-title>
+                        <v-card-title class="d-flex justify-center pt-6 font-weight-bold">{{ $t('captures.lightbox.delete_title') }}</v-card-title>
                         <v-card-text class="pt-2 pb-0">
                             <div class="text-error-lighten-1 font-weight-bold">
-                                保存先にある画像ファイルも削除され、元に戻すことはできません。<br>
-                                同じ画像が他のフォルダにもある場合は、それらも一緒に削除されます。
+                                <span v-html="$t('captures.common.delete_warning')"></span>
                             </div>
                         </v-card-text>
                         <v-card-actions class="pt-4 px-6 pb-6">
                             <v-spacer></v-spacer>
                             <v-btn color="text" variant="text" height="40" @click="isDeleteConfirmOpen = false">
                                 <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                                <span class="ml-1">キャンセル</span>
+                                <span class="ml-1">{{ $t('common.cancel') }}</span>
                             </v-btn>
                             <v-btn ref="deleteButtonRef" color="error" variant="flat" height="40" class="px-3" @click="deleteCapture">
                                 <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                                <span class="ml-1">キャプチャを削除</span>
+                                <span class="ml-1">{{ $t('captures.common.delete') }}</span>
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -141,6 +140,7 @@ let isInfoOpenRemembered = true;
 <script lang="ts" setup>
 
 import { ComponentPublicInstance, computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import CaptureInfo from '@/components/Captures/CaptureInfo.vue';
@@ -151,6 +151,8 @@ import Captures, { ICapture, ICaptureDetail, ICaptureProgram, ICaptureTag } from
 import Videos from '@/services/Videos';
 import useUserStore from '@/stores/UserStore';
 import { dayjs } from '@/utils';
+
+const { t } = useI18n();
 
 
 const props = defineProps<{
@@ -684,7 +686,7 @@ onBeforeUnmount(() => {
 // お気に入りとタグはログインが必要 (家族と共用するときに、それぞれの分類が混ざらないようにするため)
 const requireLogin = () => {
     if (!userStore.is_logged_in) {
-        Message.warning('お気に入りとタグを使うには、KonomiTV アカウントにログインしてください。');
+        Message.warning(t('captures.common.login_required_message'));
         return false;
     }
     return true;
@@ -731,7 +733,7 @@ const onTagsUpdated = async (captures: ICapture[]) => {
 // 削除は管理者だけができるが、項目は誰にでも表示し、管理者でなければ押したときにログインし直す必要があることを伝える
 const requestDelete = () => {
     if (!isAdmin.value) {
-        Message.warning('キャプチャを削除するには管理者権限が必要です。\n管理者アカウントでログインし直してください。');
+        Message.warning(t('captures.common.delete_admin_required'));
         return;
     }
     isDeleteConfirmOpen.value = true;
@@ -748,10 +750,10 @@ const deleteCapture = async () => {
         return;
     }
     if (result.failed_capture_ids.length > 0) {
-        Message.error('一部のファイルを削除できませんでした。もう一度お試しください。');
+        Message.error(t('captures.lightbox.delete_partial_failed'));
         return;
     }
-    Message.success('キャプチャを削除しました。');
+    Message.success(t('captures.lightbox.deleted'));
     // 削除したら次のキャプチャへ送り、なければ閉じる
     // 削除の応答を待つ間に閉じたり別のキャプチャを開いたりしたときは、一覧への通知だけにして、今の表示はそのまま保つ
     const neighbor = (await props.navigate(current, 1)) ?? (await props.navigate(current, -1)) ?? null;
@@ -773,7 +775,7 @@ const setAsThumbnail = async () => {
     }
     const videoId = program.value.recorded_program_ids[0];
     if (await Videos.updateThumbnailFromCapture(videoId, props.capture.id)) {
-        Message.success('録画番組のサムネイルを、このキャプチャに変更しました。');
+        Message.success(t('captures.lightbox.thumbnail_set'));
     }
 };
 

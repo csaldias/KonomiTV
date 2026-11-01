@@ -6,14 +6,14 @@
             <SPHeaderBar :hide-on-smartphone-vertical="true" />
             <v-card class="settings-container d-flex px-5 py-5 mx-auto" elevation="0" width="100%" max-width="1000">
                 <nav class="settings-navigation">
-                    <h1 class="mt-2" style="font-size: 24px;">マイページ</h1>
+                    <h1 class="mt-2" style="font-size: 24px;">{{ $t('navigation.mypage') }}</h1>
                     <router-link v-ripple to="/settings/account" class="account mt-6">
                         <div class="account-wrapper">
                             <img class="account__icon" :src="userStore.user ? (userStore.user_icon_url ?? '') : '/assets/images/account-icon-default.png'">
                             <div class="account__info">
                                 <div class="account__info-name">
-                                    <span class="account__info-name-text">{{ userStore.user ? userStore.user.name : 'ログインしていません' }}</span>
-                                    <span class="account__info-admin" v-if="userStore.user?.is_admin">管理者</span>
+                                    <span class="account__info-name-text">{{ userStore.user ? userStore.user.name : $t('mypage.not_logged_in') }}</span>
+                                    <span class="account__info-admin" v-if="userStore.user?.is_admin">{{ $t('common.admin') }}</span>
                                 </div>
                                 <span class="account__info-id">{{ userStore.user ? `User ID: ${userStore.user.id}` : 'Not logged in' }}</span>
                             </div>
@@ -21,19 +21,19 @@
                     </router-link>
                     <v-btn variant="flat" class="settings-navigation__button" to="/settings/">
                         <Icon icon="fluent:settings-20-regular" width="26px" />
-                        <span class="ml-4">設定</span>
+                        <span class="ml-4">{{ $t('navigation.settings') }}</span>
                     </v-btn>
                     <v-btn variant="flat" class="settings-navigation__button mt-3" to="/offline-videos/">
                         <Icon icon="fluent:cloud-arrow-down-16-regular" width="26px" />
-                        <span class="ml-4">オフライン保存</span>
+                        <span class="ml-4">{{ $t('navigation.offline_videos') }}</span>
                     </v-btn>
                     <v-btn variant="flat" class="settings-navigation__button" to="/mylist/">
                         <Icon icon="ic:round-playlist-play" width="26px" />
-                        <span class="ml-4">マイリスト</span>
+                        <span class="ml-4">{{ $t('navigation.mylist') }}</span>
                     </v-btn>
                     <v-btn variant="flat" class="settings-navigation__button" to="/watched-history/">
                         <Icon icon="fluent:history-20-regular" width="26px" />
-                        <span class="ml-4">視聴履歴</span>
+                        <span class="ml-4">{{ $t('navigation.watched_history') }}</span>
                     </v-btn>
                     <v-btn variant="flat" class="settings-navigation__button settings-navigation__button--version mt-3"
                         :class="{'settings-navigation__button--version-highlight': versionStore.is_update_available}"

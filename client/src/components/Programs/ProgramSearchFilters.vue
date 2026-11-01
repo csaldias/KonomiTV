@@ -3,17 +3,17 @@
         <div class="program-search-filters__title">
             <span class="program-search-filters__title-label">
                 <Icon icon="fluent:filter-20-filled" width="20px" height="20px" />
-                検索条件
+                {{ $t('program_search.title') }}
             </span>
             <button type="button" v-ripple class="program-search-filters__reset-button" @click="resetFilters">
                 <Icon icon="fluent:arrow-reset-20-filled" width="14px" height="14px" />
-                リセット
+                {{ $t('program_search.reset') }}
             </button>
         </div>
         <div class="program-search-filters__basic">
             <v-text-field
                 v-model="keywordText"
-                label="検索キーワード（空欄可）"
+                :label="$t('program_search.keyword')"
                 name="program-search-keyword"
                 color="primary"
                 bg-color="background-lighten-1"
@@ -30,7 +30,7 @@
             </v-text-field>
             <v-text-field
                 v-model="excludeKeywordText"
-                label="除外キーワード"
+                :label="$t('program_search.exclude_keyword')"
                 name="program-search-exclude-keyword"
                 color="primary"
                 bg-color="background-lighten-1"
@@ -58,7 +58,7 @@
                 <v-expansion-panel-title>
                     <span class="program-search-filters__panel-title-text">
                         <Icon icon="tabler:category-filled" width="16px" height="16px" />
-                        ジャンル指定
+                        {{ $t('program_search.genre') }}
                     </span>
                     <span class="program-search-filters__panel-status-badge"
                         :class="{ 'program-search-filters__panel-status-badge--modified': isGenreFilterModified }">
@@ -82,7 +82,7 @@
                                     <Icon v-else-if="isGenreMajorPartiallySelected(genre.major)" icon="fluent:subtract-16-filled"
                                         width="14px" height="14px" />
                                 </span>
-                                <span>{{ genre.major }} （すべて）</span>
+                                <span>{{ $t('program_search.genre_all', {genre: ProgramUtils.getGenreLabel(genre.major)}) }}</span>
                                 <span class="program-search-filters__genre-expander"
                                     :class="{ 'program-search-filters__genre-expander--open': expandedGenreKeys.has(genre.major) }"
                                     @click.stop="toggleGenreExpanded(genre.major)">
@@ -100,7 +100,7 @@
                                         <Icon v-if="isGenreSelected(genre.major, middle)" icon="fluent:checkmark-16-filled"
                                             width="14px" height="14px" />
                                     </span>
-                                    <span>{{ middle }}</span>
+                                    <span>{{ ProgramUtils.getGenreLabel(genre.major, middle) }}</span>
                                 </button>
                             </div>
                         </div>
@@ -112,7 +112,7 @@
                             :aria-pressed="localCondition.is_exclude_genre_ranges"
                             @click="localCondition.is_exclude_genre_ranges = !localCondition.is_exclude_genre_ranges">
                             <Icon icon="fluent:subtract-circle-16-filled" width="16px" height="16px" />
-                            選択したジャンルを除外
+                            {{ $t('program_search.exclude_genres') }}
                         </button>
                     </div>
                 </v-expansion-panel-text>
@@ -121,7 +121,7 @@
                 <v-expansion-panel-title>
                     <span class="program-search-filters__panel-title-text">
                         <Icon icon="ic:round-cell-tower" width="16px" height="16px" />
-                        検索対象チャンネル
+                        {{ $t('program_search.channels') }}
                     </span>
                     <span class="program-search-filters__panel-status-badge"
                         :class="{
@@ -160,11 +160,11 @@
                             type="button" v-ripple
                             class="program-search-filters__mini-button"
                             @click="selectChannelType(channelType.value)">
-                            {{ channelType.label }} 全選択
+                            {{ $t('program_search.select_all_type', {type: channelType.label}) }}
                         </button>
                         <button type="button" v-ripple class="program-search-filters__mini-button"
                             @click="clearChannels">
-                            全解除
+                            {{ $t('program_search.clear_all') }}
                         </button>
                     </div>
                 </v-expansion-panel-text>
@@ -173,7 +173,7 @@
                 <v-expansion-panel-title>
                     <span class="program-search-filters__panel-title-text">
                         <Icon icon="akar-icons:schedule" width="16px" height="16px" />
-                        放送日時
+                        {{ $t('program_search.date_time') }}
                     </span>
                     <span class="program-search-filters__panel-status-badge"
                         :class="{ 'program-search-filters__panel-status-badge--modified': isDateFilterModified }">
@@ -185,22 +185,22 @@
                         <div v-for="(dateRange, index) in dateRanges" :key="dateRange.id"
                             class="program-search-filters__date-range">
                             <div class="program-search-filters__date-range-header">
-                                <span>条件 {{ index + 1 }}</span>
+                                <span>{{ $t('program_search.condition_number', {number: index + 1}) }}</span>
                                 <div class="program-search-filters__date-range-actions">
                                     <button type="button" v-ripple class="program-search-filters__icon-button"
-                                        aria-label="条件を複製"
+                                        :aria-label="$t('program_search.duplicate_condition')"
                                         @click="copyDateRange(index)">
                                         <Icon icon="fluent:copy-16-regular" width="15px" height="15px" />
                                     </button>
                                     <button type="button" v-ripple class="program-search-filters__icon-button"
-                                        aria-label="条件を削除"
+                                        :aria-label="$t('program_search.delete_condition')"
                                         @click="removeDateRange(index)">
                                         <Icon icon="fluent:delete-16-filled" width="15px" height="15px" />
                                     </button>
                                 </div>
                             </div>
                             <div class="program-search-filters__date-row">
-                                <span class="program-search-filters__date-label">開始</span>
+                                <span class="program-search-filters__date-label">{{ $t('program_search.start') }}</span>
                                 <select v-model.number="dateRange.start_day_of_week" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-start-day`">
                                     <option v-for="dayOfWeek in dayOfWeekOptions" :key="dayOfWeek.value"
@@ -211,18 +211,18 @@
                                 <select v-model.number="dateRange.start_hour" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-start-hour`">
                                     <option v-for="hour in hourOptions" :key="hour" :value="hour">
-                                        {{ hour.toString().padStart(2, '0') }}時
+                                        {{ $t('timetable.hour_option', {hour: hour.toString().padStart(2, '0')}) }}
                                     </option>
                                 </select>
                                 <select v-model.number="dateRange.start_minute" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-start-minute`">
                                     <option v-for="minute in minuteOptions" :key="minute" :value="minute">
-                                        {{ minute.toString().padStart(2, '0') }}分
+                                        {{ $t('program_search.minute_option', {minute: minute.toString().padStart(2, '0')}) }}
                                     </option>
                                 </select>
                             </div>
                             <div class="program-search-filters__date-row">
-                                <span class="program-search-filters__date-label">終了</span>
+                                <span class="program-search-filters__date-label">{{ $t('program_search.end') }}</span>
                                 <select v-model.number="dateRange.end_day_of_week" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-end-day`">
                                     <option v-for="dayOfWeek in dayOfWeekOptions" :key="dayOfWeek.value"
@@ -233,13 +233,13 @@
                                 <select v-model.number="dateRange.end_hour" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-end-hour`">
                                     <option v-for="hour in hourOptions" :key="hour" :value="hour">
-                                        {{ hour.toString().padStart(2, '0') }}時
+                                        {{ $t('timetable.hour_option', {hour: hour.toString().padStart(2, '0')}) }}
                                     </option>
                                 </select>
                                 <select v-model.number="dateRange.end_minute" class="program-search-filters__select"
                                     :name="`program-search-date-${dateRange.id}-end-minute`">
                                     <option v-for="minute in minuteOptions" :key="minute" :value="minute">
-                                        {{ minute.toString().padStart(2, '0') }}分
+                                        {{ $t('program_search.minute_option', {minute: minute.toString().padStart(2, '0')}) }}
                                     </option>
                                 </select>
                             </div>
@@ -247,7 +247,7 @@
                         <button type="button" v-ripple class="program-search-filters__mini-button program-search-filters__mini-button--wide"
                             @click="addDateRange">
                             <Icon icon="fluent:add-16-filled" width="15px" height="15px" />
-                            日時条件を追加
+                            {{ $t('program_search.add_date_condition') }}
                         </button>
                     </div>
                     <button type="button" v-ripple
@@ -256,7 +256,7 @@
                         :aria-pressed="localCondition.is_exclude_date_ranges"
                         @click="localCondition.is_exclude_date_ranges = !localCondition.is_exclude_date_ranges">
                         <Icon icon="fluent:subtract-circle-16-filled" width="16px" height="16px" />
-                        選択した日時を除外
+                        {{ $t('program_search.exclude_dates') }}
                     </button>
                 </v-expansion-panel-text>
             </v-expansion-panel>
@@ -264,7 +264,7 @@
                 <v-expansion-panel-title>
                     <span class="program-search-filters__panel-title-text">
                         <Icon icon="fluent:clock-12-regular" width="16px" height="16px" />
-                        番組長
+                        {{ $t('program_search.duration') }}
                     </span>
                     <span class="program-search-filters__panel-status-badge"
                         :class="{ 'program-search-filters__panel-status-badge--modified': isDurationFilterModified }">
@@ -274,24 +274,24 @@
                 <v-expansion-panel-text>
                     <div class="program-search-filters__duration-grid">
                         <label class="program-search-filters__number-field">
-                            <span>最小</span>
+                            <span>{{ $t('program_search.min') }}</span>
                             <input v-model="durationRangeMinText"
                                 type="number"
                                 name="program-search-duration-min"
                                 min="0"
                                 inputmode="numeric"
-                                placeholder="指定なし">
-                            <span>分</span>
+                                :placeholder="$t('program_search.not_specified')">
+                            <span>{{ $t('program_search.minutes_unit') }}</span>
                         </label>
                         <label class="program-search-filters__number-field">
-                            <span>最大</span>
+                            <span>{{ $t('program_search.max') }}</span>
                             <input v-model="durationRangeMaxText"
                                 type="number"
                                 name="program-search-duration-max"
                                 min="0"
                                 inputmode="numeric"
-                                placeholder="指定なし">
-                            <span>分</span>
+                                :placeholder="$t('program_search.not_specified')">
+                            <span>{{ $t('program_search.minutes_unit') }}</span>
                         </label>
                     </div>
                 </v-expansion-panel-text>
@@ -300,7 +300,7 @@
                 <v-expansion-panel-title>
                     <span class="program-search-filters__panel-title-text">
                         <Icon icon="fluent:money-16-filled" width="16px" height="16px" />
-                        無料放送/有料放送
+                        {{ $t('program_search.broadcast_type') }}
                     </span>
                     <span class="program-search-filters__panel-status-badge"
                         :class="{ 'program-search-filters__panel-status-badge--modified': isBroadcastTypeFilterModified }">
@@ -324,7 +324,7 @@
             <v-btn class="program-search-filters__submit" color="secondary" variant="flat" block
                 :loading="isSearching" @click="emitSearch">
                 <Icon icon="fluent:search-20-filled" width="20px" height="20px" class="mr-1" />
-                検索
+                {{ $t('program_search.search') }}
             </v-btn>
         </div>
     </aside>
@@ -332,11 +332,14 @@
 <script lang="ts" setup>
 
 import { computed, nextTick, ref, toRaw, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { ChannelType, ILiveChannel } from '@/services/Channels';
 import type { IProgramSearchCondition, IProgramSearchConditionDate } from '@/services/Programs';
 
 import Utils, { ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 type GenreOption = {
     major: string;
@@ -412,40 +415,41 @@ let dateRangeIdSequence = 1;
 const allGenreMiddleLabel = 'すべて';
 const genreKeySeparator = '\u0000';
 
-const allChannelTypeOptions: ChannelTypeOption[] = [
-    { label: '地デジ', value: 'GR' },
+// 以下の選択肢の表示名は、表示言語に追従させるため computed にしている
+const allChannelTypeOptions = computed<ChannelTypeOption[]>(() => [
+    { label: t('channel_type.terrestrial'), value: 'GR' },
     { label: 'BS', value: 'BS' },
     { label: 'CS', value: 'CS' },
     { label: 'CATV', value: 'CATV' },
     { label: 'SKY', value: 'SKY' },
     { label: 'BS4K', value: 'BS4K' },
-];
+]);
 
-const basicToggleOptions: BasicToggleOption[] = [
-    { key: 'is_title_only', label: '番組名のみ', icon: 'fluent:text-t-20-filled' },
-    { key: 'is_case_sensitive', label: '大小文字区別', icon: 'fluent:text-change-case-20-filled' },
-    { key: 'is_fuzzy_search_enabled', label: 'あいまい検索', icon: 'fluent:sparkle-20-filled' },
-    { key: 'is_regex_search_enabled', label: '正規表現検索', icon: 'fluent:braces-20-filled' },
-];
+const basicToggleOptions = computed<BasicToggleOption[]>(() => [
+    { key: 'is_title_only', label: t('program_search.title_only'), icon: 'fluent:text-t-20-filled' },
+    { key: 'is_case_sensitive', label: t('program_search.case_sensitive'), icon: 'fluent:text-change-case-20-filled' },
+    { key: 'is_fuzzy_search_enabled', label: t('program_search.fuzzy'), icon: 'fluent:sparkle-20-filled' },
+    { key: 'is_regex_search_enabled', label: t('program_search.regex'), icon: 'fluent:braces-20-filled' },
+]);
 
-const dayOfWeekOptions: DayOfWeekOption[] = [
-    { label: '日曜日', value: 0 },
-    { label: '月曜日', value: 1 },
-    { label: '火曜日', value: 2 },
-    { label: '水曜日', value: 3 },
-    { label: '木曜日', value: 4 },
-    { label: '金曜日', value: 5 },
-    { label: '土曜日', value: 6 },
-];
+const dayOfWeekOptions = computed<DayOfWeekOption[]>(() => [
+    { label: t('program_search.sunday'), value: 0 },
+    { label: t('program_search.monday'), value: 1 },
+    { label: t('program_search.tuesday'), value: 2 },
+    { label: t('program_search.wednesday'), value: 3 },
+    { label: t('program_search.thursday'), value: 4 },
+    { label: t('program_search.friday'), value: 5 },
+    { label: t('program_search.saturday'), value: 6 },
+]);
 
 const hourOptions = Array.from({ length: 24 }, (_, hour) => hour);
 const minuteOptions = Array.from({ length: 60 }, (_, minute) => minute);
 
-const broadcastTypeOptions: BroadcastTypeOption[] = [
-    { label: 'すべて', value: 'All' },
-    { label: '無料のみ', value: 'FreeOnly' },
-    { label: '有料のみ', value: 'PaidOnly' },
-];
+const broadcastTypeOptions = computed<BroadcastTypeOption[]>(() => [
+    { label: t('program_search.all'), value: 'All' },
+    { label: t('program_search.free_only'), value: 'FreeOnly' },
+    { label: t('program_search.paid_only'), value: 'PaidOnly' },
+]);
 
 const genreOptions = computed<GenreOption[]>(() => {
     return Object.entries(ProgramUtils.CONTENT_TYPE).map(([, contentType]) => {
@@ -460,7 +464,7 @@ const genreOptions = computed<GenreOption[]>(() => {
 const channelTypeOptions = computed<ChannelTypeOption[]>(() => {
     // チャンネルが存在しない種別の一括ボタンは出さず、押しても何も変わらない UI を避ける
     const availableChannelTypes = new Set(props.channels.map((channel) => channel.type));
-    return allChannelTypeOptions.filter((channelType) => availableChannelTypes.has(channelType.value));
+    return allChannelTypeOptions.value.filter((channelType) => availableChannelTypes.has(channelType.value));
 });
 
 const selectableChannels = computed(() => {
@@ -506,7 +510,7 @@ const isBroadcastTypeFilterModified = computed(() => {
 const genreFilterStatusLabel = computed(() => {
     // ジャンルは未選択が指定なしなので、チェック数よりも検索条件としての意味を見出しに出す
     if (selectedGenreKeys.value.size === 0) {
-        return localCondition.value.is_exclude_genre_ranges === true ? '除外オン' : '指定なし';
+        return localCondition.value.is_exclude_genre_ranges === true ? t('program_search.exclude_on') : t('program_search.not_specified');
     }
 
     // 大分類すべてが選択されている場合、画面上は配下の中分類すべてが選択済みに見える
@@ -523,29 +527,29 @@ const genreFilterStatusLabel = computed(() => {
     });
 
     return localCondition.value.is_exclude_genre_ranges === true
-        ? `除外 ${selectedGenreCount}件`
-        : `${selectedGenreCount}件選択`;
+        ? t('program_search.excluded_count', {count: selectedGenreCount})
+        : t('program_search.selected_count', {count: selectedGenreCount});
 });
 
 const channelFilterStatusLabel = computed(() => {
     // チャンネルは検索対象そのものなので、全件・0件・一部選択を明示してジャンルとの差を出す
     if (selectedServiceKeys.value.size === 0) {
-        return '未選択';
+        return t('program_search.none_selected');
     }
     if (isChannelFilterModified.value === false) {
-        return 'すべて';
+        return t('program_search.all');
     }
-    return `${selectedServiceKeys.value.size}件選択`;
+    return t('program_search.selected_count', {count: selectedServiceKeys.value.size});
 });
 
 const dateFilterStatusLabel = computed(() => {
     // 日時は0件が指定なしなので、除外だけが入っている状態も見落とさないよう短く示す
     if (dateRanges.value.length === 0) {
-        return localCondition.value.is_exclude_date_ranges === true ? '除外オン' : '指定なし';
+        return localCondition.value.is_exclude_date_ranges === true ? t('program_search.exclude_on') : t('program_search.not_specified');
     }
     return localCondition.value.is_exclude_date_ranges === true
-        ? `除外 ${dateRanges.value.length}件`
-        : `${dateRanges.value.length}件指定`;
+        ? t('program_search.excluded_count', {count: dateRanges.value.length})
+        : t('program_search.specified_count', {count: dateRanges.value.length});
 });
 
 const durationFilterStatusLabel = computed(() => {
@@ -553,22 +557,22 @@ const durationFilterStatusLabel = computed(() => {
     const min = localCondition.value.duration_range_min;
     const max = localCondition.value.duration_range_max;
     if (min === null && max === null) {
-        return '指定なし';
+        return t('program_search.not_specified');
     }
     if (min !== null && max !== null) {
-        return `${min}〜${max}分`;
+        return t('program_search.duration_range', {min, max});
     }
     if (min !== null) {
-        return `${min}分以上`;
+        return t('program_search.duration_min', {min});
     }
-    return `${max}分以下`;
+    return t('program_search.duration_max', {max});
 });
 
 const broadcastTypeFilterStatusLabel = computed(() => {
     // 内部値ではなく、ユーザーが選んだラベルそのものを見出しに出す
-    return broadcastTypeOptions.find((broadcastType) => {
+    return broadcastTypeOptions.value.find((broadcastType) => {
         return broadcastType.value === localCondition.value.broadcast_type;
-    })?.label ?? 'すべて';
+    })?.label ?? t('program_search.all');
 });
 
 const keywordText = computed({
@@ -616,7 +620,7 @@ const getChannelServiceKey = (channel: ILiveChannel): string => {
 
 const getChannelTypeLabel = (channelType: ChannelType): string => {
     // チャンネル種別は型として固定されているが、将来追加された場合でも表示が空にならないよう値を返す
-    return allChannelTypeOptions.find((channelTypeOption) => {
+    return allChannelTypeOptions.value.find((channelTypeOption) => {
         return channelTypeOption.value === channelType;
     })?.label ?? channelType;
 };

@@ -7,25 +7,25 @@
             <div class="capture-info__actions">
                 <v-btn variant="flat" color="background-lighten-2" height="38" class="capture-info__action" @click="$emit('open-program')">
                     <Icon icon="fluent:image-multiple-20-regular" width="18px" />
-                    <span class="ml-2">この番組のキャプチャ</span>
+                    <span class="ml-2">{{ $t('captures.common.captures_of_program') }}</span>
                 </v-btn>
                 <v-btn v-if="program.recorded_program_ids.length > 0" variant="flat" color="primary" height="38"
                     class="capture-info__action" @click="$emit('play')">
                     <Icon icon="fluent:play-20-filled" width="18px" />
-                    <span class="ml-2">{{ capture.playback_position !== null ? 'この場面から再生' : '録画を再生' }}</span>
+                    <span class="ml-2">{{ capture.playback_position !== null ? $t('captures.info.play_from_here') : $t('captures.common.play_recording') }}</span>
                 </v-btn>
             </div>
         </section>
         <section v-else class="capture-info__program">
-            <h1 class="capture-info__title">番組情報がありません</h1>
-            <div class="capture-info__description">撮影時の番組情報が、この画像には記録されていません。</div>
+            <h1 class="capture-info__title">{{ $t('program.no_info_title') }}</h1>
+            <div class="capture-info__description">{{ $t('captures.info.no_metadata') }}</div>
         </section>
 
         <!-- 撮影したときに出ていた字幕 -->
         <div v-if="capture.caption_text" class="capture-info__caption">
             <div class="capture-info__caption-heading">
                 <Icon icon="fluent:closed-caption-20-regular" width="18px" />
-                <span>字幕テキスト</span>
+                <span>{{ $t('captures.info.caption_text') }}</span>
             </div>
             <div class="capture-info__caption-text">{{ capture.caption_text }}</div>
         </div>
@@ -33,30 +33,30 @@
         <!-- キャプチャ自体の情報 -->
         <div class="capture-info__list">
             <div class="capture-info__row">
-                <span class="capture-info__label">撮影日時</span>
+                <span class="capture-info__label">{{ $t('captures.info.captured_at') }}</span>
                 <span>{{ formatDateTime(capture.captured_at) }}</span>
             </div>
             <div v-if="capture.broadcast_at" class="capture-info__row">
-                <span class="capture-info__label">放送日時</span>
+                <span class="capture-info__label">{{ $t('captures.info.broadcast_at') }}</span>
                 <span>{{ formatDateTime(capture.broadcast_at) }}</span>
             </div>
             <div v-if="capture.playback_position !== null" class="capture-info__row">
-                <span class="capture-info__label">再生位置</span>
-                <span>開始から {{ formatPosition(capture.playback_position) }}</span>
+                <span class="capture-info__label">{{ $t('captures.info.playback_position') }}</span>
+                <span>{{ $t('captures.info.from_start', {position: formatPosition(capture.playback_position)}) }}</span>
             </div>
             <div class="capture-info__row">
-                <span class="capture-info__label">画像サイズ</span>
+                <span class="capture-info__label">{{ $t('captures.info.image_size') }}</span>
                 <span>{{ capture.image_width }}×{{ capture.image_height }}・{{ Utils.formatBytes(capture.file_size) }}</span>
             </div>
             <div class="capture-info__row">
-                <span class="capture-info__label">合成情報</span>
+                <span class="capture-info__label">{{ $t('captures.info.content') }}</span>
                 <span>{{ contentLabel }}</span>
             </div>
             <div v-if="detail !== null" class="capture-info__row">
-                <span class="capture-info__label">保存場所</span>
+                <span class="capture-info__label">{{ $t('captures.info.locations') }}</span>
                 <span class="capture-info__files">
                     <span v-for="file in detail.files" :key="file.file_path">
-                        {{ file.file_path }}<template v-if="file.status !== 'Available'"> ({{ file.status === 'Missing' ? 'ファイルが見つかりません' : 'ファイルを読み込めません' }})</template>
+                        {{ file.file_path }}<template v-if="file.status !== 'Available'"> ({{ file.status === 'Missing' ? $t('captures.info.file_missing') : $t('captures.info.file_unreadable') }})</template>
                     </span>
                 </span>
             </div>
@@ -73,10 +73,13 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import CaptureProgramInfo from '@/components/Captures/CaptureProgramInfo.vue';
 import { ICapture, ICaptureDetail, ICaptureProgram } from '@/services/Captures';
 import Utils, { dayjs, ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 
 const props = defineProps<{
@@ -93,22 +96,24 @@ defineEmits<{
 
 // 画像に何が写し込まれているか (映像だけか、字幕やコメントも一緒に撮ったか)
 const contentLabel = computed(() => {
-    const parts = ['映像'];
+    if (props.capture.is_caption_composited && props.capture.is_comment_composited) {
+        return t('captures.info.content_video_caption_comment');
+    }
     if (props.capture.is_caption_composited) {
-        parts.push('字幕');
+        return t('captures.info.content_video_caption');
     }
     if (props.capture.is_comment_composited) {
-        parts.push('コメント');
+        return t('captures.info.content_video_comment');
     }
-    return parts.length === 1 ? '映像のみ' : parts.join('と');
+    return t('captures.info.content_video_only');
 });
 
-const formatDateTime = (value: string) => Utils.apply28HourClock(dayjs(value).format('YYYY/MM/DD (dd) HH:mm:ss'));
+const formatDateTime = (value: string) => Utils.apply28HourClock(dayjs(value).format(t('program.datetime_seconds_format')));
 const formatPosition = (seconds: number) => {
     const sign = seconds < 0 ? '-' : '';
     const value = Math.floor(Math.abs(seconds));
     const minutes = Math.floor(value / 60);
-    return `${sign}${minutes}分${String(value % 60).padStart(2, '0')}秒`;
+    return t('captures.info.position', {sign, minutes, seconds: String(value % 60).padStart(2, '0')});
 };
 
 </script>

@@ -9,22 +9,22 @@
                 <div class="recorded-program-list__title-count" v-if="!showMoreButton">
                     <template v-if="isSearching">
                         <Icon icon="line-md:loading-twotone-loop" class="mr-1 spin" width="20px" height="20px" />
-                        <span>検索中...</span>
+                        <span>{{ $t('common.searching') }}</span>
                     </template>
-                    <template v-else>{{displayTotal}}件</template>
+                    <template v-else>{{ $t('common.count', {count: displayTotal}) }}</template>
                 </div>
             </h2>
             <div class="recorded-program-list__actions" :class="{'recorded-program-list__actions--mylist': forMylist}">
                 <v-select v-if="!hideSort"
                     v-model="sort_order"
                     :items="forMylist ? [
-                        { title: '追加が新しい順', value: 'mylist_added_desc' },
-                        { title: '追加が古い順', value: 'mylist_added_asc' },
-                        { title: '録画が新しい順', value: 'recorded_desc' },
-                        { title: '録画が古い順', value: 'recorded_asc' },
+                        { title: $t('videos.list.sort_mylist_added_desc'), value: 'mylist_added_desc' },
+                        { title: $t('videos.list.sort_mylist_added_asc'), value: 'mylist_added_asc' },
+                        { title: $t('videos.list.sort_recorded_desc'), value: 'recorded_desc' },
+                        { title: $t('videos.list.sort_recorded_asc'), value: 'recorded_asc' },
                     ] : [
-                        { title: '新しい順', value: 'desc' },
-                        { title: '古い順', value: 'asc' },
+                        { title: $t('videos.list.sort_desc'), value: 'desc' },
+                        { title: $t('videos.list.sort_asc'), value: 'asc' },
                     ]"
                     item-title="title"
                     item-value="value"
@@ -40,7 +40,7 @@
                     variant="text"
                     class="recorded-program-list__more"
                     @click="$emit('more')">
-                    <span class="text-primary">もっと見る</span>
+                    <span class="text-primary">{{ $t('common.show_more') }}</span>
                     <Icon icon="fluent:chevron-right-12-regular" width="18px" class="ml-1 text-text-darken-1" style="margin: 0px -4px;" />
                 </v-btn>
             </div>
@@ -58,9 +58,9 @@
                 }">
                 <div class="recorded-program-list__empty-content">
                     <Icon class="recorded-program-list__empty-icon" :icon="emptyIcon" width="54px" height="54px" />
-                    <h2 v-html="emptyMessage"></h2>
+                    <h2 v-html="emptyMessage ?? $t('videos.list.empty_message')"></h2>
                     <div class="recorded-program-list__empty-submessage"
-                        v-if="emptySubMessage" v-html="emptySubMessage"></div>
+                        v-if="emptySubMessage !== ''" v-html="emptySubMessage ?? $t('videos.list.empty_sub_message')"></div>
                 </div>
             </div>
             <div class="recorded-program-list__grid-content">
@@ -88,6 +88,7 @@
 <script lang="ts" setup>
 
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { IOfflineDownloadJob, IOfflineVideo } from '@/services/OfflineVideos';
@@ -95,6 +96,8 @@ import type { IOfflineDownloadJob, IOfflineVideo } from '@/services/OfflineVideo
 import RecordedProgram from '@/components/Videos/RecordedProgram.vue';
 import { type IRecordedProgram, MylistSortOrder, SortOrder } from '@/services/Videos';
 import Utils from '@/utils';
+
+const { t } = useI18n();
 
 const router = useRouter();
 
@@ -131,8 +134,9 @@ const props = withDefaults(defineProps<{
     showBackButton: false,
     showEmptyMessage: true,
     emptyIcon: 'fluent:search-20-regular',
-    emptyMessage: '録画番組が見つかりませんでした。',
-    emptySubMessage: 'サーバー設定で録画フォルダのパスを<br class="d-sm-none">正しく設定できているか確認してください。',
+    // emptyMessage / emptySubMessage を省略したときは、表示言語に合わせた既定の文言を表示する
+    emptyMessage: undefined,
+    emptySubMessage: undefined,
     isLoading: false,
     isSearching: false,
     forMylist: false,

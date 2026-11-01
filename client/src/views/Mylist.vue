@@ -7,11 +7,11 @@
             <div class="mylist-container-wrapper">
                 <div class="mylist-container">
                     <Breadcrumbs :crumbs="[
-                        { name: 'ホーム', path: '/' },
-                        { name: 'マイリスト', path: '/mylist/', disabled: true },
+                        { name: $t('common.home'), path: '/' },
+                        { name: $t('navigation.mylist'), path: '/mylist/', disabled: true },
                     ]" />
                     <RecordedProgramList
-                        title="マイリスト"
+                        :title="$t('navigation.mylist')"
                         :programs="programs"
                         :total="total_programs"
                         :page="current_page"
@@ -20,8 +20,8 @@
                         :showBackButton="true"
                         :showEmptyMessage="!is_loading"
                         :emptyIcon="'ic:round-playlist-play'"
-                        :emptyMessage="'あとで観たい番組を<br class=\'d-sm-none\'>マイリストに保存できます。'"
-                        :emptySubMessage="'録画番組の右上にある ＋ ボタンから、<br class=\'d-sm-none\'>番組をマイリストに追加できます。'"
+                        :emptyMessage="$t('videos.list.mylist_empty')"
+                        :emptySubMessage="$t('videos.list.mylist_empty_sub')"
                         :forMylist="true"
                         @update:page="updatePage"
                         @update:sortOrder="updateSortOrder($event as MylistSortOrder)" />

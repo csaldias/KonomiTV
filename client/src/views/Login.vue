@@ -9,18 +9,18 @@
                     width="100%" max-width="450">
                     <v-card-title class="login__logo py-4 d-flex flex-column justify-center align-center">
                         <img class="d-block" src="/assets/images/logo.svg" style="max-width: 250px;" />
-                        <h4 class="mt-10">ログイン</h4>
+                        <h4 class="mt-10">{{ $t('account.login') }}</h4>
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-form ref="login" @submit.prevent>
                         <v-text-field class="mt-12" color="primary" variant="outlined"
-                            placeholder="ユーザー名" hide-details autofocus
+                            :placeholder="$t('account.username')" hide-details autofocus
                             :density="is_form_dense ? 'compact' : 'default'"
                             v-model="username"
                             @keydown.enter="onFieldEnter">
                         </v-text-field>
                         <v-text-field class="mt-8" color="primary" variant="outlined"
-                            placeholder="パスワード" hide-details
+                            :placeholder="$t('account.password')" hide-details
                             :density="is_form_dense ? 'compact' : 'default'"
                             v-model="password"
                             :type="password_showing ? 'text' : 'password'"
@@ -30,7 +30,7 @@
                         </v-text-field>
                         <v-btn class="login-button mt-5" color="secondary" variant="flat" width="100%" height="56"
                             @click="login()">
-                            <Icon icon="fa:sign-in" class="mr-2" />ログイン
+                            <Icon icon="fa:sign-in" class="mr-2" />{{ $t('account.login') }}
                         </v-btn>
                     </v-form>
                 </v-card>
@@ -93,7 +93,7 @@ export default defineComponent({
 
             // ユーザー名またはパスワードが空
             if (this.username === '' || this.password === '') {
-                Message.error('ユーザー名またはパスワードが空です。');
+                Message.error(this.$t('account.login_empty'));
                 return;
             }
 

@@ -9,19 +9,19 @@
                     width="100%" max-width="450">
                     <v-card-title class="register__logo py-4 d-flex flex-column justify-center align-center">
                         <img class="d-block" src="/assets/images/logo.svg" style="max-width: 250px;" />
-                        <h4 class="mt-10">アカウントを作成</h4>
+                        <h4 class="mt-10">{{ $t('account.register') }}</h4>
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-form ref="register" @submit.prevent>
                         <v-text-field class="mt-12" color="primary" variant="outlined"
-                            placeholder="ユーザー名" autofocus
+                            :placeholder="$t('account.username')" autofocus
                             :density="is_form_dense ? 'compact' : 'default'"
                             v-model="username"
                             :rules="[username_validation]"
                             @keydown.enter="onFieldEnter">
                         </v-text-field>
                         <v-text-field style="margin-top: 10px;" color="primary" variant="outlined"
-                            placeholder="パスワード"
+                            :placeholder="$t('account.password')"
                             :density="is_form_dense ? 'compact' : 'default'"
                             v-model="password"
                             :type="password_showing ? 'text' : 'password'"
@@ -32,7 +32,7 @@
                         </v-text-field>
                         <v-btn class="register-button mt-5" color="secondary" variant="flat" width="100%" height="56"
                             @click="register()">
-                            <Icon icon="fluent:person-add-20-filled" class="mr-2" height="24" />アカウントを作成
+                            <Icon icon="fluent:person-add-20-filled" class="mr-2" height="24" />{{ $t('account.register') }}
                         </v-btn>
                     </v-form>
             </v-card>
@@ -67,16 +67,16 @@ export default defineComponent({
 
             username: null as string | null,
             username_validation: (value: string | null) => {
-                if (value === '' || value === null) return 'ユーザー名を入力してください。';
-                if (/^.{2,}$/.test(value) === false) return 'ユーザー名は2文字以上で入力してください。';
+                if (value === '' || value === null) return this.$t('account.username_required');
+                if (/^.{2,}$/.test(value) === false) return this.$t('account.username_too_short');
                 return true;
             },
             password: null as string | null,
             password_showing: true,  // アカウント作成時はデフォルトでパスワードを表示する
             password_validation: (value: string | null) => {
-                if (value === '' || value === null) return 'パスワードを入力してください。';
+                if (value === '' || value === null) return this.$t('account.password_required');
                 // ref: https://qiita.com/grrrr/items/0b35b5c1c98eebfa5128
-                if (/^[a-zA-Z0-9!-/:-@¥[-`{-~]{4,}$/.test(value) === false) return 'パスワードは4文字以上の半角英数記号を入力してください。';
+                if (/^[a-zA-Z0-9!-/:-@¥[-`{-~]{4,}$/.test(value) === false) return this.$t('account.password_invalid');
                 return true;
             },
         };

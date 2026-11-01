@@ -13,13 +13,13 @@
                     :class="{ 'reservation-detail-drawer__tab--active': activeTab === 'info' }"
                     @click="activeTab = 'info'">
                     <Icon icon="fluent:info-12-regular" width="20px" height="20px" />
-                    <span class="reservation-detail-drawer__tab-text">番組情報 {{ !showSettingsTab ? '（終了済み）' : '' }}</span>
+                    <span class="reservation-detail-drawer__tab-text">{{ $t('watch.panel.program') }} {{ !showSettingsTab ? $t('reservations.drawer.ended_suffix') : '' }}</span>
                 </div>
                 <div v-if="showSettingsTab" v-ripple class="reservation-detail-drawer__tab"
                     :class="{ 'reservation-detail-drawer__tab--active': activeTab === 'settings' }"
                     @click="activeTab = 'settings'">
                     <Icon icon="material-symbols:settings-video-camera-outline-rounded" width="20px" height="20px" />
-                    <span class="reservation-detail-drawer__tab-text">録画設定</span>
+                    <span class="reservation-detail-drawer__tab-text">{{ $t('reservations.drawer.settings_tab') }}</span>
                 </div>
             </div>
             <div v-ripple class="reservation-detail-drawer__close" @click="handleClose">
@@ -35,23 +35,21 @@
                 <div v-if="isPartialRecording" class="status-banner status-banner--warning mb-4">
                     <Icon icon="fluent:warning-16-filled" class="status-banner__icon" />
                     <span class="status-banner__text">
-                        チューナー不足のため、この番組は一部のみ録画されます。<br>
-                        優先度を上げるか、重複する録画予約を調整してください。
+                        <span v-html="$t('reservations.drawer.partial_warning')"></span>
                     </span>
                 </div>
                 <!-- チューナー不足エラーバナー（録画不可） -->
                 <div v-if="isUnavailableRecording" class="status-banner status-banner--error mb-4">
                     <Icon icon="fluent:error-circle-16-filled" class="status-banner__icon" />
                     <span class="status-banner__text">
-                        チューナー不足のため、この番組は録画できません。<br>
-                        優先度を上げるか、重複する録画予約を削除してください。
+                        <span v-html="$t('reservations.drawer.impossible_warning')"></span>
                     </span>
                 </div>
                 <!-- Mirakurun バックエンド時の通知 -->
                 <div v-if="!isEDCBBackend && !isPastProgram && !hasRealReservation" class="status-banner status-banner--info mb-4">
                     <Icon icon="fluent:info-16-regular" class="status-banner__icon" />
                     <span class="status-banner__text">
-                        録画予約機能は EDCB バックエンド選択時のみ利用できます。
+                        {{ $t('timetable.edcb_only') }}
                     </span>
                 </div>
                 <!-- 番組情報 -->
@@ -78,19 +76,19 @@
                 <!-- 実際の予約がある場合: 削除ボタン -->
                 <v-btn v-if="hasRealReservation" class="px-3" variant="text" @click="handleDelete">
                     <Icon icon="fluent:delete-16-regular" width="20px" height="20px" />
-                    <span class="ml-1">予約を削除</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.delete') }}</span>
                 </v-btn>
                 <!-- 実際の予約がある場合かつ録画設定タブ: 保存ボタン -->
                 <v-btn v-if="hasRealReservation && activeTab === 'settings'" class="px-3" color="secondary" variant="flat"
                     :disabled="!hasChanges" :loading="isSaving" @click="handleSave">
                     <Icon icon="fluent:save-16-regular" width="20px" height="20px" />
-                    <span class="ml-1">変更を保存</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.save') }}</span>
                 </v-btn>
                 <!-- mock の予約 (予約なし) の場合: 予約追加ボタン -->
                 <v-btn v-if="showAddButton" class="px-3" color="secondary" variant="flat"
                     :disabled="!isEDCBBackend" :loading="isAdding" @click="handleAddReservation">
                     <Icon icon="fluent:timer-16-regular" width="20px" height="20px" />
-                    <span class="ml-1">予約を追加</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.add') }}</span>
                 </v-btn>
             </div>
         </div>
@@ -99,7 +97,7 @@
             <div class="reservation-detail-drawer__actions">
                 <v-btn class="px-3" variant="text" @click="handleClose">
                     <Icon icon="fluent:dismiss-16-regular" width="20px" height="20px" />
-                    <span class="ml-1">閉じる</span>
+                    <span class="ml-1">{{ $t('common.close') }}</span>
                 </v-btn>
             </div>
         </div>
@@ -109,7 +107,7 @@
     <v-dialog v-model="showDeleteDialog" max-width="715">
         <v-card>
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                録画予約を削除しますか？
+                {{ $t('reservations.drawer.delete_title') }}
             </v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <div v-if="reservation" class="mb-4">
@@ -122,21 +120,19 @@
                 <div v-if="isRecordingInProgress && reservation" class="warning-banner warning-banner--recording">
                     <Icon icon="fluent:warning-16-filled" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        この番組は現在録画中です。<br>
-                        予約を削除すると、現在までの録画ファイルは残りますが、残りの期間の録画は中断されます。
+                        <span v-html="$t('reservations.drawer.delete_recording_warning')"></span>
                     </span>
                 </div>
                 <div v-else-if="reservation" class="warning-banner warning-banner--normal">
                     <Icon icon="fluent:info-16-regular" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        録画予約を削除すると、番組開始時刻までに再度予約を追加しない限り、この番組は録画されません。
+                        {{ $t('reservations.drawer.delete_warning') }}
                     </span>
                 </div>
                 <div v-if="isKeywordAutoReservation && reservation" class="warning-banner warning-banner--keyword mt-3">
                     <Icon icon="fluent:warning-16-filled" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        この予約はキーワード自動予約で追加されました。削除してもすぐに再追加される可能性があります。<br>
-                        録画が不要な場合は削除ではなく「無効」にすることをおすすめします。
+                        <span v-html="$t('reservations.drawer.delete_auto_warning')"></span>
                     </span>
                 </div>
             </v-card-text>
@@ -144,11 +140,11 @@
                 <v-spacer></v-spacer>
                 <v-btn color="text" variant="text" @click="showDeleteDialog = false">
                     <Icon icon="fluent:dismiss-16-filled" width="18px" height="18px" />
-                    <span class="ml-1">キャンセル</span>
+                    <span class="ml-1">{{ $t('common.cancel') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="error" variant="flat" @click="confirmDelete">
                     <Icon icon="fluent:delete-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">予約を削除</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.delete') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -158,14 +154,13 @@
     <v-dialog v-model="showCloseConfirmDialog" max-width="500">
         <v-card>
             <v-card-title class="d-flex justify-center pt-6 font-weight-bold">
-                変更を破棄しますか？
+                {{ $t('reservations.drawer.discard_title') }}
             </v-card-title>
             <v-card-text class="pt-2 pb-0">
                 <div class="warning-banner warning-banner--normal">
                     <Icon icon="fluent:info-16-regular" class="warning-banner__icon" />
                     <span class="warning-banner__text">
-                        録画設定の変更がまだ保存されていません。<br>
-                        このまま閉じると、変更内容は破棄されます。
+                        <span v-html="$t('reservations.drawer.discard_text')"></span>
                     </span>
                 </div>
             </v-card-text>
@@ -173,11 +168,11 @@
                 <v-spacer></v-spacer>
                 <v-btn color="text" variant="text" @click="showCloseConfirmDialog = false">
                     <Icon icon="fluent:arrow-left-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">編集に戻る</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.back_to_edit') }}</span>
                 </v-btn>
                 <v-btn class="px-3" color="secondary" variant="flat" @click="confirmClose">
                     <Icon icon="fluent:dismiss-16-regular" width="18px" height="18px" />
-                    <span class="ml-1">変更を破棄</span>
+                    <span class="ml-1">{{ $t('reservations.drawer.discard') }}</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -186,6 +181,7 @@
 <script lang="ts" setup>
 
 import { ref, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ReservationProgramInfo from '@/components/Reservations/ReservationProgramInfo.vue';
 import ReservationRecordingSettings from '@/components/Reservations/ReservationRecordingSettings.vue';
@@ -195,6 +191,8 @@ import { type IProgram } from '@/services/Programs';
 import Reservations, { type IReservation, type IRecordSettings, type IRecordSettingsPresets } from '@/services/Reservations';
 import useServerSettingsStore from '@/stores/ServerSettingsStore';
 import { ProgramUtils } from '@/utils';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
@@ -355,7 +353,7 @@ const handleSave = async () => {
     const captionIsDefault = currentSettings.value.caption_recording_mode === 'Default';
     const dataBroadcastingIsDefault = currentSettings.value.data_broadcasting_recording_mode === 'Default';
     if (captionIsDefault !== dataBroadcastingIsDefault) {
-        Message.warning('字幕データ録画設定・データ放送録画設定を明示的に設定する際は、両方とも「デフォルト設定を使う」以外に設定してください。');
+        Message.warning(t('reservations.drawer.caption_data_both_required'));
         return;
     }
 
@@ -363,14 +361,14 @@ const handleSave = async () => {
     try {
         const result = await Reservations.updateReservation(props.reservation.id, currentSettings.value);
         if (result) {
-            Message.success('録画設定の変更を保存しました。');
+            Message.success(t('reservations.drawer.saved'));
             const updatedReservation = { ...props.reservation, record_settings: currentSettings.value };
             emit('updated', updatedReservation);
             hasChanges.value = false;
         }
     } catch (error) {
         console.error('Failed to save settings:', error);
-        Message.error('録画設定の保存に失敗しました。');
+        Message.error(t('reservations.drawer.save_failed'));
     } finally {
         isSaving.value = false;
     }
@@ -389,7 +387,7 @@ const confirmDelete = async () => {
     try {
         const success = await Reservations.deleteReservation(props.reservation.id);
         if (success) {
-            Message.success('録画予約を削除しました。');
+            Message.success(t('reservations.drawer.deleted'));
             emit('deleted', props.reservation.id);
             isVisible.value = false;
         }
@@ -405,7 +403,7 @@ const handleAddReservation = async () => {
 
     // EDCB バックエンドでない場合はエラー
     if (!isEDCBBackend.value) {
-        Message.error('録画予約機能は EDCB バックエンド選択時のみ利用できます。');
+        Message.error(t('timetable.edcb_only'));
         return;
     }
 
@@ -416,7 +414,7 @@ const handleAddReservation = async () => {
         const captionIsDefault = recordSettings.caption_recording_mode === 'Default';
         const dataBroadcastingIsDefault = recordSettings.data_broadcasting_recording_mode === 'Default';
         if (captionIsDefault !== dataBroadcastingIsDefault) {
-            Message.warning('字幕データ録画設定・データ放送録画設定を明示的に設定する際は、両方とも「デフォルト設定を使う」以外に設定してください。');
+            Message.warning(t('reservations.drawer.caption_data_both_required'));
             isAdding.value = false;
             return;
         }
@@ -425,13 +423,13 @@ const handleAddReservation = async () => {
         // ユーザーが録画設定タブで設定をカスタマイズしていればその設定が使われる
         const success = await Reservations.addReservation(displayProgram.value.id, recordSettings);
         if (success) {
-            Message.success('録画予約を追加しました。');
+            Message.success(t('timetable.reservation_added'));
             emit('added');
             isVisible.value = false;
         }
     } catch (error) {
         console.error('Failed to add reservation:', error);
-        Message.error('録画予約の追加に失敗しました。');
+        Message.error(t('reservations.card.add_failed'));
     } finally {
         isAdding.value = false;
     }

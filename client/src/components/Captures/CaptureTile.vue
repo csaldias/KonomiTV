@@ -21,16 +21,16 @@
         <!-- ログインしていないとき (is_favorite が null) は、お気に入りを使えないので出さない -->
         <div v-if="capture.is_favorite !== null" v-ripple class="capture-tile__favorite"
             :class="{'capture-tile__favorite--active': capture.is_favorite}"
-            v-ftooltip.bottom="capture.is_favorite ? 'お気に入りから外す' : 'お気に入りに追加'"
+            v-ftooltip.bottom="capture.is_favorite ? $t('captures.common.remove_favorite') : $t('captures.common.add_favorite')"
             @click.stop="toggleFavorite">
             <Icon :icon="capture.is_favorite ? 'fluent:heart-24-filled' : 'fluent:heart-24-regular'" width="22px" height="22px" />
         </div>
         <div class="capture-tile__badges">
             <!-- 画像に写し込まれているものは、小さなタイルでも場所を取らないよう見慣れた記号で示し、言葉は読み上げとツールチップで伝える -->
-            <span v-if="capture.is_caption_composited" class="capture-tile__badge" role="img" aria-label="字幕入り" title="字幕入り">
+            <span v-if="capture.is_caption_composited" class="capture-tile__badge" role="img" :aria-label="$t('captures.tile.with_captions')" :title="$t('captures.tile.with_captions')">
                 <Icon icon="fluent:closed-caption-16-filled" width="16px" height="16px" />
             </span>
-            <span v-if="capture.is_comment_composited" class="capture-tile__badge" role="img" aria-label="コメント入り" title="コメント入り">
+            <span v-if="capture.is_comment_composited" class="capture-tile__badge" role="img" :aria-label="$t('captures.tile.with_comments')" :title="$t('captures.tile.with_comments')">
                 <Icon icon="fluent:comment-text-16-filled" width="15px" height="15px" />
             </span>
         </div>
@@ -44,10 +44,13 @@
 <script lang="ts" setup>
 
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { openWithTransition } from '@/components/Captures/CaptureTransition';
 import Message from '@/message';
 import Captures, { ICapture } from '@/services/Captures';
+
+const { t } = useI18n();
 
 
 const props = withDefaults(defineProps<{
@@ -113,7 +116,7 @@ const toggleFavorite = async () => {
     const succeeded = await Captures.updateFavorites([capture.id], next);
     isUpdatingFavorite = false;
     if (succeeded) {
-        Message.success(next ? 'キャプチャをお気に入りに追加しました。' : 'キャプチャをお気に入りから外しました。');
+        Message.success(next ? t('captures.tile.favorited') : t('captures.tile.unfavorited'));
         emit('updated', { ...capture, is_favorite: next });
     }
 };

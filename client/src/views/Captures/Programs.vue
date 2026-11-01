@@ -1,13 +1,13 @@
 <template>
     <CapturePage :crumbs="[
-        { name: 'ホーム', path: '/' },
-        { name: 'キャプチャ', path: '/captures/' },
-        { name: '番組別', path: '/captures/programs/', disabled: true },
+        { name: $t('common.home'), path: '/' },
+        { name: $t('navigation.captures'), path: '/captures/' },
+        { name: $t('captures.common.by_program'), path: '/captures/programs/', disabled: true },
     ]">
-        <CaptureHeader title="番組別" active-tab="Programs" @scanned="reset" @uploaded="reset" />
+        <CaptureHeader :title="$t('captures.common.by_program')" active-tab="Programs" @scanned="reset" @uploaded="reset" />
         <div class="capture-programs__toolbar">
             <v-text-field v-model="queryInput" class="capture-programs__search" color="primary" bg-color="background-lighten-1"
-                variant="solo" density="comfortable" hide-details flat clearable placeholder="番組名・チャンネル名で絞り込む"
+                variant="solo" density="comfortable" hide-details flat clearable :placeholder="$t('captures.programs.filter_placeholder')"
                 @keydown.enter="applyQuery" @click:clear="queryInput = ''; applyQuery()">
                 <template #prepend-inner>
                     <Icon icon="fluent:search-20-regular" width="18px" class="text-text-darken-1" />
@@ -16,10 +16,10 @@
             <!-- 絞り込みは検索欄の隣、並べ替えは同じ行の右端に配置する (スマホの縦画面では検索欄の下に2つを並べる) -->
             <div class="capture-programs__selects">
                 <v-select v-model="recordedFilter" class="capture-programs__select"
-                    :items="[{ title: 'すべての番組', value: null }, { title: '録画番組あり', value: true }, { title: '録画番組なし', value: false }]"
+                    :items="[{ title: $t('captures.programs.all_programs'), value: null }, { title: $t('captures.programs.with_recording'), value: true }, { title: $t('captures.programs.without_recording'), value: false }]"
                     color="primary" bg-color="background-lighten-1" variant="solo" density="comfortable" hide-details flat />
                 <v-select v-model="order" class="capture-programs__select capture-programs__select--order"
-                    :items="[{ title: '放送が新しい順', value: 'BroadcastAtDesc' }, { title: '放送が古い順', value: 'BroadcastAtAsc' }]"
+                    :items="[{ title: $t('captures.programs.sort_desc'), value: 'BroadcastAtDesc' }, { title: $t('captures.programs.sort_asc'), value: 'BroadcastAtAsc' }]"
                     color="primary" bg-color="background-lighten-1" variant="solo" density="comfortable" hide-details flat />
             </div>
         </div>
@@ -30,26 +30,26 @@
         </div>
         <div v-else-if="isLoadFailed" class="capture-empty">
             <Icon class="capture-empty__icon" icon="fluent:cloud-error-20-regular" width="54px" height="54px" />
-            <div class="capture-empty__message">番組の一覧を読み込めませんでした。</div>
-            <div class="capture-empty__sub">KonomiTV サーバーが起動しているか確認してから、ページを再読み込みしてください。</div>
+            <div class="capture-empty__message">{{ $t('captures.programs.load_failed') }}</div>
+            <div class="capture-empty__sub">{{ $t('captures.common.load_failed_sub') }}</div>
         </div>
         <div v-else-if="!isLoading && programs.length === 0 && (String(route.query.query ?? '') !== '' || recordedFilter !== null)" class="capture-empty">
             <Icon class="capture-empty__icon" icon="fluent:search-20-regular" width="54px" height="54px" />
-            <div class="capture-empty__message">条件に一致する番組はありません。</div>
-            <div class="capture-empty__sub">検索キーワードを消去するか、絞り込みを「すべての番組」に戻すと、他の番組も表示されます。</div>
+            <div class="capture-empty__message">{{ $t('captures.programs.empty_filtered') }}</div>
+            <div class="capture-empty__sub">{{ $t('captures.programs.empty_filtered_sub') }}</div>
         </div>
         <div v-else-if="!isLoading && programs.length === 0" class="capture-empty">
             <Icon class="capture-empty__icon" icon="fluent:video-clip-multiple-20-regular" width="54px" height="54px" />
-            <div class="capture-empty__message">番組情報が記録されたキャプチャはまだありません。</div>
-            <div class="capture-empty__sub">視聴画面でキャプチャを撮影すると、<br class="d-none d-sm-inline">番組の放送回ごとにここにまとまって表示されます。</div>
+            <div class="capture-empty__message">{{ $t('captures.programs.empty') }}</div>
+            <div class="capture-empty__sub">{{ $t('captures.programs.empty_sub') }}</div>
         </div>
         <div class="capture-programs__grid">
             <router-link v-for="program in programs" :key="program.id" v-ripple class="capture-program-card"
                 :to="`/captures/programs/${program.id}`">
                 <div class="capture-program-card__cover">
                     <img :src="Captures.getImageURL(program.cover_capture)" loading="lazy" decoding="async" alt="">
-                    <span v-if="program.recorded_program_ids.length > 0" class="capture-program-card__badge">録画あり</span>
-                    <span class="capture-program-card__count">{{ program.capture_count.toLocaleString() }}枚</span>
+                    <span v-if="program.recorded_program_ids.length > 0" class="capture-program-card__badge">{{ $t('captures.programs.has_recording') }}</span>
+                    <span class="capture-program-card__count">{{ $t('captures.common.count_unit', {count: program.capture_count.toLocaleString()}) }}</span>
                 </div>
                 <div class="capture-program-card__meta">
                     <div class="capture-program-card__title" v-html="ProgramUtils.decorateProgramInfo(program, 'title')"></div>
@@ -58,7 +58,7 @@
                         <img v-if="program.channel !== null" class="capture-program-card__broadcaster-icon" loading="lazy" decoding="async"
                             :src="`${Utils.api_base_url}/channels/${program.channel.id}/logo`" @error="onLogoError">
                         <div class="capture-program-card__broadcaster-container">
-                            <div class="capture-program-card__broadcaster-name">{{ program.channel?.name ?? 'チャンネル情報なし' }}</div>
+                            <div class="capture-program-card__broadcaster-name">{{ program.channel?.name ?? $t('captures.common.no_channel_info') }}</div>
                             <div class="capture-program-card__broadcaster-time">{{ formatBroadcast(program.start_time, program.end_time) }}</div>
                         </div>
                     </div>
