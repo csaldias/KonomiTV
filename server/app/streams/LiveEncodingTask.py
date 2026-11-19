@@ -897,7 +897,10 @@ class LiveEncodingTask:
                     self.live_stream.setStatus('Offline', 'チューナーの起動に失敗しました。空きチューナーが不足していると考えられます。(E-02E)')
 
                     # チューナーを閉じる
+                    ## tuner.close() した時点でそのチューナーインスタンスは意味をなさなくなるので、LiveStream インスタンスのプロパティからも削除する
+                    ## 制御権限を失ったチューナーインスタンスが残ると、次回の視聴時に再利用されて setChannel() が常に失敗してしまう
                     await self.live_stream.tuner.close(self.live_stream.live_stream_id)
+                    self.live_stream.tuner = None
 
                     # すべての視聴中クライアントのライブストリームへの接続を切断する
                     self.live_stream.disconnectAll()
@@ -935,7 +938,10 @@ class LiveEncodingTask:
                     self.live_stream.setStatus('Offline', 'チューナーへの接続に失敗しました。チューナー側に何らかの問題があるかもしれません。(E-03E)')
 
                     # チューナーを閉じる
+                    ## tuner.close() した時点でそのチューナーインスタンスは意味をなさなくなるので、LiveStream インスタンスのプロパティからも削除する
+                    ## 制御権限を失ったチューナーインスタンスが残ると、次回の視聴時に再利用されて setChannel() が常に失敗してしまう
                     await self.live_stream.tuner.close(self.live_stream.live_stream_id)
+                    self.live_stream.tuner = None
 
                     # すべての視聴中クライアントのライブストリームへの接続を切断する
                     self.live_stream.disconnectAll()
